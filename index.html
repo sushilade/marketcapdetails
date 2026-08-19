@@ -56,6 +56,134 @@
       box-shadow: var(--card-shadow);
     }
     
+    .menu-toggle {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.3s;
+    }
+    
+    .menu-toggle:hover {
+      background: rgba(255, 255, 255, 0.35);
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 300px;
+      height: 100vh;
+      background: white;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      z-index: 2000;
+      transition: left 0.3s ease-in-out;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar.open {
+      left: 0;
+    }
+    
+    .sidebar-header {
+      background: var(--primary);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .sidebar-header h3 {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    .sidebar-close {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+    
+    .sidebar-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .sidebar-content {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      background: white;
+      color: var(--primary);
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.3s;
+      text-align: left;
+    }
+    
+    .sidebar-link:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+    
+    .sidebar-link.active {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+    
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    
+    .sidebar-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    
     h1, h2, h3, h4 {
       font-family: 'Montserrat', sans-serif;
       font-weight: 700;
@@ -161,9 +289,7 @@
       padding: 25px;
     }
     
-    #dataView {
-      display: block;
-    }
+    /* Data View will be shown via menu/tab selection */
     
     .controls {
       margin-bottom: 25px;
@@ -187,7 +313,7 @@
 
     .search-container {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 15px;
       align-items: center;
       margin-top: 15px;
@@ -195,6 +321,7 @@
       background: rgba(255, 255, 255, 0.8);
       border-radius: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      overflow-x: auto;
     }
 
     .search-container label {
@@ -289,6 +416,42 @@
       border-radius: 10px;
       box-shadow: var(--card-shadow);
       margin-top: 20px;
+      position: relative;
+    }
+    
+    .table-scroll-area {
+      max-height: 460px;
+      overflow-y: auto;
+    }
+    
+    .scroll-btn {
+      position: absolute;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .scroll-btn:hover {
+      background: var(--accent);
+    }
+    
+    .scroll-up {
+      top: 55px;
+    }
+    
+    .scroll-down {
+      bottom: 20px;
     }
     
     table {
@@ -315,6 +478,20 @@
     
     th:last-child {
       border-top-right-radius: 10px;
+    }
+    
+    #marketTable th:first-child {
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 3;
+    }
+
+    #marketTable td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: white;
     }
     
     td {
@@ -443,6 +620,7 @@
       
       .table-container {
         overflow-x: auto;
+        position: relative;
       }
       
       th, td {
@@ -480,9 +658,45 @@
 <body>
 
 <div class="container">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Menu</h3>
+      <button class="sidebar-close" onclick="toggleMenu()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="sidebar-content">
+      <button class="sidebar-link" onclick="openTabFromMenu(event, 'dataView')">
+        <i class="fas fa-table"></i> Data View
+      </button>
+      <button class="sidebar-link" onclick="openTabFromMenu(event, 'stockAnalysis')">
+        <i class="fas fa-chart-line"></i> Stock Analysis
+      </button>
+      <button class="sidebar-link" onclick="openTabFromMenu(event, 'marketOverview')">
+        <i class="fas fa-globe"></i> Market Overview
+      </button>
+      <button class="sidebar-link" onclick="openTabFromMenu(event, 'topPerformers')">
+        <i class="fas fa-trophy"></i> Top Performers
+      </button>
+      <button class="sidebar-link" onclick="openTabFromMenu(event, 'rankChanges')">
+        <i class="fas fa-arrow-up"></i> Rank Up
+      </button>
+      <button class="sidebar-link" onclick="openTabFromMenu(event, 'historyRank')">
+        <i class="fas fa-history"></i> History Rank
+      </button>
+    </div>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMenuOnOverlay()"></div>
   <header>
-    <h1>Market Data Analysis Dashboard</h1>
-    <p class="subtitle"></p>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h1>Market Data Analysis Dashboard</h1>
+        <p class="subtitle"></p>
+      </div>
+      <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
   </header>
   
   <div class="dashboard-stats">
@@ -503,31 +717,13 @@
     </div>
     <div class="stat-card">
       <div class="stat-label">LAST UPDATED</div>
-      <div class="stat-value" id="lastUpdated">2026-08-18</div>
+      <div class="stat-value" id="lastUpdated">2026-08-19</div>
       <div class="stat-desc">Data freshness</div>
     </div>
   </div>
 
   <div class="tab-container">
     <div class="tab">
-      <button class="tablinks active" onclick="openTab(event, 'dataView')">
-        <i class="fas fa-table"></i> Data View
-      </button>
-      <button class="tablinks" onclick="openTab(event, 'stockAnalysis')">
-        <i class="fas fa-chart-line"></i> Stock Analysis
-      </button>
-      <button class="tablinks" onclick="openTab(event, 'marketOverview')">
-        <i class="fas fa-globe"></i> Market Overview
-      </button>
-      <button class="tablinks" onclick="openTab(event, 'topPerformers')">
-        <i class="fas fa-trophy"></i> Top Performers
-      </button>
-      <button class="tablinks" onclick="openTab(event, 'nonPerformers')">
-        <i class="fas fa-thumbs-down"></i> Non Performers
-      </button>
-      <button class="tablinks" onclick="openTab(event, 'rankChanges')">
-        <i class="fas fa-arrow-up"></i> Rank Up
-      </button>
     </div>
 
     <!-- Data View Tab -->
@@ -574,6 +770,7 @@
       </div>
 
       <div class="table-container">
+        <div class="table-scroll-area" id="tableScrollArea">
         <table class="dataframe dataframe" id="marketTable">
   <thead>
     <tr style="text-align: right;">
@@ -1336,6 +1533,9 @@
       <th>2026-08-18 Market Cap</th>
       <th>2026-08-18 Delivery Qty</th>
       <th>2026-08-18 Rank</th>
+      <th>2026-08-19 Market Cap</th>
+      <th>2026-08-19 Delivery Qty</th>
+      <th>2026-08-19 Rank</th>
     </tr>
   </thead>
   <tbody>
@@ -1521,9 +1721,9 @@
       <td>1887779.93</td>
       <td>64.83</td>
       <td>1</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>-</td>
+      <td>1887779.93</td>
+      <td>64.83</td>
+      <td>1</td>
       <td>1902530.33</td>
       <td>43.58</td>
       <td>1</td>
@@ -2098,6 +2298,9 @@
       <td>1.0</td>
       <td>1789001.0</td>
       <td>55.42</td>
+      <td>1.0</td>
+      <td>1774115.0</td>
+      <td>58.12</td>
       <td>1.0</td>
     </tr>
     <tr>
@@ -2860,6 +3063,9 @@
       <td>1114224.0</td>
       <td>58.99</td>
       <td>3.0</td>
+      <td>1109600.0</td>
+      <td>62.10</td>
+      <td>3.0</td>
     </tr>
     <tr>
       <td>TCS</td>
@@ -3620,6 +3826,9 @@
       <td>6.0</td>
       <td>824923.0</td>
       <td>44.47</td>
+      <td>6.0</td>
+      <td>828180.0</td>
+      <td>52.86</td>
       <td>6.0</td>
     </tr>
     <tr>
@@ -4382,6 +4591,9 @@
       <td>1206948.0</td>
       <td>64.22</td>
       <td>2.0</td>
+      <td>1199424.0</td>
+      <td>75.21</td>
+      <td>2.0</td>
     </tr>
     <tr>
       <td>ICICIBANK</td>
@@ -4391,9 +4603,9 @@
       <td>1005996.50</td>
       <td>67.92</td>
       <td>5.0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>1005996.50</td>
+      <td>67.92</td>
+      <td>5.0</td>
       <td>1012501.53</td>
       <td>76.04</td>
       <td>5.0</td>
@@ -5142,6 +5354,9 @@
       <td>4.0</td>
       <td>1013290.0</td>
       <td>55.93</td>
+      <td>4.0</td>
+      <td>1006114.0</td>
+      <td>69.20</td>
       <td>4.0</td>
     </tr>
     <tr>
@@ -5904,6 +6119,9 @@
       <td>971984.0</td>
       <td>49.35</td>
       <td>5.0</td>
+      <td>967922.0</td>
+      <td>57.64</td>
+      <td>5.0</td>
     </tr>
     <tr>
       <td>INFY</td>
@@ -6665,6 +6883,9 @@
       <td>452473.0</td>
       <td>60.12</td>
       <td>11.0</td>
+      <td>454421.0</td>
+      <td>63.91</td>
+      <td>12.0</td>
     </tr>
     <tr>
       <td>LICI</td>
@@ -7425,6 +7646,9 @@
       <td>9.0</td>
       <td>518649.0</td>
       <td>49.65</td>
+      <td>9.0</td>
+      <td>522571.0</td>
+      <td>54.42</td>
       <td>9.0</td>
     </tr>
     <tr>
@@ -8187,6 +8411,9 @@
       <td>681306.0</td>
       <td>62.11</td>
       <td>7.0</td>
+      <td>672527.0</td>
+      <td>57.52</td>
+      <td>7.0</td>
     </tr>
     <tr>
       <td>HINDUNILVR</td>
@@ -8947,6 +9174,9 @@
       <td>10.0</td>
       <td>478141.0</td>
       <td>59.56</td>
+      <td>10.0</td>
+      <td>474781.0</td>
+      <td>58.42</td>
       <td>10.0</td>
     </tr>
     <tr>
@@ -9709,6 +9939,9 @@
       <td>338295.0</td>
       <td>59.18</td>
       <td>23.0</td>
+      <td>334599.0</td>
+      <td>63.94</td>
+      <td>23.0</td>
     </tr>
     <tr>
       <td>LT</td>
@@ -10469,6 +10702,9 @@
       <td>8.0</td>
       <td>559193.0</td>
       <td>60.34</td>
+      <td>8.0</td>
+      <td>556028.0</td>
+      <td>56.79</td>
       <td>8.0</td>
     </tr>
     <tr>
@@ -11231,6 +11467,9 @@
       <td>352233.0</td>
       <td>63.10</td>
       <td>20.0</td>
+      <td>359506.0</td>
+      <td>32.79</td>
+      <td>20.0</td>
     </tr>
     <tr>
       <td>KOTAKBANK</td>
@@ -11992,6 +12231,9 @@
       <td>385609.0</td>
       <td>58.35</td>
       <td>19.0</td>
+      <td>388196.0</td>
+      <td>54.69</td>
+      <td>17.0</td>
     </tr>
     <tr>
       <td>MARUTI</td>
@@ -12752,6 +12994,9 @@
       <td>14.0</td>
       <td>430448.0</td>
       <td>52.54</td>
+      <td>14.0</td>
+      <td>430417.0</td>
+      <td>50.10</td>
       <td>14.0</td>
     </tr>
     <tr>
@@ -13514,6 +13759,9 @@
       <td>449899.0</td>
       <td>57.82</td>
       <td>12.0</td>
+      <td>455873.0</td>
+      <td>66.01</td>
+      <td>11.0</td>
     </tr>
     <tr>
       <td>AXISBANK</td>
@@ -14275,6 +14523,9 @@
       <td>386918.0</td>
       <td>60.01</td>
       <td>18.0</td>
+      <td>384428.0</td>
+      <td>59.80</td>
+      <td>19.0</td>
     </tr>
     <tr>
       <td>ULTRACEMCO</td>
@@ -15036,6 +15287,9 @@
       <td>338851.0</td>
       <td>64.66</td>
       <td>22.0</td>
+      <td>337407.0</td>
+      <td>61.04</td>
+      <td>21.0</td>
     </tr>
     <tr>
       <td>HAL</td>
@@ -15797,6 +16051,9 @@
       <td>341008.0</td>
       <td>49.34</td>
       <td>21.0</td>
+      <td>335524.0</td>
+      <td>64.56</td>
+      <td>22.0</td>
     </tr>
     <tr>
       <td>NTPC</td>
@@ -16557,6 +16814,9 @@
       <td>24.0</td>
       <td>326874.0</td>
       <td>63.31</td>
+      <td>24.0</td>
+      <td>326341.0</td>
+      <td>56.03</td>
       <td>24.0</td>
     </tr>
     <tr>
@@ -17319,6 +17579,9 @@
       <td>322206.0</td>
       <td>52.22</td>
       <td>25.0</td>
+      <td>322334.0</td>
+      <td>62.93</td>
+      <td>25.0</td>
     </tr>
     <tr>
       <td>ONGC</td>
@@ -18079,6 +18342,9 @@
       <td>29.0</td>
       <td>301297.0</td>
       <td>52.46</td>
+      <td>28.0</td>
+      <td>299410.0</td>
+      <td>56.77</td>
       <td>28.0</td>
     </tr>
     <tr>
@@ -18841,6 +19107,9 @@
       <td>448207.0</td>
       <td>59.85</td>
       <td>13.0</td>
+      <td>449930.0</td>
+      <td>52.03</td>
+      <td>13.0</td>
     </tr>
     <tr>
       <td>ADANIPORTS</td>
@@ -19602,6 +19871,9 @@
       <td>387618.0</td>
       <td>49.63</td>
       <td>17.0</td>
+      <td>387502.0</td>
+      <td>62.23</td>
+      <td>18.0</td>
     </tr>
     <tr>
       <td>BEL</td>
@@ -20362,6 +20634,9 @@
       <td>28.0</td>
       <td>301162.0</td>
       <td>49.25</td>
+      <td>29.0</td>
+      <td>299116.0</td>
+      <td>60.07</td>
       <td>29.0</td>
     </tr>
     <tr>
@@ -21124,6 +21399,9 @@
       <td>406367.0</td>
       <td>43.13</td>
       <td>15.0</td>
+      <td>404716.0</td>
+      <td>48.16</td>
+      <td>15.0</td>
     </tr>
     <tr>
       <td>DMART</td>
@@ -21884,6 +22162,9 @@
       <td>32.0</td>
       <td>259659.0</td>
       <td>45.23</td>
+      <td>32.0</td>
+      <td>258615.0</td>
+      <td>47.35</td>
       <td>32.0</td>
     </tr>
     <tr>
@@ -22646,6 +22927,9 @@
       <td>176357.0</td>
       <td>42.63</td>
       <td>52.0</td>
+      <td>177833.0</td>
+      <td>36.45</td>
+      <td>51.0</td>
     </tr>
     <tr>
       <td>POWERGRID</td>
@@ -23406,6 +23690,9 @@
       <td>35.0</td>
       <td>249256.0</td>
       <td>68.58</td>
+      <td>35.0</td>
+      <td>245070.0</td>
+      <td>62.19</td>
       <td>35.0</td>
     </tr>
     <tr>
@@ -24168,6 +24455,9 @@
       <td>172644.0</td>
       <td>50.79</td>
       <td>53.0</td>
+      <td>175904.0</td>
+      <td>56.06</td>
+      <td>53.0</td>
     </tr>
     <tr>
       <td>JSWSTEEL</td>
@@ -24928,6 +25218,9 @@
       <td>27.0</td>
       <td>309985.0</td>
       <td>53.78</td>
+      <td>27.0</td>
+      <td>314436.0</td>
+      <td>39.91</td>
       <td>27.0</td>
     </tr>
     <tr>
@@ -25690,6 +25983,9 @@
       <td>250761.0</td>
       <td>59.65</td>
       <td>34.0</td>
+      <td>246509.0</td>
+      <td>59.31</td>
+      <td>34.0</td>
     </tr>
     <tr>
       <td>BAJAJ-AUTO</td>
@@ -26450,6 +26746,9 @@
       <td>26.0</td>
       <td>318964.0</td>
       <td>58.34</td>
+      <td>26.0</td>
+      <td>320009.0</td>
+      <td>51.57</td>
       <td>26.0</td>
     </tr>
     <tr>
@@ -27212,6 +27511,9 @@
       <td>282015.0</td>
       <td>59.61</td>
       <td>30.0</td>
+      <td>282498.0</td>
+      <td>61.03</td>
+      <td>30.0</td>
     </tr>
     <tr>
       <td>ASIANPAINT</td>
@@ -27972,6 +28274,9 @@
       <td>33.0</td>
       <td>252115.0</td>
       <td>52.95</td>
+      <td>33.0</td>
+      <td>252345.0</td>
+      <td>63.12</td>
       <td>33.0</td>
     </tr>
     <tr>
@@ -28734,6 +29039,9 @@
       <td>396454.0</td>
       <td>36.47</td>
       <td>16.0</td>
+      <td>393446.0</td>
+      <td>34.49</td>
+      <td>16.0</td>
     </tr>
     <tr>
       <td>DLF</td>
@@ -29494,6 +29802,9 @@
       <td>55.0</td>
       <td>164794.0</td>
       <td>42.98</td>
+      <td>55.0</td>
+      <td>165821.0</td>
+      <td>35.28</td>
       <td>55.0</td>
     </tr>
     <tr>
@@ -30256,6 +30567,9 @@
       <td>201839.0</td>
       <td>52.94</td>
       <td>44.0</td>
+      <td>200795.0</td>
+      <td>51.01</td>
+      <td>44.0</td>
     </tr>
     <tr>
       <td>TRENT</td>
@@ -31017,6 +31331,9 @@
       <td>156882.0</td>
       <td>45.06</td>
       <td>60.0</td>
+      <td>157463.0</td>
+      <td>43.47</td>
+      <td>58.0</td>
     </tr>
     <tr>
       <td>IOC</td>
@@ -31778,6 +32095,9 @@
       <td>194590.0</td>
       <td>61.33</td>
       <td>46.0</td>
+      <td>192472.0</td>
+      <td>64.53</td>
+      <td>45.0</td>
     </tr>
     <tr>
       <td>HINDZINC</td>
@@ -32538,6 +32858,9 @@
       <td>36.0</td>
       <td>235772.0</td>
       <td>50.95</td>
+      <td>36.0</td>
+      <td>235350.0</td>
+      <td>46.06</td>
       <td>36.0</td>
     </tr>
     <tr>
@@ -33300,6 +33623,9 @@
       <td>231569.0</td>
       <td>54.85</td>
       <td>38.0</td>
+      <td>229696.0</td>
+      <td>51.60</td>
+      <td>38.0</td>
     </tr>
     <tr>
       <td>JIOFIN</td>
@@ -34060,6 +34386,9 @@
       <td>56.0</td>
       <td>162305.0</td>
       <td>46.62</td>
+      <td>56.0</td>
+      <td>160555.0</td>
+      <td>45.31</td>
       <td>56.0</td>
     </tr>
     <tr>
@@ -34822,6 +35151,9 @@
       <td>223127.0</td>
       <td>62.72</td>
       <td>40.0</td>
+      <td>222535.0</td>
+      <td>64.78</td>
+      <td>40.0</td>
     </tr>
     <tr>
       <td>SBILIFE</td>
@@ -35583,6 +35915,9 @@
       <td>178379.0</td>
       <td>63.98</td>
       <td>50.0</td>
+      <td>178620.0</td>
+      <td>59.71</td>
+      <td>49.0</td>
     </tr>
     <tr>
       <td>VEDL</td>
@@ -36343,6 +36678,9 @@
       <td>98.0</td>
       <td>103234.0</td>
       <td>52.88</td>
+      <td>100.0</td>
+      <td>102686.0</td>
+      <td>56.02</td>
       <td>100.0</td>
     </tr>
     <tr>
@@ -37105,6 +37443,9 @@
       <td>112532.0</td>
       <td>47.59</td>
       <td>88.0</td>
+      <td>111317.0</td>
+      <td>40.35</td>
+      <td>89.0</td>
     </tr>
     <tr>
       <td>DIVISLAB</td>
@@ -37865,6 +38206,9 @@
       <td>39.0</td>
       <td>227984.0</td>
       <td>56.08</td>
+      <td>39.0</td>
+      <td>227241.0</td>
+      <td>60.60</td>
       <td>39.0</td>
     </tr>
     <tr>
@@ -38627,6 +38971,9 @@
       <td>156029.0</td>
       <td>66.41</td>
       <td>61.0</td>
+      <td>155813.0</td>
+      <td>61.28</td>
+      <td>60.0</td>
     </tr>
     <tr>
       <td>HDFCLIFE</td>
@@ -39388,6 +39735,9 @@
       <td>116933.0</td>
       <td>58.94</td>
       <td>83.0</td>
+      <td>116509.0</td>
+      <td>66.76</td>
+      <td>83.0</td>
     </tr>
     <tr>
       <td>LTIM</td>
@@ -40032,6 +40382,9 @@
       <td>1547</td>
       <td>64.08</td>
       <td>497</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -40910,6 +41263,9 @@
       <td>148591.0</td>
       <td>54.88</td>
       <td>63.0</td>
+      <td>146071.0</td>
+      <td>66.02</td>
+      <td>64.0</td>
     </tr>
     <tr>
       <td>HYUNDAI</td>
@@ -41671,6 +42027,9 @@
       <td>177621.0</td>
       <td>47.65</td>
       <td>51.0</td>
+      <td>176687.0</td>
+      <td>54.07</td>
+      <td>52.0</td>
     </tr>
     <tr>
       <td>SOLARINDS</td>
@@ -42432,6 +42791,9 @@
       <td>183513.0</td>
       <td>34.46</td>
       <td>48.0</td>
+      <td>178455.0</td>
+      <td>37.67</td>
+      <td>50.0</td>
     </tr>
     <tr>
       <td>ADANIGREEN</td>
@@ -43192,6 +43554,9 @@
       <td>42.0</td>
       <td>215450.0</td>
       <td>29.39</td>
+      <td>42.0</td>
+      <td>212979.0</td>
+      <td>29.60</td>
       <td>42.0</td>
     </tr>
     <tr>
@@ -43954,6 +44319,9 @@
       <td>125249.0</td>
       <td>37.09</td>
       <td>77.0</td>
+      <td>126652.0</td>
+      <td>54.03</td>
+      <td>76.0</td>
     </tr>
     <tr>
       <td>PIDILITIND</td>
@@ -44714,6 +45082,9 @@
       <td>54.0</td>
       <td>170378.0</td>
       <td>70.75</td>
+      <td>54.0</td>
+      <td>167935.0</td>
+      <td>65.62</td>
       <td>54.0</td>
     </tr>
     <tr>
@@ -45476,6 +45847,9 @@
       <td>220125.0</td>
       <td>62.77</td>
       <td>41.0</td>
+      <td>219356.0</td>
+      <td>64.33</td>
+      <td>41.0</td>
     </tr>
     <tr>
       <td>HINDALCO</td>
@@ -46236,6 +46610,9 @@
       <td>37.0</td>
       <td>234071.0</td>
       <td>61.06</td>
+      <td>37.0</td>
+      <td>233475.0</td>
+      <td>50.40</td>
       <td>37.0</td>
     </tr>
     <tr>
@@ -46998,6 +47375,9 @@
       <td>121004.0</td>
       <td>40.78</td>
       <td>80.0</td>
+      <td>120900.0</td>
+      <td>49.60</td>
+      <td>80.0</td>
     </tr>
     <tr>
       <td>BPCL</td>
@@ -47759,6 +48139,9 @@
       <td>134623.0</td>
       <td>55.86</td>
       <td>72.0</td>
+      <td>133192.0</td>
+      <td>50.04</td>
+      <td>73.0</td>
     </tr>
     <tr>
       <td>BRITANNIA</td>
@@ -48519,6 +48902,9 @@
       <td>74.0</td>
       <td>132357.0</td>
       <td>67.44</td>
+      <td>74.0</td>
+      <td>131345.0</td>
+      <td>54.43</td>
       <td>74.0</td>
     </tr>
     <tr>
@@ -49281,6 +49667,9 @@
       <td>102473.0</td>
       <td>62.72</td>
       <td>101.0</td>
+      <td>101256.0</td>
+      <td>50.26</td>
+      <td>105.0</td>
     </tr>
     <tr>
       <td>CHOLAFIN</td>
@@ -50042,6 +50431,9 @@
       <td>159276.0</td>
       <td>61.91</td>
       <td>58.0</td>
+      <td>159745.0</td>
+      <td>64.59</td>
+      <td>57.0</td>
     </tr>
     <tr>
       <td>TVSMOTOR</td>
@@ -50802,6 +51194,9 @@
       <td>43.0</td>
       <td>206985.0</td>
       <td>59.27</td>
+      <td>43.0</td>
+      <td>207190.0</td>
+      <td>55.13</td>
       <td>43.0</td>
     </tr>
     <tr>
@@ -51564,6 +51959,9 @@
       <td>104354.0</td>
       <td>27.20</td>
       <td>98.0</td>
+      <td>103418.0</td>
+      <td>38.48</td>
+      <td>98.0</td>
     </tr>
     <tr>
       <td>PFC</td>
@@ -52324,6 +52722,9 @@
       <td>79.0</td>
       <td>123572.0</td>
       <td>66.74</td>
+      <td>78.0</td>
+      <td>123572.0</td>
+      <td>61.58</td>
       <td>78.0</td>
     </tr>
     <tr>
@@ -53086,6 +53487,9 @@
       <td>159906.0</td>
       <td>36.50</td>
       <td>57.0</td>
+      <td>157447.0</td>
+      <td>47.78</td>
+      <td>59.0</td>
     </tr>
     <tr>
       <td>TATAPOWER</td>
@@ -53846,6 +54250,9 @@
       <td>80.0</td>
       <td>121742.0</td>
       <td>50.77</td>
+      <td>79.0</td>
+      <td>121071.0</td>
+      <td>49.77</td>
       <td>79.0</td>
     </tr>
     <tr>
@@ -54608,6 +55015,9 @@
       <td>260800.0</td>
       <td>52.05</td>
       <td>31.0</td>
+      <td>260236.0</td>
+      <td>56.89</td>
+      <td>31.0</td>
     </tr>
     <tr>
       <td>GODREJCP</td>
@@ -55368,6 +55778,9 @@
       <td>113.0</td>
       <td>95269.0</td>
       <td>52.99</td>
+      <td>113.0</td>
+      <td>95167.0</td>
+      <td>56.04</td>
       <td>113.0</td>
     </tr>
     <tr>
@@ -56130,6 +56543,9 @@
       <td>126181.0</td>
       <td>51.39</td>
       <td>76.0</td>
+      <td>126698.0</td>
+      <td>51.54</td>
+      <td>75.0</td>
     </tr>
     <tr>
       <td>GAIL</td>
@@ -56891,6 +57307,9 @@
       <td>114077.0</td>
       <td>71.65</td>
       <td>87.0</td>
+      <td>113420.0</td>
+      <td>57.74</td>
+      <td>88.0</td>
     </tr>
     <tr>
       <td>PNB</td>
@@ -57652,6 +58071,9 @@
       <td>133892.0</td>
       <td>44.64</td>
       <td>73.0</td>
+      <td>135019.0</td>
+      <td>43.68</td>
+      <td>72.0</td>
     </tr>
     <tr>
       <td>CIPLA</td>
@@ -58413,6 +58835,9 @@
       <td>115611.0</td>
       <td>49.86</td>
       <td>85.0</td>
+      <td>114876.0</td>
+      <td>54.51</td>
+      <td>84.0</td>
     </tr>
     <tr>
       <td>SIEMENS</td>
@@ -59173,6 +59598,9 @@
       <td>69.0</td>
       <td>140916.0</td>
       <td>35.72</td>
+      <td>68.0</td>
+      <td>138847.0</td>
+      <td>38.42</td>
       <td>68.0</td>
     </tr>
     <tr>
@@ -59935,6 +60363,9 @@
       <td>98728.0</td>
       <td>45.60</td>
       <td>108.0</td>
+      <td>97035.0</td>
+      <td>65.07</td>
+      <td>112.0</td>
     </tr>
     <tr>
       <td>UNIONBANK</td>
@@ -60695,6 +61126,9 @@
       <td>66.0</td>
       <td>141603.0</td>
       <td>47.24</td>
+      <td>67.0</td>
+      <td>142672.0</td>
+      <td>48.25</td>
       <td>67.0</td>
     </tr>
     <tr>
@@ -61457,6 +61891,9 @@
       <td>98391.0</td>
       <td>57.88</td>
       <td>109.0</td>
+      <td>97657.0</td>
+      <td>53.08</td>
+      <td>110.0</td>
     </tr>
     <tr>
       <td>TORNTPHARM</td>
@@ -62218,6 +62655,9 @@
       <td>189080.0</td>
       <td>53.03</td>
       <td>47.0</td>
+      <td>190678.0</td>
+      <td>65.74</td>
+      <td>46.0</td>
     </tr>
     <tr>
       <td>INDHOTEL</td>
@@ -62979,6 +63419,9 @@
       <td>102344.0</td>
       <td>70.71</td>
       <td>102.0</td>
+      <td>102963.0</td>
+      <td>57.05</td>
+      <td>99.0</td>
     </tr>
     <tr>
       <td>BSE</td>
@@ -63740,6 +64183,9 @@
       <td>134928.0</td>
       <td>33.99</td>
       <td>71.0</td>
+      <td>136722.0</td>
+      <td>30.83</td>
+      <td>70.0</td>
     </tr>
     <tr>
       <td>UNITDSPR</td>
@@ -64501,6 +64947,9 @@
       <td>110622.0</td>
       <td>62.40</td>
       <td>91.0</td>
+      <td>110848.0</td>
+      <td>56.58</td>
+      <td>90.0</td>
     </tr>
     <tr>
       <td>HDFCAMC</td>
@@ -65262,6 +65711,9 @@
       <td>108268.0</td>
       <td>65.59</td>
       <td>95.0</td>
+      <td>109413.0</td>
+      <td>64.06</td>
+      <td>93.0</td>
     </tr>
     <tr>
       <td>SHREECEM</td>
@@ -66023,6 +66475,9 @@
       <td>89209.0</td>
       <td>61.60</td>
       <td>116.0</td>
+      <td>87820.0</td>
+      <td>43.39</td>
+      <td>120.0</td>
     </tr>
     <tr>
       <td>MUTHOOTFIN</td>
@@ -66784,6 +67239,9 @@
       <td>116188.0</td>
       <td>48.97</td>
       <td>84.0</td>
+      <td>114779.0</td>
+      <td>53.81</td>
+      <td>85.0</td>
     </tr>
     <tr>
       <td>TATACONSUM</td>
@@ -67544,6 +68002,9 @@
       <td>97.0</td>
       <td>105065.0</td>
       <td>61.13</td>
+      <td>97.0</td>
+      <td>105698.0</td>
+      <td>58.37</td>
       <td>97.0</td>
     </tr>
     <tr>
@@ -68306,6 +68767,9 @@
       <td>179847.0</td>
       <td>43.71</td>
       <td>49.0</td>
+      <td>179731.0</td>
+      <td>45.65</td>
+      <td>48.0</td>
     </tr>
     <tr>
       <td>CGPOWER</td>
@@ -69067,6 +69531,9 @@
       <td>140876.0</td>
       <td>50.91</td>
       <td>69.0</td>
+      <td>135969.0</td>
+      <td>43.52</td>
+      <td>71.0</td>
     </tr>
     <tr>
       <td>RECLTD</td>
@@ -69827,6 +70294,9 @@
       <td>116.0</td>
       <td>89134.0</td>
       <td>64.80</td>
+      <td>117.0</td>
+      <td>88739.0</td>
+      <td>56.76</td>
       <td>117.0</td>
     </tr>
     <tr>
@@ -70589,6 +71059,9 @@
       <td>98245.0</td>
       <td>58.69</td>
       <td>111.0</td>
+      <td>98245.0</td>
+      <td>58.21</td>
+      <td>109.0</td>
     </tr>
     <tr>
       <td>ADANIENSOL</td>
@@ -71350,6 +71823,9 @@
       <td>196039.0</td>
       <td>49.59</td>
       <td>45.0</td>
+      <td>188420.0</td>
+      <td>48.52</td>
+      <td>47.0</td>
     </tr>
     <tr>
       <td>BAJAJHFL</td>
@@ -72111,6 +72587,9 @@
       <td>70208.0</td>
       <td>52.88</td>
       <td>151.0</td>
+      <td>70849.0</td>
+      <td>65.42</td>
+      <td>149.0</td>
     </tr>
     <tr>
       <td>APOLLOHOSP</td>
@@ -72872,6 +73351,9 @@
       <td>126774.0</td>
       <td>57.08</td>
       <td>75.0</td>
+      <td>125811.0</td>
+      <td>60.37</td>
+      <td>77.0</td>
     </tr>
     <tr>
       <td>IDBI</td>
@@ -73633,6 +74115,9 @@
       <td>87191.0</td>
       <td>55.06</td>
       <td>120.0</td>
+      <td>86696.0</td>
+      <td>44.91</td>
+      <td>122.0</td>
     </tr>
     <tr>
       <td>CANBK</td>
@@ -74393,6 +74878,9 @@
       <td>81.0</td>
       <td>117102.0</td>
       <td>42.84</td>
+      <td>82.0</td>
+      <td>117083.0</td>
+      <td>44.35</td>
       <td>82.0</td>
     </tr>
     <tr>
@@ -75155,6 +75643,9 @@
       <td>98293.0</td>
       <td>57.93</td>
       <td>110.0</td>
+      <td>98871.0</td>
+      <td>37.98</td>
+      <td>108.0</td>
     </tr>
     <tr>
       <td>ZYDUSLIFE</td>
@@ -75916,6 +76407,9 @@
       <td>111281.0</td>
       <td>56.90</td>
       <td>90.0</td>
+      <td>110174.0</td>
+      <td>57.59</td>
+      <td>92.0</td>
     </tr>
     <tr>
       <td>HAVELLS</td>
@@ -76677,6 +77171,9 @@
       <td>81564.0</td>
       <td>68.34</td>
       <td>123.0</td>
+      <td>80767.0</td>
+      <td>62.16</td>
+      <td>124.0</td>
     </tr>
     <tr>
       <td>ICICIGI</td>
@@ -77437,6 +77934,9 @@
       <td>125.0</td>
       <td>81113.0</td>
       <td>67.89</td>
+      <td>125.0</td>
+      <td>80708.0</td>
+      <td>61.76</td>
       <td>125.0</td>
     </tr>
     <tr>
@@ -78199,6 +78699,9 @@
       <td>143734.0</td>
       <td>39.01</td>
       <td>66.0</td>
+      <td>142938.0</td>
+      <td>41.88</td>
+      <td>66.0</td>
     </tr>
     <tr>
       <td>NAUKRI</td>
@@ -78960,6 +79463,9 @@
       <td>87854.0</td>
       <td>62.60</td>
       <td>119.0</td>
+      <td>89378.0</td>
+      <td>37.92</td>
+      <td>116.0</td>
     </tr>
     <tr>
       <td>PERSISTENT</td>
@@ -79721,6 +80227,9 @@
       <td>85855.0</td>
       <td>47.47</td>
       <td>122.0</td>
+      <td>86920.0</td>
+      <td>30.63</td>
+      <td>121.0</td>
     </tr>
     <tr>
       <td>SBICARD</td>
@@ -80482,6 +80991,9 @@
       <td>58526.0</td>
       <td>58.93</td>
       <td>174.0</td>
+      <td>59349.0</td>
+      <td>59.40</td>
+      <td>172.0</td>
     </tr>
     <tr>
       <td>ICICIPRULI</td>
@@ -81243,6 +81755,9 @@
       <td>72279.0</td>
       <td>45.79</td>
       <td>143.0</td>
+      <td>72468.0</td>
+      <td>55.74</td>
+      <td>144.0</td>
     </tr>
     <tr>
       <td>JINDALSTEL</td>
@@ -82004,6 +82519,9 @@
       <td>112362.0</td>
       <td>50.08</td>
       <td>89.0</td>
+      <td>113739.0</td>
+      <td>41.30</td>
+      <td>87.0</td>
     </tr>
     <tr>
       <td>SWIGGY</td>
@@ -82765,6 +83283,9 @@
       <td>75632.0</td>
       <td>35.09</td>
       <td>138.0</td>
+      <td>75190.0</td>
+      <td>45.47</td>
+      <td>139.0</td>
     </tr>
     <tr>
       <td>SRF</td>
@@ -83526,6 +84047,9 @@
       <td>77959.0</td>
       <td>50.14</td>
       <td>132.0</td>
+      <td>76436.0</td>
+      <td>51.80</td>
+      <td>138.0</td>
     </tr>
     <tr>
       <td>CUMMINSIND</td>
@@ -84287,6 +84811,9 @@
       <td>148302.0</td>
       <td>62.54</td>
       <td>64.0</td>
+      <td>144698.0</td>
+      <td>62.01</td>
+      <td>65.0</td>
     </tr>
     <tr>
       <td>POLYCAB</td>
@@ -85048,6 +85575,9 @@
       <td>137703.0</td>
       <td>46.96</td>
       <td>70.0</td>
+      <td>137718.0</td>
+      <td>45.29</td>
+      <td>69.0</td>
     </tr>
     <tr>
       <td>NTPCGREEN</td>
@@ -85809,6 +86339,9 @@
       <td>77539.0</td>
       <td>52.06</td>
       <td>135.0</td>
+      <td>77185.0</td>
+      <td>66.74</td>
+      <td>134.0</td>
     </tr>
     <tr>
       <td>MARICO</td>
@@ -86570,6 +87103,9 @@
       <td>109265.0</td>
       <td>53.14</td>
       <td>93.0</td>
+      <td>110362.0</td>
+      <td>57.92</td>
+      <td>91.0</td>
     </tr>
     <tr>
       <td>LUPIN</td>
@@ -87331,6 +87867,9 @@
       <td>102054.0</td>
       <td>64.84</td>
       <td>103.0</td>
+      <td>101734.0</td>
+      <td>67.73</td>
+      <td>102.0</td>
     </tr>
     <tr>
       <td>JSWENERGY</td>
@@ -88092,6 +88631,9 @@
       <td>100493.0</td>
       <td>49.85</td>
       <td>105.0</td>
+      <td>99732.0</td>
+      <td>49.04</td>
+      <td>106.0</td>
     </tr>
     <tr>
       <td>BHEL</td>
@@ -88853,6 +89395,9 @@
       <td>147987.0</td>
       <td>38.00</td>
       <td>65.0</td>
+      <td>146177.0</td>
+      <td>28.59</td>
+      <td>63.0</td>
     </tr>
     <tr>
       <td>SUZLON</td>
@@ -89614,6 +90159,9 @@
       <td>65676.0</td>
       <td>42.46</td>
       <td>157.0</td>
+      <td>64288.0</td>
+      <td>49.25</td>
+      <td>159.0</td>
     </tr>
     <tr>
       <td>GMRAIRPORT</td>
@@ -90375,6 +90923,9 @@
       <td>107057.0</td>
       <td>56.03</td>
       <td>96.0</td>
+      <td>108229.0</td>
+      <td>54.19</td>
+      <td>95.0</td>
     </tr>
     <tr>
       <td>HEROMOTOCO</td>
@@ -91135,6 +91686,9 @@
       <td>86.0</td>
       <td>114991.0</td>
       <td>62.28</td>
+      <td>86.0</td>
+      <td>114270.0</td>
+      <td>54.40</td>
       <td>86.0</td>
     </tr>
     <tr>
@@ -91897,6 +92451,9 @@
       <td>79800.0</td>
       <td>46.30</td>
       <td>128.0</td>
+      <td>79475.0</td>
+      <td>40.28</td>
+      <td>128.0</td>
     </tr>
     <tr>
       <td>POLICYBZR</td>
@@ -92658,6 +93215,9 @@
       <td>80832.0</td>
       <td>64.10</td>
       <td>126.0</td>
+      <td>82456.0</td>
+      <td>51.73</td>
+      <td>123.0</td>
     </tr>
     <tr>
       <td>DIXON</td>
@@ -93419,6 +93979,9 @@
       <td>86516.0</td>
       <td>34.82</td>
       <td>121.0</td>
+      <td>88423.0</td>
+      <td>42.40</td>
+      <td>119.0</td>
     </tr>
     <tr>
       <td>INDIANB</td>
@@ -94179,6 +94742,9 @@
       <td>82.0</td>
       <td>117859.0</td>
       <td>44.53</td>
+      <td>81.0</td>
+      <td>117610.0</td>
+      <td>30.46</td>
       <td>81.0</td>
     </tr>
     <tr>
@@ -94941,6 +95507,9 @@
       <td>77878.0</td>
       <td>52.25</td>
       <td>134.0</td>
+      <td>77974.0</td>
+      <td>50.42</td>
+      <td>131.0</td>
     </tr>
     <tr>
       <td>OFSS</td>
@@ -95702,6 +96271,9 @@
       <td>101207.0</td>
       <td>51.87</td>
       <td>104.0</td>
+      <td>102522.0</td>
+      <td>54.57</td>
+      <td>101.0</td>
     </tr>
     <tr>
       <td>DABUR</td>
@@ -96463,6 +97035,9 @@
       <td>71578.0</td>
       <td>43.85</td>
       <td>145.0</td>
+      <td>70913.0</td>
+      <td>54.90</td>
+      <td>148.0</td>
     </tr>
     <tr>
       <td>NHPC</td>
@@ -97224,6 +97799,9 @@
       <td>77075.0</td>
       <td>61.39</td>
       <td>136.0</td>
+      <td>76513.0</td>
+      <td>48.45</td>
+      <td>137.0</td>
     </tr>
     <tr>
       <td>RVNL</td>
@@ -97984,6 +98562,9 @@
       <td>197.0</td>
       <td>46912.0</td>
       <td>42.83</td>
+      <td>199.0</td>
+      <td>46600.0</td>
+      <td>23.62</td>
       <td>199.0</td>
     </tr>
     <tr>
@@ -98746,6 +99327,9 @@
       <td>157229.0</td>
       <td>39.66</td>
       <td>59.0</td>
+      <td>150654.0</td>
+      <td>31.50</td>
+      <td>62.0</td>
     </tr>
     <tr>
       <td>LLOYDSME</td>
@@ -99507,6 +100091,9 @@
       <td>109091.0</td>
       <td>61.26</td>
       <td>94.0</td>
+      <td>107740.0</td>
+      <td>52.30</td>
+      <td>96.0</td>
     </tr>
     <tr>
       <td>WAAREEENER</td>
@@ -100268,6 +100855,9 @@
       <td>77927.0</td>
       <td>53.86</td>
       <td>133.0</td>
+      <td>77061.0</td>
+      <td>42.75</td>
+      <td>136.0</td>
     </tr>
     <tr>
       <td>OIL</td>
@@ -101029,6 +101619,9 @@
       <td>78158.0</td>
       <td>39.71</td>
       <td>131.0</td>
+      <td>77239.0</td>
+      <td>47.55</td>
+      <td>133.0</td>
     </tr>
     <tr>
       <td>GODREJPROP</td>
@@ -101790,6 +102383,9 @@
       <td>60166.0</td>
       <td>29.32</td>
       <td>171.0</td>
+      <td>60465.0</td>
+      <td>28.22</td>
+      <td>169.0</td>
     </tr>
     <tr>
       <td>PRESTIGE</td>
@@ -102550,6 +103146,9 @@
       <td>155.0</td>
       <td>68486.0</td>
       <td>49.84</td>
+      <td>154.0</td>
+      <td>68132.0</td>
+      <td>38.33</td>
       <td>154.0</td>
     </tr>
     <tr>
@@ -103312,6 +103911,9 @@
       <td>63931.0</td>
       <td>56.67</td>
       <td>161.0</td>
+      <td>63816.0</td>
+      <td>49.92</td>
+      <td>161.0</td>
     </tr>
     <tr>
       <td>ATGL</td>
@@ -104073,6 +104675,9 @@
       <td>71218.0</td>
       <td>34.94</td>
       <td>148.0</td>
+      <td>72686.0</td>
+      <td>16.20</td>
+      <td>143.0</td>
     </tr>
     <tr>
       <td>IDEA</td>
@@ -104834,6 +105439,9 @@
       <td>152980.0</td>
       <td>14.38</td>
       <td>62.0</td>
+      <td>152438.0</td>
+      <td>17.58</td>
+      <td>61.0</td>
     </tr>
     <tr>
       <td>TORNTPOWER</td>
@@ -105595,6 +106203,9 @@
       <td>63668.0</td>
       <td>49.62</td>
       <td>163.0</td>
+      <td>62635.0</td>
+      <td>67.75</td>
+      <td>165.0</td>
     </tr>
     <tr>
       <td>BDL</td>
@@ -106356,6 +106967,9 @@
       <td>51062.0</td>
       <td>26.07</td>
       <td>188.0</td>
+      <td>49449.0</td>
+      <td>34.95</td>
+      <td>190.0</td>
     </tr>
     <tr>
       <td>OBEROIRLTY</td>
@@ -107117,6 +107731,9 @@
       <td>67557.0</td>
       <td>20.77</td>
       <td>156.0</td>
+      <td>67982.0</td>
+      <td>27.72</td>
+      <td>155.0</td>
     </tr>
     <tr>
       <td>ASHOKLEY</td>
@@ -107878,6 +108495,9 @@
       <td>103585.0</td>
       <td>47.66</td>
       <td>99.0</td>
+      <td>101676.0</td>
+      <td>44.42</td>
+      <td>103.0</td>
     </tr>
     <tr>
       <td>COROMANDEL</td>
@@ -108639,6 +109259,9 @@
       <td>60773.0</td>
       <td>51.16</td>
       <td>169.0</td>
+      <td>59829.0</td>
+      <td>49.31</td>
+      <td>170.0</td>
     </tr>
     <tr>
       <td>ABCAPITAL</td>
@@ -109400,6 +110023,9 @@
       <td>110005.0</td>
       <td>61.57</td>
       <td>92.0</td>
+      <td>108364.0</td>
+      <td>56.43</td>
+      <td>94.0</td>
     </tr>
     <tr>
       <td>FACT</td>
@@ -110161,6 +110787,9 @@
       <td>51332.0</td>
       <td>40.54</td>
       <td>187.0</td>
+      <td>50568.0</td>
+      <td>31.96</td>
+      <td>188.0</td>
     </tr>
     <tr>
       <td>INDUSINDBK</td>
@@ -110921,6 +111550,9 @@
       <td>131.0</td>
       <td>79081.0</td>
       <td>43.75</td>
+      <td>129.0</td>
+      <td>79214.0</td>
+      <td>53.60</td>
       <td>129.0</td>
     </tr>
     <tr>
@@ -111683,6 +112315,9 @@
       <td>51758.0</td>
       <td>30.12</td>
       <td>183.0</td>
+      <td>51122.0</td>
+      <td>53.35</td>
+      <td>187.0</td>
     </tr>
     <tr>
       <td>GICRE</td>
@@ -112444,6 +113079,9 @@
       <td>63009.0</td>
       <td>60.86</td>
       <td>165.0</td>
+      <td>63079.0</td>
+      <td>53.43</td>
+      <td>163.0</td>
     </tr>
     <tr>
       <td>BERGEPAINT</td>
@@ -113204,6 +113842,9 @@
       <td>163.0</td>
       <td>62690.0</td>
       <td>50.23</td>
+      <td>166.0</td>
+      <td>61914.0</td>
+      <td>29.63</td>
       <td>166.0</td>
     </tr>
     <tr>
@@ -113966,6 +114607,9 @@
       <td>76703.0</td>
       <td>64.74</td>
       <td>137.0</td>
+      <td>77076.0</td>
+      <td>55.87</td>
+      <td>135.0</td>
     </tr>
     <tr>
       <td>AUROPHARMA</td>
@@ -114727,6 +115371,9 @@
       <td>94649.0</td>
       <td>57.77</td>
       <td>114.0</td>
+      <td>93470.0</td>
+      <td>58.35</td>
+      <td>115.0</td>
     </tr>
     <tr>
       <td>PIIND</td>
@@ -115488,6 +116135,9 @@
       <td>38157.0</td>
       <td>65.44</td>
       <td>226.0</td>
+      <td>38005.0</td>
+      <td>63.49</td>
+      <td>223.0</td>
     </tr>
     <tr>
       <td>YESBANK</td>
@@ -116249,6 +116899,9 @@
       <td>70496.0</td>
       <td>40.75</td>
       <td>149.0</td>
+      <td>71375.0</td>
+      <td>47.40</td>
+      <td>145.0</td>
     </tr>
     <tr>
       <td>SCHAEFFLER</td>
@@ -117010,6 +117663,9 @@
       <td>63698.0</td>
       <td>61.38</td>
       <td>162.0</td>
+      <td>64254.0</td>
+      <td>50.50</td>
+      <td>160.0</td>
     </tr>
     <tr>
       <td>BHARATFORG</td>
@@ -117771,6 +118427,9 @@
       <td>100346.0</td>
       <td>59.36</td>
       <td>106.0</td>
+      <td>98916.0</td>
+      <td>62.79</td>
+      <td>107.0</td>
     </tr>
     <tr>
       <td>COFORGE</td>
@@ -118532,6 +119191,9 @@
       <td>78489.0</td>
       <td>52.33</td>
       <td>130.0</td>
+      <td>80264.0</td>
+      <td>33.02</td>
+      <td>127.0</td>
     </tr>
     <tr>
       <td>IRCTC</td>
@@ -119293,6 +119955,9 @@
       <td>39400.0</td>
       <td>63.68</td>
       <td>218.0</td>
+      <td>39120.0</td>
+      <td>57.89</td>
+      <td>217.0</td>
     </tr>
     <tr>
       <td>UNOMINDA</td>
@@ -120053,6 +120718,9 @@
       <td>142.0</td>
       <td>73523.0</td>
       <td>43.31</td>
+      <td>141.0</td>
+      <td>73465.0</td>
+      <td>52.24</td>
       <td>141.0</td>
     </tr>
     <tr>
@@ -120815,6 +121483,9 @@
       <td>38263.0</td>
       <td>29.92</td>
       <td>225.0</td>
+      <td>38187.0</td>
+      <td>27.45</td>
+      <td>222.0</td>
     </tr>
     <tr>
       <td>NMDC</td>
@@ -121576,6 +122247,9 @@
       <td>74018.0</td>
       <td>46.88</td>
       <td>140.0</td>
+      <td>73279.0</td>
+      <td>52.95</td>
+      <td>142.0</td>
     </tr>
     <tr>
       <td>LINDEINDIA</td>
@@ -122336,6 +123010,9 @@
       <td>175.0</td>
       <td>57238.0</td>
       <td>53.26</td>
+      <td>176.0</td>
+      <td>56969.0</td>
+      <td>63.32</td>
       <td>176.0</td>
     </tr>
     <tr>
@@ -123098,6 +123775,9 @@
       <td>80670.0</td>
       <td>51.32</td>
       <td>127.0</td>
+      <td>80617.0</td>
+      <td>54.78</td>
+      <td>126.0</td>
     </tr>
     <tr>
       <td>MRF</td>
@@ -123859,6 +124539,9 @@
       <td>56619.0</td>
       <td>54.34</td>
       <td>177.0</td>
+      <td>56640.0</td>
+      <td>49.27</td>
+      <td>178.0</td>
     </tr>
     <tr>
       <td>SUPREMEIND</td>
@@ -124620,6 +125303,9 @@
       <td>45780.0</td>
       <td>53.11</td>
       <td>205.0</td>
+      <td>45856.0</td>
+      <td>57.39</td>
+      <td>203.0</td>
     </tr>
     <tr>
       <td>ALKEM</td>
@@ -125380,6 +126066,9 @@
       <td>162.0</td>
       <td>65461.0</td>
       <td>28.09</td>
+      <td>158.0</td>
+      <td>64355.0</td>
+      <td>66.01</td>
       <td>158.0</td>
     </tr>
     <tr>
@@ -126142,6 +126831,9 @@
       <td>69386.0</td>
       <td>63.36</td>
       <td>152.0</td>
+      <td>68635.0</td>
+      <td>52.35</td>
+      <td>153.0</td>
     </tr>
     <tr>
       <td>FORTIS</td>
@@ -126903,6 +127595,9 @@
       <td>69207.0</td>
       <td>41.88</td>
       <td>153.0</td>
+      <td>68799.0</td>
+      <td>60.01</td>
+      <td>152.0</td>
     </tr>
     <tr>
       <td>VMM</td>
@@ -127663,6 +128358,9 @@
       <td>191.0</td>
       <td>48586.0</td>
       <td>48.73</td>
+      <td>191.0</td>
+      <td>48440.0</td>
+      <td>45.09</td>
       <td>191.0</td>
     </tr>
     <tr>
@@ -128425,6 +129123,9 @@
       <td>99138.0</td>
       <td>26.59</td>
       <td>107.0</td>
+      <td>101523.0</td>
+      <td>37.41</td>
+      <td>104.0</td>
     </tr>
     <tr>
       <td>COCHINSHIP</td>
@@ -129186,6 +129887,9 @@
       <td>39070.0</td>
       <td>22.51</td>
       <td>221.0</td>
+      <td>39067.0</td>
+      <td>38.10</td>
+      <td>218.0</td>
     </tr>
     <tr>
       <td>TIINDIA</td>
@@ -129946,6 +130650,9 @@
       <td>183.0</td>
       <td>57278.0</td>
       <td>15.73</td>
+      <td>175.0</td>
+      <td>57316.0</td>
+      <td>28.42</td>
       <td>175.0</td>
     </tr>
     <tr>
@@ -130708,6 +131415,9 @@
       <td>91823.0</td>
       <td>68.15</td>
       <td>115.0</td>
+      <td>93756.0</td>
+      <td>63.29</td>
+      <td>114.0</td>
     </tr>
     <tr>
       <td>GLAXO</td>
@@ -131469,6 +132179,9 @@
       <td>49195.0</td>
       <td>55.91</td>
       <td>190.0</td>
+      <td>51248.0</td>
+      <td>31.90</td>
+      <td>186.0</td>
     </tr>
     <tr>
       <td>JSL</td>
@@ -132230,6 +132943,9 @@
       <td>60413.0</td>
       <td>50.58</td>
       <td>170.0</td>
+      <td>59622.0</td>
+      <td>57.93</td>
+      <td>171.0</td>
     </tr>
     <tr>
       <td>MFSL</td>
@@ -132991,6 +133707,9 @@
       <td>54683.0</td>
       <td>65.68</td>
       <td>181.0</td>
+      <td>53358.0</td>
+      <td>42.75</td>
+      <td>182.0</td>
     </tr>
     <tr>
       <td>BANKINDIA</td>
@@ -133752,6 +134471,9 @@
       <td>64693.0</td>
       <td>46.15</td>
       <td>160.0</td>
+      <td>64511.0</td>
+      <td>53.43</td>
+      <td>157.0</td>
     </tr>
     <tr>
       <td>KALYANKJIL</td>
@@ -134512,6 +135234,9 @@
       <td>164.0</td>
       <td>62130.0</td>
       <td>32.87</td>
+      <td>167.0</td>
+      <td>61469.0</td>
+      <td>17.10</td>
       <td>167.0</td>
     </tr>
     <tr>
@@ -135274,6 +135999,9 @@
       <td>51355.0</td>
       <td>66.79</td>
       <td>186.0</td>
+      <td>49652.0</td>
+      <td>60.89</td>
+      <td>189.0</td>
     </tr>
     <tr>
       <td>SAIL</td>
@@ -136035,6 +136763,9 @@
       <td>70301.0</td>
       <td>45.67</td>
       <td>150.0</td>
+      <td>71354.0</td>
+      <td>48.30</td>
+      <td>146.0</td>
     </tr>
     <tr>
       <td>UBL</td>
@@ -136795,6 +137526,9 @@
       <td>230.0</td>
       <td>35906.0</td>
       <td>47.86</td>
+      <td>231.0</td>
+      <td>35959.0</td>
+      <td>54.29</td>
       <td>231.0</td>
     </tr>
     <tr>
@@ -137557,6 +138291,9 @@
       <td>73073.0</td>
       <td>65.17</td>
       <td>142.0</td>
+      <td>73702.0</td>
+      <td>52.74</td>
+      <td>140.0</td>
     </tr>
     <tr>
       <td>MPHASIS</td>
@@ -138317,6 +139054,9 @@
       <td>193.0</td>
       <td>46421.0</td>
       <td>53.74</td>
+      <td>201.0</td>
+      <td>46278.0</td>
+      <td>52.56</td>
       <td>201.0</td>
     </tr>
     <tr>
@@ -139079,6 +139819,9 @@
       <td>88471.0</td>
       <td>58.82</td>
       <td>118.0</td>
+      <td>88718.0</td>
+      <td>51.84</td>
+      <td>118.0</td>
     </tr>
     <tr>
       <td>PAGEIND</td>
@@ -139839,6 +140582,9 @@
       <td>211.0</td>
       <td>40627.0</td>
       <td>54.12</td>
+      <td>215.0</td>
+      <td>39306.0</td>
+      <td>57.28</td>
       <td>215.0</td>
     </tr>
     <tr>
@@ -140601,6 +141347,9 @@
       <td>58724.0</td>
       <td>48.05</td>
       <td>173.0</td>
+      <td>58913.0</td>
+      <td>58.23</td>
+      <td>174.0</td>
     </tr>
     <tr>
       <td>MOTILALOFS</td>
@@ -141362,6 +142111,9 @@
       <td>56481.0</td>
       <td>33.13</td>
       <td>178.0</td>
+      <td>56728.0</td>
+      <td>36.76</td>
+      <td>177.0</td>
     </tr>
     <tr>
       <td>TATACOMM</td>
@@ -142123,6 +142875,9 @@
       <td>48167.0</td>
       <td>63.77</td>
       <td>193.0</td>
+      <td>47375.0</td>
+      <td>59.44</td>
+      <td>197.0</td>
     </tr>
     <tr>
       <td>UPL</td>
@@ -142884,6 +143639,9 @@
       <td>47277.0</td>
       <td>67.70</td>
       <td>197.0</td>
+      <td>47948.0</td>
+      <td>54.52</td>
+      <td>195.0</td>
     </tr>
     <tr>
       <td>BALKRISIND</td>
@@ -143645,6 +144403,9 @@
       <td>46102.0</td>
       <td>52.37</td>
       <td>203.0</td>
+      <td>45746.0</td>
+      <td>50.09</td>
+      <td>204.0</td>
     </tr>
     <tr>
       <td>LTF</td>
@@ -144406,6 +145167,9 @@
       <td>81471.0</td>
       <td>36.93</td>
       <td>124.0</td>
+      <td>79040.0</td>
+      <td>33.24</td>
+      <td>130.0</td>
     </tr>
     <tr>
       <td>NAM-INDIA</td>
@@ -145167,6 +145931,9 @@
       <td>74835.0</td>
       <td>45.59</td>
       <td>139.0</td>
+      <td>77853.0</td>
+      <td>50.21</td>
+      <td>132.0</td>
     </tr>
     <tr>
       <td>GLENMARK</td>
@@ -145928,6 +146695,9 @@
       <td>65047.0</td>
       <td>68.50</td>
       <td>159.0</td>
+      <td>63401.0</td>
+      <td>42.27</td>
+      <td>162.0</td>
     </tr>
     <tr>
       <td>LTTS</td>
@@ -146689,6 +147459,9 @@
       <td>37214.0</td>
       <td>49.29</td>
       <td>228.0</td>
+      <td>37551.0</td>
+      <td>26.63</td>
+      <td>227.0</td>
     </tr>
     <tr>
       <td>IREDA</td>
@@ -147450,6 +148223,9 @@
       <td>32382.0</td>
       <td>44.23</td>
       <td>246.0</td>
+      <td>32002.0</td>
+      <td>36.80</td>
+      <td>247.0</td>
     </tr>
     <tr>
       <td>CONCOR</td>
@@ -148211,6 +148987,9 @@
       <td>39470.0</td>
       <td>51.51</td>
       <td>217.0</td>
+      <td>39173.0</td>
+      <td>40.70</td>
+      <td>216.0</td>
     </tr>
     <tr>
       <td>GODREJIND</td>
@@ -148972,6 +149751,9 @@
       <td>41264.0</td>
       <td>44.27</td>
       <td>213.0</td>
+      <td>40758.0</td>
+      <td>44.30</td>
+      <td>212.0</td>
     </tr>
     <tr>
       <td>JKCEMENT</td>
@@ -149733,6 +150515,9 @@
       <td>41377.0</td>
       <td>35.77</td>
       <td>212.0</td>
+      <td>40689.0</td>
+      <td>46.66</td>
+      <td>213.0</td>
     </tr>
     <tr>
       <td>JUBLFOOD</td>
@@ -150494,6 +151279,9 @@
       <td>33028.0</td>
       <td>42.46</td>
       <td>240.0</td>
+      <td>32880.0</td>
+      <td>44.79</td>
+      <td>244.0</td>
     </tr>
     <tr>
       <td>PREMIERENE</td>
@@ -151255,6 +152043,9 @@
       <td>46062.0</td>
       <td>42.24</td>
       <td>204.0</td>
+      <td>45485.0</td>
+      <td>51.58</td>
+      <td>205.0</td>
     </tr>
     <tr>
       <td>HUDCO</td>
@@ -152016,6 +152807,9 @@
       <td>37505.0</td>
       <td>45.18</td>
       <td>227.0</td>
+      <td>37617.0</td>
+      <td>40.54</td>
+      <td>226.0</td>
     </tr>
     <tr>
       <td>PETRONET</td>
@@ -152776,6 +153570,9 @@
       <td>207.0</td>
       <td>42937.0</td>
       <td>67.81</td>
+      <td>207.0</td>
+      <td>43222.0</td>
+      <td>59.65</td>
       <td>207.0</td>
     </tr>
     <tr>
@@ -153538,6 +154335,9 @@
       <td>47345.0</td>
       <td>58.54</td>
       <td>196.0</td>
+      <td>48033.0</td>
+      <td>54.94</td>
+      <td>193.0</td>
     </tr>
     <tr>
       <td>PGHH</td>
@@ -154299,6 +155099,9 @@
       <td>26987.0</td>
       <td>43.76</td>
       <td>278.0</td>
+      <td>26747.0</td>
+      <td>69.43</td>
+      <td>280.0</td>
     </tr>
     <tr>
       <td>AIIL</td>
@@ -155059,6 +155862,9 @@
       <td>199.0</td>
       <td>46834.0</td>
       <td>36.52</td>
+      <td>200.0</td>
+      <td>46537.0</td>
+      <td>43.49</td>
       <td>200.0</td>
     </tr>
     <tr>
@@ -155821,6 +156627,9 @@
       <td>41456.0</td>
       <td>35.65</td>
       <td>211.0</td>
+      <td>40467.0</td>
+      <td>45.56</td>
+      <td>214.0</td>
     </tr>
     <tr>
       <td>GODFRYPHLP</td>
@@ -156582,6 +157391,9 @@
       <td>32792.0</td>
       <td>37.59</td>
       <td>241.0</td>
+      <td>33030.0</td>
+      <td>17.90</td>
+      <td>239.0</td>
     </tr>
     <tr>
       <td>THERMAX</td>
@@ -157343,6 +158155,9 @@
       <td>48558.0</td>
       <td>47.64</td>
       <td>192.0</td>
+      <td>48019.0</td>
+      <td>49.36</td>
+      <td>194.0</td>
     </tr>
     <tr>
       <td>ASTRAL</td>
@@ -158104,6 +158919,9 @@
       <td>40834.0</td>
       <td>44.85</td>
       <td>214.0</td>
+      <td>41503.0</td>
+      <td>40.67</td>
+      <td>210.0</td>
     </tr>
     <tr>
       <td>MAHABANK</td>
@@ -158864,6 +159682,9 @@
       <td>167.0</td>
       <td>61847.0</td>
       <td>48.70</td>
+      <td>168.0</td>
+      <td>61378.0</td>
+      <td>59.23</td>
       <td>168.0</td>
     </tr>
     <tr>
@@ -159626,6 +160447,9 @@
       <td>32498.0</td>
       <td>59.14</td>
       <td>244.0</td>
+      <td>32885.0</td>
+      <td>56.54</td>
+      <td>243.0</td>
     </tr>
     <tr>
       <td>BIOCON</td>
@@ -160387,6 +161211,9 @@
       <td>68039.0</td>
       <td>44.06</td>
       <td>155.0</td>
+      <td>67265.0</td>
+      <td>47.26</td>
+      <td>156.0</td>
     </tr>
     <tr>
       <td>TATAELXSI</td>
@@ -161148,6 +161975,9 @@
       <td>22814.0</td>
       <td>48.80</td>
       <td>305.0</td>
+      <td>22799.0</td>
+      <td>26.80</td>
+      <td>304.0</td>
     </tr>
     <tr>
       <td>KPITTECH</td>
@@ -161909,6 +162739,9 @@
       <td>16356.0</td>
       <td>29.25</td>
       <td>371.0</td>
+      <td>16149.0</td>
+      <td>36.76</td>
+      <td>373.0</td>
     </tr>
     <tr>
       <td>UCOBANK</td>
@@ -162669,6 +163502,9 @@
       <td>245.0</td>
       <td>32414.0</td>
       <td>50.86</td>
+      <td>245.0</td>
+      <td>32176.0</td>
+      <td>53.54</td>
       <td>245.0</td>
     </tr>
     <tr>
@@ -163431,6 +164267,9 @@
       <td>36846.0</td>
       <td>64.86</td>
       <td>229.0</td>
+      <td>36539.0</td>
+      <td>64.29</td>
+      <td>229.0</td>
     </tr>
     <tr>
       <td>FLUOROCHEM</td>
@@ -164191,6 +165030,9 @@
       <td>184.0</td>
       <td>51686.0</td>
       <td>50.63</td>
+      <td>184.0</td>
+      <td>51629.0</td>
+      <td>43.62</td>
       <td>184.0</td>
     </tr>
     <tr>
@@ -164953,6 +165795,9 @@
       <td>34457.0</td>
       <td>53.42</td>
       <td>234.0</td>
+      <td>35168.0</td>
+      <td>62.48</td>
+      <td>233.0</td>
     </tr>
     <tr>
       <td>KPRMILL</td>
@@ -165714,6 +166559,9 @@
       <td>38416.0</td>
       <td>42.99</td>
       <td>223.0</td>
+      <td>38587.0</td>
+      <td>38.31</td>
+      <td>220.0</td>
     </tr>
     <tr>
       <td>CHOLAHLDNG</td>
@@ -166475,6 +167323,9 @@
       <td>29293.0</td>
       <td>65.53</td>
       <td>266.0</td>
+      <td>29236.0</td>
+      <td>65.85</td>
+      <td>264.0</td>
     </tr>
     <tr>
       <td>SJVN</td>
@@ -167236,6 +168087,9 @@
       <td>26023.0</td>
       <td>55.36</td>
       <td>284.0</td>
+      <td>25975.0</td>
+      <td>55.58</td>
+      <td>285.0</td>
     </tr>
     <tr>
       <td>M&amp;MFIN</td>
@@ -167997,6 +168851,9 @@
       <td>53666.0</td>
       <td>53.00</td>
       <td>182.0</td>
+      <td>54167.0</td>
+      <td>47.87</td>
+      <td>180.0</td>
     </tr>
     <tr>
       <td>GRSE</td>
@@ -168758,6 +169615,9 @@
       <td>30711.0</td>
       <td>34.67</td>
       <td>255.0</td>
+      <td>30207.0</td>
+      <td>39.74</td>
+      <td>258.0</td>
     </tr>
     <tr>
       <td>KAYNES</td>
@@ -169519,6 +170379,9 @@
       <td>24428.0</td>
       <td>25.19</td>
       <td>295.0</td>
+      <td>25629.0</td>
+      <td>22.83</td>
+      <td>287.0</td>
     </tr>
     <tr>
       <td>ESCORTS</td>
@@ -170279,6 +171142,9 @@
       <td>233.0</td>
       <td>34346.0</td>
       <td>56.84</td>
+      <td>236.0</td>
+      <td>34234.0</td>
+      <td>55.34</td>
       <td>236.0</td>
     </tr>
     <tr>
@@ -171041,6 +171907,9 @@
       <td>98001.0</td>
       <td>65.01</td>
       <td>112.0</td>
+      <td>97353.0</td>
+      <td>55.69</td>
+      <td>111.0</td>
     </tr>
     <tr>
       <td>RADICO</td>
@@ -171801,6 +172670,9 @@
       <td>166.0</td>
       <td>63412.0</td>
       <td>50.40</td>
+      <td>164.0</td>
+      <td>62918.0</td>
+      <td>48.78</td>
       <td>164.0</td>
     </tr>
     <tr>
@@ -172563,6 +173435,9 @@
       <td>28018.0</td>
       <td>36.96</td>
       <td>271.0</td>
+      <td>27776.0</td>
+      <td>40.19</td>
+      <td>271.0</td>
     </tr>
     <tr>
       <td>ACC</td>
@@ -173324,6 +174199,9 @@
       <td>24496.0</td>
       <td>58.04</td>
       <td>293.0</td>
+      <td>24203.0</td>
+      <td>61.37</td>
+      <td>295.0</td>
     </tr>
     <tr>
       <td>IPCALAB</td>
@@ -174085,6 +174963,9 @@
       <td>47645.0</td>
       <td>28.26</td>
       <td>195.0</td>
+      <td>48356.0</td>
+      <td>43.45</td>
+      <td>192.0</td>
     </tr>
     <tr>
       <td>CENTRALBK</td>
@@ -174845,6 +175726,9 @@
       <td>268.0</td>
       <td>28122.0</td>
       <td>70.40</td>
+      <td>269.0</td>
+      <td>27995.0</td>
+      <td>60.71</td>
       <td>269.0</td>
     </tr>
     <tr>
@@ -175607,6 +176491,9 @@
       <td>24688.0</td>
       <td>61.23</td>
       <td>290.0</td>
+      <td>24510.0</td>
+      <td>49.93</td>
+      <td>290.0</td>
     </tr>
     <tr>
       <td>KEI</td>
@@ -176367,6 +177254,9 @@
       <td>178.0</td>
       <td>55352.0</td>
       <td>44.73</td>
+      <td>179.0</td>
+      <td>54311.0</td>
+      <td>50.23</td>
       <td>179.0</td>
     </tr>
     <tr>
@@ -177129,6 +178019,9 @@
       <td>71261.0</td>
       <td>42.74</td>
       <td>147.0</td>
+      <td>70995.0</td>
+      <td>37.20</td>
+      <td>147.0</td>
     </tr>
     <tr>
       <td>ENDURANCE</td>
@@ -177890,6 +178783,9 @@
       <td>42321.0</td>
       <td>55.99</td>
       <td>208.0</td>
+      <td>41903.0</td>
+      <td>66.30</td>
+      <td>209.0</td>
     </tr>
     <tr>
       <td>GILLETTE</td>
@@ -178651,6 +179547,9 @@
       <td>24510.0</td>
       <td>63.62</td>
       <td>292.0</td>
+      <td>24471.0</td>
+      <td>68.01</td>
+      <td>291.0</td>
     </tr>
     <tr>
       <td>BLUESTARCO</td>
@@ -179412,6 +180311,9 @@
       <td>30698.0</td>
       <td>52.10</td>
       <td>256.0</td>
+      <td>30702.0</td>
+      <td>44.64</td>
+      <td>254.0</td>
     </tr>
     <tr>
       <td>HONAUT</td>
@@ -180173,6 +181075,9 @@
       <td>32183.0</td>
       <td>41.17</td>
       <td>248.0</td>
+      <td>31917.0</td>
+      <td>43.95</td>
+      <td>250.0</td>
     </tr>
     <tr>
       <td>LICHSGFIN</td>
@@ -180934,6 +181839,9 @@
       <td>27437.0</td>
       <td>54.65</td>
       <td>276.0</td>
+      <td>27338.0</td>
+      <td>48.65</td>
+      <td>274.0</td>
     </tr>
     <tr>
       <td>TATAINVEST</td>
@@ -181695,6 +182603,9 @@
       <td>32785.0</td>
       <td>49.91</td>
       <td>242.0</td>
+      <td>32962.0</td>
+      <td>44.12</td>
+      <td>240.0</td>
     </tr>
     <tr>
       <td>3MINDIA</td>
@@ -182456,6 +183367,9 @@
       <td>39315.0</td>
       <td>47.89</td>
       <td>219.0</td>
+      <td>37737.0</td>
+      <td>36.56</td>
+      <td>225.0</td>
     </tr>
     <tr>
       <td>POONAWALLA</td>
@@ -183216,6 +184130,9 @@
       <td>206.0</td>
       <td>43805.0</td>
       <td>50.73</td>
+      <td>206.0</td>
+      <td>43418.0</td>
+      <td>47.17</td>
       <td>206.0</td>
     </tr>
     <tr>
@@ -183978,6 +184895,9 @@
       <td>46359.0</td>
       <td>50.33</td>
       <td>202.0</td>
+      <td>46109.0</td>
+      <td>28.90</td>
+      <td>202.0</td>
     </tr>
     <tr>
       <td>METROBRAND</td>
@@ -184739,6 +185659,9 @@
       <td>25288.0</td>
       <td>66.82</td>
       <td>288.0</td>
+      <td>25345.0</td>
+      <td>55.29</td>
+      <td>289.0</td>
     </tr>
     <tr>
       <td>EXIDEIND</td>
@@ -185500,6 +186423,9 @@
       <td>39537.0</td>
       <td>51.39</td>
       <td>216.0</td>
+      <td>38930.0</td>
+      <td>42.32</td>
+      <td>219.0</td>
     </tr>
     <tr>
       <td>APARINDS</td>
@@ -186261,6 +187187,9 @@
       <td>72229.0</td>
       <td>40.01</td>
       <td>144.0</td>
+      <td>69378.0</td>
+      <td>39.53</td>
+      <td>151.0</td>
     </tr>
     <tr>
       <td>NBCC</td>
@@ -187022,6 +187951,9 @@
       <td>23760.0</td>
       <td>54.91</td>
       <td>299.0</td>
+      <td>23541.0</td>
+      <td>39.77</td>
+      <td>298.0</td>
     </tr>
     <tr>
       <td>GUJGASLTD</td>
@@ -187693,6 +188625,9 @@
       <td>32359.0</td>
       <td>61.34</td>
       <td>246.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -188544,6 +189479,9 @@
       <td>23691.0</td>
       <td>43.88</td>
       <td>301.0</td>
+      <td>23303.0</td>
+      <td>54.95</td>
+      <td>300.0</td>
     </tr>
     <tr>
       <td>AIAENG</td>
@@ -189305,6 +190243,9 @@
       <td>41462.0</td>
       <td>49.97</td>
       <td>210.0</td>
+      <td>40920.0</td>
+      <td>55.96</td>
+      <td>211.0</td>
     </tr>
     <tr>
       <td>MEDANTA</td>
@@ -190066,6 +191007,9 @@
       <td>38903.0</td>
       <td>71.09</td>
       <td>222.0</td>
+      <td>38421.0</td>
+      <td>52.73</td>
+      <td>221.0</td>
     </tr>
     <tr>
       <td>NLCINDIA</td>
@@ -190827,6 +191771,9 @@
       <td>38354.0</td>
       <td>45.72</td>
       <td>224.0</td>
+      <td>37078.0</td>
+      <td>69.21</td>
+      <td>228.0</td>
     </tr>
     <tr>
       <td>ITI</td>
@@ -191588,6 +192535,9 @@
       <td>27041.0</td>
       <td>44.98</td>
       <td>277.0</td>
+      <td>26786.0</td>
+      <td>10.26</td>
+      <td>279.0</td>
     </tr>
     <tr>
       <td>NIACL</td>
@@ -192349,6 +193299,9 @@
       <td>30265.0</td>
       <td>30.55</td>
       <td>260.0</td>
+      <td>30496.0</td>
+      <td>25.53</td>
+      <td>256.0</td>
     </tr>
     <tr>
       <td>SONACOMS</td>
@@ -193109,6 +194062,9 @@
       <td>188.0</td>
       <td>51380.0</td>
       <td>45.92</td>
+      <td>185.0</td>
+      <td>51349.0</td>
+      <td>51.59</td>
       <td>185.0</td>
     </tr>
     <tr>
@@ -193871,6 +194827,9 @@
       <td>33783.0</td>
       <td>31.08</td>
       <td>239.0</td>
+      <td>32890.0</td>
+      <td>36.13</td>
+      <td>242.0</td>
     </tr>
     <tr>
       <td>ASTERDM</td>
@@ -194632,6 +195591,9 @@
       <td>71477.0</td>
       <td>57.28</td>
       <td>146.0</td>
+      <td>69733.0</td>
+      <td>84.28</td>
+      <td>150.0</td>
     </tr>
     <tr>
       <td>IRB</td>
@@ -195393,6 +196355,9 @@
       <td>22996.0</td>
       <td>63.62</td>
       <td>304.0</td>
+      <td>22887.0</td>
+      <td>63.79</td>
+      <td>303.0</td>
     </tr>
     <tr>
       <td>IKS</td>
@@ -196154,6 +197119,9 @@
       <td>31964.0</td>
       <td>61.74</td>
       <td>250.0</td>
+      <td>31140.0</td>
+      <td>59.62</td>
+      <td>252.0</td>
     </tr>
     <tr>
       <td>BANDHANBNK</td>
@@ -196914,6 +197882,9 @@
       <td>271.0</td>
       <td>27469.0</td>
       <td>51.78</td>
+      <td>275.0</td>
+      <td>27260.0</td>
+      <td>36.35</td>
       <td>275.0</td>
     </tr>
     <tr>
@@ -197676,6 +198647,9 @@
       <td>19178.0</td>
       <td>54.99</td>
       <td>329.0</td>
+      <td>19064.0</td>
+      <td>66.80</td>
+      <td>328.0</td>
     </tr>
     <tr>
       <td>IGL</td>
@@ -198437,6 +199411,9 @@
       <td>20930.0</td>
       <td>55.66</td>
       <td>320.0</td>
+      <td>21266.0</td>
+      <td>14.26</td>
+      <td>314.0</td>
     </tr>
     <tr>
       <td>GLAND</td>
@@ -199197,6 +200174,9 @@
       <td>194.0</td>
       <td>47097.0</td>
       <td>70.93</td>
+      <td>198.0</td>
+      <td>46822.0</td>
+      <td>52.18</td>
       <td>198.0</td>
     </tr>
     <tr>
@@ -199959,6 +200939,9 @@
       <td>27661.0</td>
       <td>50.24</td>
       <td>273.0</td>
+      <td>27207.0</td>
+      <td>80.31</td>
+      <td>276.0</td>
     </tr>
     <tr>
       <td>WOCKPHARMA</td>
@@ -200720,6 +201703,9 @@
       <td>30207.0</td>
       <td>55.49</td>
       <td>261.0</td>
+      <td>29674.0</td>
+      <td>51.55</td>
+      <td>263.0</td>
     </tr>
     <tr>
       <td>RPOWER</td>
@@ -201481,6 +202467,9 @@
       <td>9276.0</td>
       <td>43.12</td>
       <td>467.0</td>
+      <td>8962.0</td>
+      <td>50.62</td>
+      <td>471.0</td>
     </tr>
     <tr>
       <td>PNBHOUSING</td>
@@ -202242,6 +203231,9 @@
       <td>29858.0</td>
       <td>67.19</td>
       <td>263.0</td>
+      <td>30593.0</td>
+      <td>54.13</td>
+      <td>255.0</td>
     </tr>
     <tr>
       <td>ABREL</td>
@@ -203003,6 +203995,9 @@
       <td>15533.0</td>
       <td>52.62</td>
       <td>384.0</td>
+      <td>15581.0</td>
+      <td>48.85</td>
+      <td>382.0</td>
     </tr>
     <tr>
       <td>DELHIVERY</td>
@@ -203763,6 +204758,9 @@
       <td>236.0</td>
       <td>33847.0</td>
       <td>50.67</td>
+      <td>237.0</td>
+      <td>33712.0</td>
+      <td>53.79</td>
       <td>237.0</td>
     </tr>
     <tr>
@@ -204525,6 +205523,9 @@
       <td>48122.0</td>
       <td>13.22</td>
       <td>194.0</td>
+      <td>47665.0</td>
+      <td>25.41</td>
+      <td>196.0</td>
     </tr>
     <tr>
       <td>JBCHEPHARM</td>
@@ -205268,6 +206269,9 @@
       <td>0.0</td>
       <td>0.00</td>
       <td>493.0</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>494.0</td>
       <td>0.0</td>
       <td>0.00</td>
       <td>494.0</td>
@@ -206047,6 +207051,9 @@
       <td>26831.0</td>
       <td>48.14</td>
       <td>279.0</td>
+      <td>26062.0</td>
+      <td>60.07</td>
+      <td>284.0</td>
     </tr>
     <tr>
       <td>FSL</td>
@@ -206808,6 +207815,9 @@
       <td>18400.0</td>
       <td>46.81</td>
       <td>342.0</td>
+      <td>19062.0</td>
+      <td>19.85</td>
+      <td>329.0</td>
     </tr>
     <tr>
       <td>AFFLE</td>
@@ -207568,6 +208578,9 @@
       <td>298.0</td>
       <td>24101.0</td>
       <td>52.00</td>
+      <td>297.0</td>
+      <td>23629.0</td>
+      <td>48.76</td>
       <td>297.0</td>
     </tr>
     <tr>
@@ -208330,6 +209343,9 @@
       <td>33791.0</td>
       <td>55.40</td>
       <td>238.0</td>
+      <td>33138.0</td>
+      <td>54.66</td>
+      <td>238.0</td>
     </tr>
     <tr>
       <td>PFIZER</td>
@@ -209091,6 +210107,9 @@
       <td>22072.0</td>
       <td>71.82</td>
       <td>308.0</td>
+      <td>22511.0</td>
+      <td>69.86</td>
+      <td>307.0</td>
     </tr>
     <tr>
       <td>NUVAMA</td>
@@ -209851,6 +210870,9 @@
       <td>249.0</td>
       <td>32040.0</td>
       <td>62.50</td>
+      <td>249.0</td>
+      <td>31927.0</td>
+      <td>56.71</td>
       <td>249.0</td>
     </tr>
     <tr>
@@ -210613,6 +211635,9 @@
       <td>24141.0</td>
       <td>55.84</td>
       <td>296.0</td>
+      <td>24099.0</td>
+      <td>52.84</td>
+      <td>296.0</td>
     </tr>
     <tr>
       <td>SYNGENE</td>
@@ -211374,6 +212399,9 @@
       <td>16288.0</td>
       <td>60.71</td>
       <td>374.0</td>
+      <td>16061.0</td>
+      <td>45.75</td>
+      <td>375.0</td>
     </tr>
     <tr>
       <td>ANGELONE</td>
@@ -212135,6 +213163,9 @@
       <td>26656.0</td>
       <td>36.82</td>
       <td>280.0</td>
+      <td>26451.0</td>
+      <td>34.86</td>
+      <td>282.0</td>
     </tr>
     <tr>
       <td>PPLPHARMA</td>
@@ -212896,6 +213927,9 @@
       <td>28011.0</td>
       <td>32.92</td>
       <td>272.0</td>
+      <td>27898.0</td>
+      <td>32.35</td>
+      <td>270.0</td>
     </tr>
     <tr>
       <td>STARHEALTH</td>
@@ -213656,6 +214690,9 @@
       <td>235.0</td>
       <td>34414.0</td>
       <td>65.89</td>
+      <td>235.0</td>
+      <td>34314.0</td>
+      <td>57.87</td>
       <td>235.0</td>
     </tr>
     <tr>
@@ -214418,6 +215455,9 @@
       <td>21377.0</td>
       <td>26.16</td>
       <td>316.0</td>
+      <td>21718.0</td>
+      <td>27.53</td>
+      <td>311.0</td>
     </tr>
     <tr>
       <td>EMCURE</td>
@@ -215179,6 +216219,9 @@
       <td>35612.0</td>
       <td>59.96</td>
       <td>232.0</td>
+      <td>35678.0</td>
+      <td>61.96</td>
+      <td>232.0</td>
     </tr>
     <tr>
       <td>PEL</td>
@@ -215922,6 +216965,9 @@
       <td>0.0</td>
       <td>0.00</td>
       <td>494.0</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>495.0</td>
       <td>0.0</td>
       <td>0.00</td>
       <td>495.0</td>
@@ -216701,6 +217747,9 @@
       <td>30386.0</td>
       <td>64.58</td>
       <td>259.0</td>
+      <td>29873.0</td>
+      <td>51.58</td>
+      <td>262.0</td>
     </tr>
     <tr>
       <td>SUMICHEM</td>
@@ -217462,6 +218511,9 @@
       <td>28046.0</td>
       <td>42.18</td>
       <td>270.0</td>
+      <td>27650.0</td>
+      <td>46.59</td>
+      <td>272.0</td>
     </tr>
     <tr>
       <td>EMAMILTD</td>
@@ -218223,6 +219275,9 @@
       <td>17394.0</td>
       <td>48.94</td>
       <td>355.0</td>
+      <td>17466.0</td>
+      <td>54.68</td>
+      <td>353.0</td>
     </tr>
     <tr>
       <td>HINDCOPPER</td>
@@ -218984,6 +220039,9 @@
       <td>54781.0</td>
       <td>23.08</td>
       <td>180.0</td>
+      <td>53718.0</td>
+      <td>32.25</td>
+      <td>181.0</td>
     </tr>
     <tr>
       <td>LALPATHLAB</td>
@@ -219744,6 +220802,9 @@
       <td>250.0</td>
       <td>31790.0</td>
       <td>53.97</td>
+      <td>251.0</td>
+      <td>31631.0</td>
+      <td>69.48</td>
       <td>251.0</td>
     </tr>
     <tr>
@@ -220506,6 +221567,9 @@
       <td>19022.0</td>
       <td>59.04</td>
       <td>331.0</td>
+      <td>18925.0</td>
+      <td>57.11</td>
+      <td>331.0</td>
     </tr>
     <tr>
       <td>RAMCOCEM</td>
@@ -221266,6 +222330,9 @@
       <td>310.0</td>
       <td>21603.0</td>
       <td>59.77</td>
+      <td>313.0</td>
+      <td>21429.0</td>
+      <td>47.05</td>
       <td>313.0</td>
     </tr>
     <tr>
@@ -222028,6 +223095,9 @@
       <td>24897.0</td>
       <td>61.59</td>
       <td>289.0</td>
+      <td>24294.0</td>
+      <td>50.47</td>
+      <td>294.0</td>
     </tr>
     <tr>
       <td>ASTRAZEN</td>
@@ -222789,6 +223859,9 @@
       <td>19052.0</td>
       <td>40.14</td>
       <td>330.0</td>
+      <td>18750.0</td>
+      <td>90.67</td>
+      <td>332.0</td>
     </tr>
     <tr>
       <td>ERIS</td>
@@ -223550,6 +224623,9 @@
       <td>18708.0</td>
       <td>75.74</td>
       <td>333.0</td>
+      <td>18708.0</td>
+      <td>59.40</td>
+      <td>334.0</td>
     </tr>
     <tr>
       <td>WELCORP</td>
@@ -224311,6 +225387,9 @@
       <td>50753.0</td>
       <td>60.06</td>
       <td>189.0</td>
+      <td>51993.0</td>
+      <td>49.99</td>
+      <td>183.0</td>
     </tr>
     <tr>
       <td>JSWHL</td>
@@ -225072,6 +226151,9 @@
       <td>12792.0</td>
       <td>44.28</td>
       <td>424.0</td>
+      <td>12653.0</td>
+      <td>43.89</td>
+      <td>423.0</td>
     </tr>
     <tr>
       <td>KEC</td>
@@ -225833,6 +226915,9 @@
       <td>11385.0</td>
       <td>58.02</td>
       <td>439.0</td>
+      <td>11260.0</td>
+      <td>46.79</td>
+      <td>437.0</td>
     </tr>
     <tr>
       <td>MRPL</td>
@@ -226593,6 +227678,9 @@
       <td>253.0</td>
       <td>31012.0</td>
       <td>15.38</td>
+      <td>253.0</td>
+      <td>30714.0</td>
+      <td>17.13</td>
       <td>253.0</td>
     </tr>
     <tr>
@@ -227355,6 +228443,9 @@
       <td>16603.0</td>
       <td>50.39</td>
       <td>367.0</td>
+      <td>16163.0</td>
+      <td>49.59</td>
+      <td>372.0</td>
     </tr>
     <tr>
       <td>NAVINFLUOR</td>
@@ -228116,6 +229207,9 @@
       <td>42296.0</td>
       <td>56.77</td>
       <td>209.0</td>
+      <td>42412.0</td>
+      <td>58.57</td>
+      <td>208.0</td>
     </tr>
     <tr>
       <td>REDINGTON</td>
@@ -228877,6 +229971,9 @@
       <td>25485.0</td>
       <td>46.78</td>
       <td>287.0</td>
+      <td>25954.0</td>
+      <td>47.78</td>
+      <td>286.0</td>
     </tr>
     <tr>
       <td>SHYAMMETL</td>
@@ -229638,6 +230735,9 @@
       <td>27634.0</td>
       <td>13.22</td>
       <td>274.0</td>
+      <td>27581.0</td>
+      <td>45.88</td>
+      <td>273.0</td>
     </tr>
     <tr>
       <td>SKFINDIA</td>
@@ -230398,6 +231498,9 @@
       <td>483.0</td>
       <td>8004.0</td>
       <td>51.94</td>
+      <td>482.0</td>
+      <td>8077.0</td>
+      <td>48.68</td>
       <td>482.0</td>
     </tr>
     <tr>
@@ -231160,6 +232263,9 @@
       <td>25921.0</td>
       <td>46.79</td>
       <td>285.0</td>
+      <td>25569.0</td>
+      <td>30.99</td>
+      <td>288.0</td>
     </tr>
     <tr>
       <td>MANAPPURAM</td>
@@ -231921,6 +233027,9 @@
       <td>32557.0</td>
       <td>38.99</td>
       <td>243.0</td>
+      <td>31937.0</td>
+      <td>49.64</td>
+      <td>248.0</td>
     </tr>
     <tr>
       <td>FIVESTAR</td>
@@ -232682,6 +233791,9 @@
       <td>15822.0</td>
       <td>43.49</td>
       <td>378.0</td>
+      <td>15246.0</td>
+      <td>47.12</td>
+      <td>389.0</td>
     </tr>
     <tr>
       <td>CROMPTON</td>
@@ -233443,6 +234555,9 @@
       <td>15763.0</td>
       <td>39.26</td>
       <td>381.0</td>
+      <td>15808.0</td>
+      <td>49.17</td>
+      <td>378.0</td>
     </tr>
     <tr>
       <td>HSCL</td>
@@ -234204,6 +235319,9 @@
       <td>39204.0</td>
       <td>16.33</td>
       <td>220.0</td>
+      <td>37844.0</td>
+      <td>22.92</td>
+      <td>224.0</td>
     </tr>
     <tr>
       <td>EIHOTEL</td>
@@ -234964,6 +236082,9 @@
       <td>337.0</td>
       <td>18510.0</td>
       <td>43.46</td>
+      <td>339.0</td>
+      <td>18604.0</td>
+      <td>79.53</td>
       <td>339.0</td>
     </tr>
     <tr>
@@ -235726,6 +236847,9 @@
       <td>29520.0</td>
       <td>27.91</td>
       <td>264.0</td>
+      <td>29160.0</td>
+      <td>33.72</td>
+      <td>265.0</td>
     </tr>
     <tr>
       <td>INOXWIND</td>
@@ -236487,6 +237611,9 @@
       <td>12953.0</td>
       <td>35.23</td>
       <td>421.0</td>
+      <td>12744.0</td>
+      <td>37.56</td>
+      <td>422.0</td>
     </tr>
     <tr>
       <td>CHAMBLFERT</td>
@@ -237248,6 +238375,9 @@
       <td>17428.0</td>
       <td>68.66</td>
       <td>354.0</td>
+      <td>17468.0</td>
+      <td>59.48</td>
+      <td>352.0</td>
     </tr>
     <tr>
       <td>PSB</td>
@@ -238009,6 +239139,9 @@
       <td>16461.0</td>
       <td>60.09</td>
       <td>369.0</td>
+      <td>16483.0</td>
+      <td>53.10</td>
+      <td>366.0</td>
     </tr>
     <tr>
       <td>BASF</td>
@@ -238770,6 +239903,9 @@
       <td>17277.0</td>
       <td>58.35</td>
       <td>358.0</td>
+      <td>16930.0</td>
+      <td>54.27</td>
+      <td>361.0</td>
     </tr>
     <tr>
       <td>CESC</td>
@@ -239531,6 +240667,9 @@
       <td>22269.0</td>
       <td>69.14</td>
       <td>307.0</td>
+      <td>21140.0</td>
+      <td>43.41</td>
+      <td>315.0</td>
     </tr>
     <tr>
       <td>ABSLAMC</td>
@@ -240292,6 +241431,9 @@
       <td>29418.0</td>
       <td>50.89</td>
       <td>265.0</td>
+      <td>29036.0</td>
+      <td>52.13</td>
+      <td>266.0</td>
     </tr>
     <tr>
       <td>POLYMED</td>
@@ -241053,6 +242195,9 @@
       <td>18101.0</td>
       <td>54.91</td>
       <td>346.0</td>
+      <td>17930.0</td>
+      <td>44.66</td>
+      <td>345.0</td>
     </tr>
     <tr>
       <td>PGEL</td>
@@ -241814,6 +242959,9 @@
       <td>17100.0</td>
       <td>33.73</td>
       <td>361.0</td>
+      <td>17240.0</td>
+      <td>29.27</td>
+      <td>356.0</td>
     </tr>
     <tr>
       <td>CONCORDBIO</td>
@@ -242575,6 +243723,9 @@
       <td>16456.0</td>
       <td>34.29</td>
       <td>370.0</td>
+      <td>16633.0</td>
+      <td>43.24</td>
+      <td>363.0</td>
     </tr>
     <tr>
       <td>HATSUN</td>
@@ -243336,6 +244487,9 @@
       <td>21717.0</td>
       <td>49.74</td>
       <td>311.0</td>
+      <td>20617.0</td>
+      <td>66.59</td>
+      <td>320.0</td>
     </tr>
     <tr>
       <td>TVSHLTD</td>
@@ -244096,6 +245250,9 @@
       <td>269.0</td>
       <td>28486.0</td>
       <td>53.96</td>
+      <td>268.0</td>
+      <td>28169.0</td>
+      <td>61.08</td>
       <td>268.0</td>
     </tr>
     <tr>
@@ -244858,6 +246015,9 @@
       <td>16551.0</td>
       <td>36.56</td>
       <td>368.0</td>
+      <td>16385.0</td>
+      <td>29.89</td>
+      <td>368.0</td>
     </tr>
     <tr>
       <td>ATUL</td>
@@ -245619,6 +246779,9 @@
       <td>19484.0</td>
       <td>57.00</td>
       <td>324.0</td>
+      <td>19431.0</td>
+      <td>56.43</td>
+      <td>326.0</td>
     </tr>
     <tr>
       <td>DEVYANI</td>
@@ -246380,6 +247543,9 @@
       <td>17446.0</td>
       <td>36.35</td>
       <td>353.0</td>
+      <td>17631.0</td>
+      <td>40.46</td>
+      <td>350.0</td>
     </tr>
     <tr>
       <td>SUNDRMFAST</td>
@@ -247141,6 +248307,9 @@
       <td>25763.0</td>
       <td>65.46</td>
       <td>286.0</td>
+      <td>26211.0</td>
+      <td>50.94</td>
+      <td>283.0</td>
     </tr>
     <tr>
       <td>CASTROLIND</td>
@@ -247902,6 +249071,9 @@
       <td>18452.0</td>
       <td>66.33</td>
       <td>341.0</td>
+      <td>18654.0</td>
+      <td>55.98</td>
+      <td>338.0</td>
     </tr>
     <tr>
       <td>IIFL</td>
@@ -248663,6 +249835,9 @@
       <td>26458.0</td>
       <td>53.79</td>
       <td>282.0</td>
+      <td>26930.0</td>
+      <td>51.93</td>
+      <td>278.0</td>
     </tr>
     <tr>
       <td>KPIL</td>
@@ -249424,6 +250599,9 @@
       <td>23976.0</td>
       <td>47.16</td>
       <td>298.0</td>
+      <td>23481.0</td>
+      <td>44.03</td>
+      <td>299.0</td>
     </tr>
     <tr>
       <td>CAMS</td>
@@ -250185,6 +251363,9 @@
       <td>18920.0</td>
       <td>55.50</td>
       <td>332.0</td>
+      <td>18729.0</td>
+      <td>56.01</td>
+      <td>333.0</td>
     </tr>
     <tr>
       <td>OLAELEC</td>
@@ -250946,6 +252127,9 @@
       <td>17879.0</td>
       <td>31.83</td>
       <td>349.0</td>
+      <td>17287.0</td>
+      <td>38.13</td>
+      <td>355.0</td>
     </tr>
     <tr>
       <td>VINATIORGA</td>
@@ -251707,6 +252891,9 @@
       <td>13943.0</td>
       <td>52.24</td>
       <td>403.0</td>
+      <td>13789.0</td>
+      <td>52.54</td>
+      <td>408.0</td>
     </tr>
     <tr>
       <td>RATNAMANI</td>
@@ -252468,6 +253655,9 @@
       <td>16716.0</td>
       <td>47.86</td>
       <td>365.0</td>
+      <td>16191.0</td>
+      <td>69.99</td>
+      <td>371.0</td>
     </tr>
     <tr>
       <td>KARURVYSYA</td>
@@ -253229,6 +254419,9 @@
       <td>32331.0</td>
       <td>59.39</td>
       <td>247.0</td>
+      <td>32017.0</td>
+      <td>58.52</td>
+      <td>246.0</td>
     </tr>
     <tr>
       <td>CHALET</td>
@@ -253990,6 +255183,9 @@
       <td>18213.0</td>
       <td>41.54</td>
       <td>344.0</td>
+      <td>18679.0</td>
+      <td>36.65</td>
+      <td>336.0</td>
     </tr>
     <tr>
       <td>MANYAVAR</td>
@@ -254751,6 +255947,9 @@
       <td>13072.0</td>
       <td>47.76</td>
       <td>420.0</td>
+      <td>13218.0</td>
+      <td>49.96</td>
+      <td>418.0</td>
     </tr>
     <tr>
       <td>KANSAINER</td>
@@ -255512,6 +256711,9 @@
       <td>16336.0</td>
       <td>60.05</td>
       <td>372.0</td>
+      <td>16248.0</td>
+      <td>61.34</td>
+      <td>370.0</td>
     </tr>
     <tr>
       <td>ZENSARTECH</td>
@@ -256272,6 +257474,9 @@
       <td>443.0</td>
       <td>11002.0</td>
       <td>49.78</td>
+      <td>447.0</td>
+      <td>10871.0</td>
+      <td>39.72</td>
       <td>447.0</td>
     </tr>
     <tr>
@@ -257034,6 +258239,9 @@
       <td>19778.0</td>
       <td>49.93</td>
       <td>323.0</td>
+      <td>19895.0</td>
+      <td>43.85</td>
+      <td>323.0</td>
     </tr>
     <tr>
       <td>TRITURBINE</td>
@@ -257795,6 +259003,9 @@
       <td>18501.0</td>
       <td>72.61</td>
       <td>340.0</td>
+      <td>18088.0</td>
+      <td>30.55</td>
+      <td>342.0</td>
     </tr>
     <tr>
       <td>DEEPAKFERT</td>
@@ -258556,6 +259767,9 @@
       <td>18598.0</td>
       <td>48.22</td>
       <td>335.0</td>
+      <td>18556.0</td>
+      <td>49.41</td>
+      <td>340.0</td>
     </tr>
     <tr>
       <td>FIRSTCRY</td>
@@ -259317,6 +260531,9 @@
       <td>10679.0</td>
       <td>39.77</td>
       <td>451.0</td>
+      <td>10295.0</td>
+      <td>46.84</td>
+      <td>453.0</td>
     </tr>
     <tr>
       <td>AADHARHFC</td>
@@ -260078,6 +261295,9 @@
       <td>21254.0</td>
       <td>49.76</td>
       <td>317.0</td>
+      <td>20729.0</td>
+      <td>68.16</td>
+      <td>318.0</td>
     </tr>
     <tr>
       <td>APLLTD</td>
@@ -260839,6 +262059,9 @@
       <td>16245.0</td>
       <td>50.15</td>
       <td>375.0</td>
+      <td>16004.0</td>
+      <td>63.10</td>
+      <td>376.0</td>
     </tr>
     <tr>
       <td>ASAHIINDIA</td>
@@ -261600,6 +262823,9 @@
       <td>24541.0</td>
       <td>41.77</td>
       <td>291.0</td>
+      <td>24331.0</td>
+      <td>50.55</td>
+      <td>293.0</td>
     </tr>
     <tr>
       <td>GRINDWELL</td>
@@ -262361,6 +263587,9 @@
       <td>23273.0</td>
       <td>53.34</td>
       <td>303.0</td>
+      <td>22796.0</td>
+      <td>53.07</td>
+      <td>305.0</td>
     </tr>
     <tr>
       <td>SCHNEIDER</td>
@@ -263122,6 +264351,9 @@
       <td>30581.0</td>
       <td>36.51</td>
       <td>258.0</td>
+      <td>29959.0</td>
+      <td>46.66</td>
+      <td>260.0</td>
     </tr>
     <tr>
       <td>BEML</td>
@@ -263883,6 +265115,9 @@
       <td>16333.0</td>
       <td>39.22</td>
       <td>373.0</td>
+      <td>16374.0</td>
+      <td>35.53</td>
+      <td>369.0</td>
     </tr>
     <tr>
       <td>IRCON</td>
@@ -264643,6 +265878,9 @@
       <td>432.0</td>
       <td>11619.0</td>
       <td>49.79</td>
+      <td>433.0</td>
+      <td>11520.0</td>
+      <td>33.40</td>
       <td>433.0</td>
     </tr>
     <tr>
@@ -265405,6 +266643,9 @@
       <td>24446.0</td>
       <td>53.43</td>
       <td>294.0</td>
+      <td>24462.0</td>
+      <td>49.00</td>
+      <td>292.0</td>
     </tr>
     <tr>
       <td>DCMSHRIRAM</td>
@@ -266166,6 +267407,9 @@
       <td>15937.0</td>
       <td>23.21</td>
       <td>377.0</td>
+      <td>16420.0</td>
+      <td>43.19</td>
+      <td>367.0</td>
     </tr>
     <tr>
       <td>FORCEMOT</td>
@@ -266927,6 +268171,9 @@
       <td>23719.0</td>
       <td>40.16</td>
       <td>300.0</td>
+      <td>23246.0</td>
+      <td>42.23</td>
+      <td>301.0</td>
     </tr>
     <tr>
       <td>ANANTRAJ</td>
@@ -267687,6 +268934,9 @@
       <td>307.0</td>
       <td>22560.0</td>
       <td>46.87</td>
+      <td>306.0</td>
+      <td>22735.0</td>
+      <td>41.27</td>
       <td>306.0</td>
     </tr>
     <tr>
@@ -268449,6 +269699,9 @@
       <td>13763.0</td>
       <td>58.39</td>
       <td>411.0</td>
+      <td>13809.0</td>
+      <td>75.45</td>
+      <td>407.0</td>
     </tr>
     <tr>
       <td>BIKAJI</td>
@@ -269210,6 +270463,9 @@
       <td>15257.0</td>
       <td>61.11</td>
       <td>387.0</td>
+      <td>15269.0</td>
+      <td>53.03</td>
+      <td>388.0</td>
     </tr>
     <tr>
       <td>SIGNATURE</td>
@@ -269971,6 +271227,9 @@
       <td>11363.0</td>
       <td>5.57</td>
       <td>440.0</td>
+      <td>11045.0</td>
+      <td>8.36</td>
+      <td>443.0</td>
     </tr>
     <tr>
       <td>CARBORUNIV</td>
@@ -270732,6 +271991,9 @@
       <td>21531.0</td>
       <td>67.04</td>
       <td>315.0</td>
+      <td>20668.0</td>
+      <td>55.08</td>
+      <td>319.0</td>
     </tr>
     <tr>
       <td>KIOCL</td>
@@ -271492,6 +272754,9 @@
       <td>302.0</td>
       <td>23346.0</td>
       <td>38.59</td>
+      <td>302.0</td>
+      <td>22915.0</td>
+      <td>40.23</td>
       <td>302.0</td>
     </tr>
     <tr>
@@ -272254,6 +273519,9 @@
       <td>17922.0</td>
       <td>29.10</td>
       <td>347.0</td>
+      <td>17437.0</td>
+      <td>29.89</td>
+      <td>354.0</td>
     </tr>
     <tr>
       <td>TECHNOE</td>
@@ -273015,6 +274283,9 @@
       <td>11688.0</td>
       <td>40.30</td>
       <td>431.0</td>
+      <td>11583.0</td>
+      <td>54.59</td>
+      <td>432.0</td>
     </tr>
     <tr>
       <td>ECLERX</td>
@@ -273776,6 +275047,9 @@
       <td>17032.0</td>
       <td>40.96</td>
       <td>362.0</td>
+      <td>17154.0</td>
+      <td>36.10</td>
+      <td>358.0</td>
     </tr>
     <tr>
       <td>LMW</td>
@@ -274537,6 +275811,9 @@
       <td>21109.0</td>
       <td>52.04</td>
       <td>319.0</td>
+      <td>20937.0</td>
+      <td>42.52</td>
+      <td>316.0</td>
     </tr>
     <tr>
       <td>WHIRLPOOL</td>
@@ -275298,6 +276575,9 @@
       <td>9765.0</td>
       <td>58.49</td>
       <td>461.0</td>
+      <td>9538.0</td>
+      <td>63.67</td>
+      <td>462.0</td>
     </tr>
     <tr>
       <td>ANANDRATHI</td>
@@ -276058,6 +277338,9 @@
       <td>231.0</td>
       <td>36462.0</td>
       <td>64.39</td>
+      <td>230.0</td>
+      <td>36396.0</td>
+      <td>56.23</td>
       <td>230.0</td>
     </tr>
     <tr>
@@ -276820,6 +278103,9 @@
       <td>13933.0</td>
       <td>51.54</td>
       <td>404.0</td>
+      <td>14022.0</td>
+      <td>39.08</td>
+      <td>403.0</td>
     </tr>
     <tr>
       <td>NEWGEN</td>
@@ -277581,6 +278867,9 @@
       <td>7535.0</td>
       <td>44.14</td>
       <td>487.0</td>
+      <td>7410.0</td>
+      <td>36.18</td>
+      <td>488.0</td>
     </tr>
     <tr>
       <td>CIEINDIA</td>
@@ -278342,6 +279631,9 @@
       <td>15616.0</td>
       <td>52.79</td>
       <td>383.0</td>
+      <td>15402.0</td>
+      <td>70.38</td>
+      <td>386.0</td>
     </tr>
     <tr>
       <td>DATAPATTNS</td>
@@ -279102,6 +280394,9 @@
       <td>288.0</td>
       <td>26536.0</td>
       <td>30.28</td>
+      <td>281.0</td>
+      <td>26732.0</td>
+      <td>29.49</td>
       <td>281.0</td>
     </tr>
     <tr>
@@ -279864,6 +281159,9 @@
       <td>16662.0</td>
       <td>54.23</td>
       <td>366.0</td>
+      <td>16551.0</td>
+      <td>48.27</td>
+      <td>365.0</td>
     </tr>
     <tr>
       <td>SOBHA</td>
@@ -280625,6 +281923,9 @@
       <td>14002.0</td>
       <td>50.47</td>
       <td>402.0</td>
+      <td>13622.0</td>
+      <td>56.64</td>
+      <td>414.0</td>
     </tr>
     <tr>
       <td>INTELLECT</td>
@@ -281385,6 +282686,9 @@
       <td>464.0</td>
       <td>9717.0</td>
       <td>54.10</td>
+      <td>463.0</td>
+      <td>9517.0</td>
+      <td>54.07</td>
       <td>463.0</td>
     </tr>
     <tr>
@@ -282147,6 +283451,9 @@
       <td>19426.0</td>
       <td>44.95</td>
       <td>325.0</td>
+      <td>20187.0</td>
+      <td>39.75</td>
+      <td>321.0</td>
     </tr>
     <tr>
       <td>VGUARD</td>
@@ -282908,6 +284215,9 @@
       <td>14571.0</td>
       <td>53.39</td>
       <td>398.0</td>
+      <td>14564.0</td>
+      <td>55.08</td>
+      <td>397.0</td>
     </tr>
     <tr>
       <td>JBMA</td>
@@ -283668,6 +284978,9 @@
       <td>395.0</td>
       <td>14669.0</td>
       <td>47.96</td>
+      <td>396.0</td>
+      <td>14594.0</td>
+      <td>48.33</td>
       <td>396.0</td>
     </tr>
     <tr>
@@ -284430,6 +285743,9 @@
       <td>11092.0</td>
       <td>56.14</td>
       <td>443.0</td>
+      <td>10967.0</td>
+      <td>55.43</td>
+      <td>445.0</td>
     </tr>
     <tr>
       <td>VENTIVE</td>
@@ -285191,6 +286507,9 @@
       <td>13638.0</td>
       <td>61.98</td>
       <td>415.0</td>
+      <td>13708.0</td>
+      <td>53.40</td>
+      <td>411.0</td>
     </tr>
     <tr>
       <td>MAHSCOOTER</td>
@@ -285952,6 +287271,9 @@
       <td>15131.0</td>
       <td>51.03</td>
       <td>389.0</td>
+      <td>15295.0</td>
+      <td>50.95</td>
+      <td>387.0</td>
     </tr>
     <tr>
       <td>AARTIIND</td>
@@ -286713,6 +288035,9 @@
       <td>19297.0</td>
       <td>37.84</td>
       <td>326.0</td>
+      <td>19115.0</td>
+      <td>65.00</td>
+      <td>327.0</td>
     </tr>
     <tr>
       <td>CGCL</td>
@@ -287474,6 +288799,9 @@
       <td>21579.0</td>
       <td>31.91</td>
       <td>314.0</td>
+      <td>21743.0</td>
+      <td>30.59</td>
+      <td>310.0</td>
     </tr>
     <tr>
       <td>KAJARIACER</td>
@@ -288235,6 +289563,9 @@
       <td>19202.0</td>
       <td>53.88</td>
       <td>328.0</td>
+      <td>18982.0</td>
+      <td>49.57</td>
+      <td>330.0</td>
     </tr>
     <tr>
       <td>AFCONS</td>
@@ -288995,6 +290326,9 @@
       <td>459.0</td>
       <td>10297.0</td>
       <td>48.55</td>
+      <td>455.0</td>
+      <td>10217.0</td>
+      <td>47.76</td>
       <td>455.0</td>
     </tr>
     <tr>
@@ -289757,6 +291091,9 @@
       <td>21958.0</td>
       <td>25.41</td>
       <td>310.0</td>
+      <td>21942.0</td>
+      <td>21.43</td>
+      <td>308.0</td>
     </tr>
     <tr>
       <td>JWL</td>
@@ -290517,6 +291854,9 @@
       <td>451.0</td>
       <td>10726.0</td>
       <td>42.59</td>
+      <td>450.0</td>
+      <td>10620.0</td>
+      <td>30.40</td>
       <td>450.0</td>
     </tr>
     <tr>
@@ -291279,6 +292619,9 @@
       <td>11480.0</td>
       <td>68.82</td>
       <td>436.0</td>
+      <td>11484.0</td>
+      <td>71.32</td>
+      <td>434.0</td>
     </tr>
     <tr>
       <td>HBLENGINE</td>
@@ -292040,6 +293383,9 @@
       <td>18591.0</td>
       <td>52.52</td>
       <td>336.0</td>
+      <td>18655.0</td>
+      <td>50.20</td>
+      <td>337.0</td>
     </tr>
     <tr>
       <td>SARDAEN</td>
@@ -292800,6 +294146,9 @@
       <td>343.0</td>
       <td>18218.0</td>
       <td>40.27</td>
+      <td>343.0</td>
+      <td>17971.0</td>
+      <td>63.09</td>
       <td>343.0</td>
     </tr>
     <tr>
@@ -293562,6 +294911,9 @@
       <td>19230.0</td>
       <td>45.44</td>
       <td>327.0</td>
+      <td>19573.0</td>
+      <td>50.49</td>
+      <td>325.0</td>
     </tr>
     <tr>
       <td>APTUS</td>
@@ -294323,6 +295675,9 @@
       <td>12835.0</td>
       <td>56.43</td>
       <td>423.0</td>
+      <td>12633.0</td>
+      <td>65.21</td>
+      <td>425.0</td>
     </tr>
     <tr>
       <td>NEULANDLAB</td>
@@ -295084,6 +296439,9 @@
       <td>30020.0</td>
       <td>43.04</td>
       <td>262.0</td>
+      <td>29892.0</td>
+      <td>43.27</td>
+      <td>261.0</td>
     </tr>
     <tr>
       <td>NATCOPHARM</td>
@@ -295845,6 +297203,9 @@
       <td>16119.0</td>
       <td>42.33</td>
       <td>376.0</td>
+      <td>15851.0</td>
+      <td>44.02</td>
+      <td>377.0</td>
     </tr>
     <tr>
       <td>NAVA</td>
@@ -296606,6 +297967,9 @@
       <td>15805.0</td>
       <td>54.29</td>
       <td>380.0</td>
+      <td>15522.0</td>
+      <td>53.04</td>
+      <td>384.0</td>
     </tr>
     <tr>
       <td>IGIL</td>
@@ -297367,6 +298731,9 @@
       <td>15054.0</td>
       <td>48.53</td>
       <td>391.0</td>
+      <td>14626.0</td>
+      <td>59.58</td>
+      <td>395.0</td>
     </tr>
     <tr>
       <td>BATAINDIA</td>
@@ -298128,6 +299495,9 @@
       <td>9652.0</td>
       <td>56.05</td>
       <td>464.0</td>
+      <td>9274.0</td>
+      <td>32.72</td>
+      <td>467.0</td>
     </tr>
     <tr>
       <td>EMBDL</td>
@@ -298888,6 +300258,9 @@
       <td>477.0</td>
       <td>8722.0</td>
       <td>41.54</td>
+      <td>476.0</td>
+      <td>8663.0</td>
+      <td>50.11</td>
       <td>476.0</td>
     </tr>
     <tr>
@@ -299650,6 +301023,9 @@
       <td>26313.0</td>
       <td>45.97</td>
       <td>283.0</td>
+      <td>26931.0</td>
+      <td>38.26</td>
+      <td>277.0</td>
     </tr>
     <tr>
       <td>SAILIFE</td>
@@ -300410,6 +301786,9 @@
       <td>260.0</td>
       <td>30642.0</td>
       <td>43.58</td>
+      <td>257.0</td>
+      <td>30252.0</td>
+      <td>54.61</td>
       <td>257.0</td>
     </tr>
     <tr>
@@ -301172,6 +302551,9 @@
       <td>8820.0</td>
       <td>41.03</td>
       <td>474.0</td>
+      <td>8756.0</td>
+      <td>57.18</td>
+      <td>474.0</td>
     </tr>
     <tr>
       <td>TRIDENT</td>
@@ -301933,6 +303315,9 @@
       <td>12464.0</td>
       <td>38.68</td>
       <td>425.0</td>
+      <td>12637.0</td>
+      <td>53.72</td>
+      <td>424.0</td>
     </tr>
     <tr>
       <td>BLUEJET</td>
@@ -302694,6 +304079,9 @@
       <td>11454.0</td>
       <td>54.10</td>
       <td>437.0</td>
+      <td>11229.0</td>
+      <td>54.20</td>
+      <td>439.0</td>
     </tr>
     <tr>
       <td>LTFOODS</td>
@@ -303455,6 +304843,9 @@
       <td>14763.0</td>
       <td>53.75</td>
       <td>395.0</td>
+      <td>14834.0</td>
+      <td>43.17</td>
+      <td>393.0</td>
     </tr>
     <tr>
       <td>JINDALSAW</td>
@@ -304216,6 +305607,9 @@
       <td>17282.0</td>
       <td>44.16</td>
       <td>357.0</td>
+      <td>17116.0</td>
+      <td>35.14</td>
+      <td>359.0</td>
     </tr>
     <tr>
       <td>CYIENT</td>
@@ -304977,6 +306371,9 @@
       <td>8986.0</td>
       <td>82.98</td>
       <td>470.0</td>
+      <td>9339.0</td>
+      <td>45.75</td>
+      <td>465.0</td>
     </tr>
     <tr>
       <td>SPLPETRO</td>
@@ -305738,6 +307135,9 @@
       <td>13256.0</td>
       <td>53.79</td>
       <td>418.0</td>
+      <td>13224.0</td>
+      <td>44.95</td>
+      <td>417.0</td>
     </tr>
     <tr>
       <td>RRKABEL</td>
@@ -306499,6 +307899,9 @@
       <td>31556.0</td>
       <td>35.13</td>
       <td>252.0</td>
+      <td>32934.0</td>
+      <td>41.83</td>
+      <td>241.0</td>
     </tr>
     <tr>
       <td>BLS</td>
@@ -307260,6 +308663,9 @@
       <td>11042.0</td>
       <td>46.07</td>
       <td>445.0</td>
+      <td>11178.0</td>
+      <td>38.57</td>
+      <td>440.0</td>
     </tr>
     <tr>
       <td>NIVABUPA</td>
@@ -308021,6 +309427,9 @@
       <td>15487.0</td>
       <td>51.00</td>
       <td>385.0</td>
+      <td>15550.0</td>
+      <td>48.20</td>
+      <td>383.0</td>
     </tr>
     <tr>
       <td>DOMS</td>
@@ -308782,6 +310191,9 @@
       <td>13472.0</td>
       <td>59.94</td>
       <td>416.0</td>
+      <td>13315.0</td>
+      <td>66.09</td>
+      <td>415.0</td>
     </tr>
     <tr>
       <td>INDIAMART</td>
@@ -309542,6 +310954,9 @@
       <td>453.0</td>
       <td>10519.0</td>
       <td>55.66</td>
+      <td>452.0</td>
+      <td>10422.0</td>
+      <td>63.92</td>
       <td>452.0</td>
     </tr>
     <tr>
@@ -310304,6 +311719,9 @@
       <td>14784.0</td>
       <td>61.75</td>
       <td>394.0</td>
+      <td>14889.0</td>
+      <td>49.77</td>
+      <td>391.0</td>
     </tr>
     <tr>
       <td>KSB</td>
@@ -311065,6 +312483,9 @@
       <td>13766.0</td>
       <td>50.35</td>
       <td>410.0</td>
+      <td>14023.0</td>
+      <td>48.54</td>
+      <td>402.0</td>
     </tr>
     <tr>
       <td>BLUEDART</td>
@@ -311826,6 +313247,9 @@
       <td>12053.0</td>
       <td>63.14</td>
       <td>427.0</td>
+      <td>12041.0</td>
+      <td>52.91</td>
+      <td>428.0</td>
     </tr>
     <tr>
       <td>FINCABLES</td>
@@ -312587,6 +314011,9 @@
       <td>20212.0</td>
       <td>33.98</td>
       <td>321.0</td>
+      <td>20179.0</td>
+      <td>29.72</td>
+      <td>322.0</td>
     </tr>
     <tr>
       <td>GODREJAGRO</td>
@@ -313348,6 +314775,9 @@
       <td>11272.0</td>
       <td>52.54</td>
       <td>442.0</td>
+      <td>11045.0</td>
+      <td>51.91</td>
+      <td>444.0</td>
     </tr>
     <tr>
       <td>PCBL</td>
@@ -314109,6 +315539,9 @@
       <td>12879.0</td>
       <td>18.83</td>
       <td>422.0</td>
+      <td>12779.0</td>
+      <td>37.31</td>
+      <td>421.0</td>
     </tr>
     <tr>
       <td>TARIL</td>
@@ -314870,6 +316303,9 @@
       <td>8926.0</td>
       <td>48.20</td>
       <td>471.0</td>
+      <td>8740.0</td>
+      <td>54.43</td>
+      <td>475.0</td>
     </tr>
     <tr>
       <td>CEATLTD</td>
@@ -315631,6 +317067,9 @@
       <td>14599.0</td>
       <td>45.50</td>
       <td>397.0</td>
+      <td>14311.0</td>
+      <td>34.93</td>
+      <td>399.0</td>
     </tr>
     <tr>
       <td>AAVAS</td>
@@ -316392,6 +317831,9 @@
       <td>11005.0</td>
       <td>57.91</td>
       <td>446.0</td>
+      <td>10831.0</td>
+      <td>54.92</td>
+      <td>448.0</td>
     </tr>
     <tr>
       <td>FINPIPE</td>
@@ -317153,6 +318595,9 @@
       <td>9851.0</td>
       <td>42.22</td>
       <td>460.0</td>
+      <td>9865.0</td>
+      <td>51.32</td>
+      <td>457.0</td>
     </tr>
     <tr>
       <td>ELECON</td>
@@ -317914,6 +319359,9 @@
       <td>9761.0</td>
       <td>46.56</td>
       <td>462.0</td>
+      <td>9581.0</td>
+      <td>50.52</td>
+      <td>461.0</td>
     </tr>
     <tr>
       <td>CUB</td>
@@ -318674,6 +320122,9 @@
       <td>317.0</td>
       <td>22014.0</td>
       <td>51.22</td>
+      <td>309.0</td>
+      <td>21926.0</td>
+      <td>58.24</td>
       <td>309.0</td>
     </tr>
     <tr>
@@ -319436,6 +320887,9 @@
       <td>15105.0</td>
       <td>43.92</td>
       <td>390.0</td>
+      <td>15492.0</td>
+      <td>42.79</td>
+      <td>385.0</td>
     </tr>
     <tr>
       <td>ACE</td>
@@ -320196,6 +321650,9 @@
       <td>419.0</td>
       <td>14099.0</td>
       <td>33.40</td>
+      <td>401.0</td>
+      <td>14053.0</td>
+      <td>38.19</td>
       <td>401.0</td>
     </tr>
     <tr>
@@ -320958,6 +322415,9 @@
       <td>15667.0</td>
       <td>56.21</td>
       <td>382.0</td>
+      <td>15787.0</td>
+      <td>67.22</td>
+      <td>379.0</td>
     </tr>
     <tr>
       <td>INDGN</td>
@@ -321719,6 +323179,9 @@
       <td>13701.0</td>
       <td>64.36</td>
       <td>413.0</td>
+      <td>13650.0</td>
+      <td>51.52</td>
+      <td>412.0</td>
     </tr>
     <tr>
       <td>NCC</td>
@@ -322479,6 +323942,9 @@
       <td>476.0</td>
       <td>8821.0</td>
       <td>49.35</td>
+      <td>473.0</td>
+      <td>8765.0</td>
+      <td>48.06</td>
       <td>473.0</td>
     </tr>
     <tr>
@@ -323241,6 +324707,9 @@
       <td>11002.0</td>
       <td>55.96</td>
       <td>448.0</td>
+      <td>11135.0</td>
+      <td>17.49</td>
+      <td>442.0</td>
     </tr>
     <tr>
       <td>SANOFI</td>
@@ -324002,6 +325471,9 @@
       <td>7478.0</td>
       <td>59.77</td>
       <td>488.0</td>
+      <td>7526.0</td>
+      <td>61.16</td>
+      <td>487.0</td>
     </tr>
     <tr>
       <td>RBLBANK</td>
@@ -324763,6 +326235,9 @@
       <td>59369.0</td>
       <td>41.80</td>
       <td>172.0</td>
+      <td>59136.0</td>
+      <td>40.97</td>
+      <td>173.0</td>
     </tr>
     <tr>
       <td>CHOICEIN</td>
@@ -325524,6 +326999,9 @@
       <td>17911.0</td>
       <td>34.09</td>
       <td>348.0</td>
+      <td>17822.0</td>
+      <td>21.69</td>
+      <td>346.0</td>
     </tr>
     <tr>
       <td>GESHIP</td>
@@ -326285,6 +327763,9 @@
       <td>18631.0</td>
       <td>36.51</td>
       <td>334.0</td>
+      <td>18701.0</td>
+      <td>31.00</td>
+      <td>335.0</td>
     </tr>
     <tr>
       <td>TBOTEK</td>
@@ -327046,6 +328527,9 @@
       <td>18523.0</td>
       <td>50.64</td>
       <td>338.0</td>
+      <td>17960.0</td>
+      <td>53.08</td>
+      <td>344.0</td>
     </tr>
     <tr>
       <td>RAILTEL</td>
@@ -327807,6 +329291,9 @@
       <td>8891.0</td>
       <td>50.60</td>
       <td>472.0</td>
+      <td>9066.0</td>
+      <td>8.14</td>
+      <td>468.0</td>
     </tr>
     <tr>
       <td>JMFINANCIL</td>
@@ -328568,6 +330055,9 @@
       <td>11995.0</td>
       <td>54.34</td>
       <td>428.0</td>
+      <td>12104.0</td>
+      <td>49.28</td>
+      <td>427.0</td>
     </tr>
     <tr>
       <td>PARADEEP</td>
@@ -329329,6 +330819,9 @@
       <td>15318.0</td>
       <td>33.18</td>
       <td>386.0</td>
+      <td>15625.0</td>
+      <td>35.72</td>
+      <td>381.0</td>
     </tr>
     <tr>
       <td>VTL</td>
@@ -330090,6 +331583,9 @@
       <td>17658.0</td>
       <td>40.01</td>
       <td>352.0</td>
+      <td>17186.0</td>
+      <td>40.89</td>
+      <td>357.0</td>
     </tr>
     <tr>
       <td>RITES</td>
@@ -330851,6 +332347,9 @@
       <td>10501.0</td>
       <td>54.63</td>
       <td>453.0</td>
+      <td>10539.0</td>
+      <td>34.41</td>
+      <td>451.0</td>
     </tr>
     <tr>
       <td>BBTC</td>
@@ -331611,6 +333110,9 @@
       <td>455.0</td>
       <td>10233.0</td>
       <td>49.29</td>
+      <td>456.0</td>
+      <td>10102.0</td>
+      <td>58.18</td>
       <td>456.0</td>
     </tr>
     <tr>
@@ -332373,6 +333875,9 @@
       <td>7998.0</td>
       <td>54.47</td>
       <td>483.0</td>
+      <td>7929.0</td>
+      <td>52.06</td>
+      <td>483.0</td>
     </tr>
     <tr>
       <td>HOMEFIRST</td>
@@ -333133,6 +334638,9 @@
       <td>426.0</td>
       <td>12366.0</td>
       <td>79.56</td>
+      <td>426.0</td>
+      <td>12444.0</td>
+      <td>60.80</td>
       <td>426.0</td>
     </tr>
     <tr>
@@ -333895,6 +335403,9 @@
       <td>7407.0</td>
       <td>52.04</td>
       <td>489.0</td>
+      <td>7321.0</td>
+      <td>37.37</td>
+      <td>489.0</td>
     </tr>
     <tr>
       <td>ZYDUSWELL</td>
@@ -334656,6 +336167,9 @@
       <td>15809.0</td>
       <td>49.39</td>
       <td>379.0</td>
+      <td>15653.0</td>
+      <td>46.45</td>
+      <td>380.0</td>
     </tr>
     <tr>
       <td>MINDACORP</td>
@@ -335417,6 +336931,9 @@
       <td>17850.0</td>
       <td>25.24</td>
       <td>350.0</td>
+      <td>17739.0</td>
+      <td>45.37</td>
+      <td>348.0</td>
     </tr>
     <tr>
       <td>ZEEL</td>
@@ -336178,6 +337695,9 @@
       <td>10085.0</td>
       <td>28.95</td>
       <td>457.0</td>
+      <td>9787.0</td>
+      <td>41.12</td>
+      <td>459.0</td>
     </tr>
     <tr>
       <td>WELSPUNLIV</td>
@@ -336939,6 +338459,9 @@
       <td>16764.0</td>
       <td>11.67</td>
       <td>364.0</td>
+      <td>17090.0</td>
+      <td>27.22</td>
+      <td>360.0</td>
     </tr>
     <tr>
       <td>VOLTAMP</td>
@@ -337700,6 +339223,9 @@
       <td>14555.0</td>
       <td>48.56</td>
       <td>399.0</td>
+      <td>14461.0</td>
+      <td>64.71</td>
+      <td>398.0</td>
     </tr>
     <tr>
       <td>GMDCLTD</td>
@@ -338461,6 +339987,9 @@
       <td>18102.0</td>
       <td>39.80</td>
       <td>345.0</td>
+      <td>17734.0</td>
+      <td>50.50</td>
+      <td>349.0</td>
     </tr>
     <tr>
       <td>GRINFRA</td>
@@ -339222,6 +340751,9 @@
       <td>8389.0</td>
       <td>52.21</td>
       <td>480.0</td>
+      <td>8568.0</td>
+      <td>53.81</td>
+      <td>478.0</td>
     </tr>
     <tr>
       <td>CRAFTSMAN</td>
@@ -339982,6 +341514,9 @@
       <td>274.0</td>
       <td>28508.0</td>
       <td>35.00</td>
+      <td>267.0</td>
+      <td>28202.0</td>
+      <td>48.32</td>
       <td>267.0</td>
     </tr>
     <tr>
@@ -340744,6 +342279,9 @@
       <td>13727.0</td>
       <td>30.58</td>
       <td>412.0</td>
+      <td>13280.0</td>
+      <td>45.16</td>
+      <td>416.0</td>
     </tr>
     <tr>
       <td>KIRLOSENG</td>
@@ -341505,6 +343043,9 @@
       <td>30895.0</td>
       <td>57.09</td>
       <td>254.0</td>
+      <td>30202.0</td>
+      <td>62.87</td>
+      <td>259.0</td>
     </tr>
     <tr>
       <td>GRAVITA</td>
@@ -342266,6 +343807,9 @@
       <td>13368.0</td>
       <td>49.42</td>
       <td>417.0</td>
+      <td>13207.0</td>
+      <td>53.11</td>
+      <td>419.0</td>
     </tr>
     <tr>
       <td>ANURAS</td>
@@ -343027,6 +344571,9 @@
       <td>13832.0</td>
       <td>81.52</td>
       <td>408.0</td>
+      <td>13915.0</td>
+      <td>71.42</td>
+      <td>405.0</td>
     </tr>
     <tr>
       <td>NUVOCO</td>
@@ -343788,6 +345335,9 @@
       <td>11670.0</td>
       <td>47.56</td>
       <td>432.0</td>
+      <td>11350.0</td>
+      <td>59.96</td>
+      <td>436.0</td>
     </tr>
     <tr>
       <td>TEJASNET</td>
@@ -344549,6 +346099,9 @@
       <td>9251.0</td>
       <td>31.31</td>
       <td>468.0</td>
+      <td>9058.0</td>
+      <td>37.61</td>
+      <td>469.0</td>
     </tr>
     <tr>
       <td>JYOTHYLAB</td>
@@ -345309,6 +346862,9 @@
       <td>485.0</td>
       <td>7682.0</td>
       <td>37.58</td>
+      <td>486.0</td>
+      <td>7621.0</td>
+      <td>51.73</td>
       <td>486.0</td>
     </tr>
     <tr>
@@ -346071,6 +347627,9 @@
       <td>14830.0</td>
       <td>50.84</td>
       <td>392.0</td>
+      <td>14672.0</td>
+      <td>50.49</td>
+      <td>394.0</td>
     </tr>
     <tr>
       <td>GPIL</td>
@@ -346832,6 +348391,9 @@
       <td>17163.0</td>
       <td>43.35</td>
       <td>359.0</td>
+      <td>16558.0</td>
+      <td>47.96</td>
+      <td>364.0</td>
     </tr>
     <tr>
       <td>SHAKTIPUMP</td>
@@ -347592,6 +349154,9 @@
       <td>492.0</td>
       <td>6157.0</td>
       <td>64.27</td>
+      <td>492.0</td>
+      <td>6071.0</td>
+      <td>54.73</td>
       <td>492.0</td>
     </tr>
     <tr>
@@ -348354,6 +349919,9 @@
       <td>21113.0</td>
       <td>58.26</td>
       <td>318.0</td>
+      <td>20864.0</td>
+      <td>51.35</td>
+      <td>317.0</td>
     </tr>
     <tr>
       <td>ABDL</td>
@@ -349115,6 +350683,9 @@
       <td>17146.0</td>
       <td>42.97</td>
       <td>360.0</td>
+      <td>16726.0</td>
+      <td>46.53</td>
+      <td>362.0</td>
     </tr>
     <tr>
       <td>DBREALTY</td>
@@ -349875,6 +351446,9 @@
       <td>493.0</td>
       <td>5766.0</td>
       <td>74.98</td>
+      <td>493.0</td>
+      <td>5532.0</td>
+      <td>71.87</td>
       <td>493.0</td>
     </tr>
     <tr>
@@ -350637,6 +352211,9 @@
       <td>13843.0</td>
       <td>28.10</td>
       <td>407.0</td>
+      <td>13745.0</td>
+      <td>36.80</td>
+      <td>409.0</td>
     </tr>
     <tr>
       <td>HFCL</td>
@@ -351398,6 +352975,9 @@
       <td>35275.0</td>
       <td>52.95</td>
       <td>233.0</td>
+      <td>34637.0</td>
+      <td>36.14</td>
+      <td>234.0</td>
     </tr>
     <tr>
       <td>JPPOWER</td>
@@ -352159,6 +353739,9 @@
       <td>11863.0</td>
       <td>41.21</td>
       <td>429.0</td>
+      <td>11678.0</td>
+      <td>48.40</td>
+      <td>430.0</td>
     </tr>
     <tr>
       <td>BSOFT</td>
@@ -352919,6 +354502,9 @@
       <td>478.0</td>
       <td>8554.0</td>
       <td>57.03</td>
+      <td>479.0</td>
+      <td>8562.0</td>
+      <td>41.69</td>
       <td>479.0</td>
     </tr>
     <tr>
@@ -353681,6 +355267,9 @@
       <td>11307.0</td>
       <td>36.66</td>
       <td>441.0</td>
+      <td>11177.0</td>
+      <td>37.49</td>
+      <td>441.0</td>
     </tr>
     <tr>
       <td>SANOFICONR</td>
@@ -354442,6 +356031,9 @@
       <td>9967.0</td>
       <td>55.75</td>
       <td>458.0</td>
+      <td>9741.0</td>
+      <td>65.53</td>
+      <td>460.0</td>
     </tr>
     <tr>
       <td>SBFC</td>
@@ -355202,6 +356794,9 @@
       <td>454.0</td>
       <td>10358.0</td>
       <td>63.51</td>
+      <td>454.0</td>
+      <td>10240.0</td>
+      <td>13.35</td>
       <td>454.0</td>
     </tr>
     <tr>
@@ -355964,6 +357559,9 @@
       <td>8666.0</td>
       <td>62.62</td>
       <td>477.0</td>
+      <td>8613.0</td>
+      <td>34.50</td>
+      <td>477.0</td>
     </tr>
     <tr>
       <td>NAZARA</td>
@@ -356725,6 +358323,9 @@
       <td>13123.0</td>
       <td>47.95</td>
       <td>419.0</td>
+      <td>13203.0</td>
+      <td>50.20</td>
+      <td>420.0</td>
     </tr>
     <tr>
       <td>RKFORGE</td>
@@ -357486,6 +359087,9 @@
       <td>13674.0</td>
       <td>52.11</td>
       <td>414.0</td>
+      <td>13626.0</td>
+      <td>41.00</td>
+      <td>413.0</td>
     </tr>
     <tr>
       <td>EUREKAFORB</td>
@@ -358246,6 +359850,9 @@
       <td>481.0</td>
       <td>8349.0</td>
       <td>57.75</td>
+      <td>481.0</td>
+      <td>8107.0</td>
+      <td>74.27</td>
       <td>481.0</td>
     </tr>
     <tr>
@@ -359008,6 +360615,9 @@
       <td>11619.0</td>
       <td>52.38</td>
       <td>434.0</td>
+      <td>11252.0</td>
+      <td>57.82</td>
+      <td>438.0</td>
     </tr>
     <tr>
       <td>MARKSANS</td>
@@ -359769,6 +361379,9 @@
       <td>14786.0</td>
       <td>27.38</td>
       <td>393.0</td>
+      <td>14856.0</td>
+      <td>28.86</td>
+      <td>392.0</td>
     </tr>
     <tr>
       <td>PRUDENT</td>
@@ -360530,6 +362143,9 @@
       <td>13933.0</td>
       <td>53.44</td>
       <td>405.0</td>
+      <td>14060.0</td>
+      <td>55.14</td>
+      <td>400.0</td>
     </tr>
     <tr>
       <td>NSLNISP</td>
@@ -361291,6 +362907,9 @@
       <td>11863.0</td>
       <td>48.04</td>
       <td>430.0</td>
+      <td>11781.0</td>
+      <td>49.53</td>
+      <td>429.0</td>
     </tr>
     <tr>
       <td>GALLANTT</td>
@@ -362051,6 +363670,9 @@
       <td>402.0</td>
       <td>13897.0</td>
       <td>61.83</td>
+      <td>406.0</td>
+      <td>13873.0</td>
+      <td>51.72</td>
       <td>406.0</td>
     </tr>
     <tr>
@@ -362813,6 +364435,9 @@
       <td>8730.0</td>
       <td>62.23</td>
       <td>475.0</td>
+      <td>8788.0</td>
+      <td>67.47</td>
+      <td>472.0</td>
     </tr>
     <tr>
       <td>WESTLIFE</td>
@@ -363574,6 +365199,9 @@
       <td>9203.0</td>
       <td>51.13</td>
       <td>469.0</td>
+      <td>8980.0</td>
+      <td>64.71</td>
+      <td>470.0</td>
     </tr>
     <tr>
       <td>GENUSPOWER</td>
@@ -364335,6 +365963,9 @@
       <td>9522.0</td>
       <td>48.68</td>
       <td>466.0</td>
+      <td>9404.0</td>
+      <td>58.48</td>
+      <td>464.0</td>
     </tr>
     <tr>
       <td>GRAPHITE</td>
@@ -365096,6 +366727,9 @@
       <td>14383.0</td>
       <td>30.07</td>
       <td>400.0</td>
+      <td>14018.0</td>
+      <td>44.51</td>
+      <td>404.0</td>
     </tr>
     <tr>
       <td>LEMONTREE</td>
@@ -365857,6 +367491,9 @@
       <td>8627.0</td>
       <td>56.25</td>
       <td>478.0</td>
+      <td>8557.0</td>
+      <td>62.90</td>
+      <td>480.0</td>
     </tr>
     <tr>
       <td>ASTRAMICRO</td>
@@ -366618,6 +368255,9 @@
       <td>16919.0</td>
       <td>46.22</td>
       <td>363.0</td>
+      <td>16130.0</td>
+      <td>51.72</td>
+      <td>374.0</td>
     </tr>
     <tr>
       <td>CCL</td>
@@ -367379,6 +369019,9 @@
       <td>15168.0</td>
       <td>60.77</td>
       <td>388.0</td>
+      <td>14941.0</td>
+      <td>62.48</td>
+      <td>390.0</td>
     </tr>
     <tr>
       <td>INOXINDIA</td>
@@ -368139,6 +369782,9 @@
       <td>349.0</td>
       <td>17780.0</td>
       <td>49.41</td>
+      <td>351.0</td>
+      <td>17511.0</td>
+      <td>36.03</td>
       <td>351.0</td>
     </tr>
     <tr>
@@ -368901,6 +370547,9 @@
       <td>18560.0</td>
       <td>34.68</td>
       <td>337.0</td>
+      <td>18283.0</td>
+      <td>43.30</td>
+      <td>341.0</td>
     </tr>
     <tr>
       <td>SHRIPISTON</td>
@@ -369662,6 +371311,9 @@
       <td>19822.0</td>
       <td>44.97</td>
       <td>322.0</td>
+      <td>19649.0</td>
+      <td>52.07</td>
+      <td>324.0</td>
     </tr>
     <tr>
       <td>CANFINHOME</td>
@@ -370423,6 +372075,9 @@
       <td>10981.0</td>
       <td>68.13</td>
       <td>449.0</td>
+      <td>10914.0</td>
+      <td>62.33</td>
+      <td>446.0</td>
     </tr>
     <tr>
       <td>MEDPLUS</td>
@@ -371183,6 +372838,9 @@
       <td>484.0</td>
       <td>7989.0</td>
       <td>63.37</td>
+      <td>484.0</td>
+      <td>7784.0</td>
+      <td>66.42</td>
       <td>484.0</td>
     </tr>
     <tr>
@@ -371945,6 +373603,9 @@
       <td>7276.0</td>
       <td>56.51</td>
       <td>490.0</td>
+      <td>7273.0</td>
+      <td>62.57</td>
+      <td>490.0</td>
     </tr>
     <tr>
       <td>RELAXO</td>
@@ -372706,6 +374367,9 @@
       <td>9534.0</td>
       <td>47.93</td>
       <td>465.0</td>
+      <td>9285.0</td>
+      <td>43.54</td>
+      <td>466.0</td>
     </tr>
     <tr>
       <td>RHIM</td>
@@ -373466,6 +375130,9 @@
       <td>486.0</td>
       <td>7857.0</td>
       <td>55.55</td>
+      <td>485.0</td>
+      <td>7743.0</td>
+      <td>55.04</td>
       <td>485.0</td>
     </tr>
     <tr>
@@ -374228,6 +375895,9 @@
       <td>13815.0</td>
       <td>32.03</td>
       <td>409.0</td>
+      <td>13722.0</td>
+      <td>29.60</td>
+      <td>410.0</td>
     </tr>
     <tr>
       <td>BIRLACORPN</td>
@@ -374988,6 +376658,9 @@
       <td>491.0</td>
       <td>6884.0</td>
       <td>37.87</td>
+      <td>491.0</td>
+      <td>6778.0</td>
+      <td>49.81</td>
       <td>491.0</td>
     </tr>
     <tr>
@@ -375750,6 +377423,9 @@
       <td>17375.0</td>
       <td>29.53</td>
       <td>356.0</td>
+      <td>17780.0</td>
+      <td>30.05</td>
+      <td>347.0</td>
     </tr>
     <tr>
       <td>AETHER</td>
@@ -376510,6 +378186,9 @@
       <td>314.0</td>
       <td>21701.0</td>
       <td>29.89</td>
+      <td>312.0</td>
+      <td>21661.0</td>
+      <td>49.95</td>
       <td>312.0</td>
     </tr>
     <tr>
@@ -377272,6 +378951,9 @@
       <td>9891.0</td>
       <td>49.48</td>
       <td>459.0</td>
+      <td>9823.0</td>
+      <td>44.55</td>
+      <td>458.0</td>
     </tr>
     <tr>
       <td>EDELWEISS</td>
@@ -378033,6 +379715,9 @@
       <td>11417.0</td>
       <td>49.46</td>
       <td>438.0</td>
+      <td>11619.0</td>
+      <td>49.50</td>
+      <td>431.0</td>
     </tr>
     <tr>
       <td>INDIACEM</td>
@@ -378793,6 +380478,9 @@
       <td>436.0</td>
       <td>11574.0</td>
       <td>46.30</td>
+      <td>435.0</td>
+      <td>11357.0</td>
+      <td>54.81</td>
       <td>435.0</td>
     </tr>
     <tr>
@@ -379555,9 +381243,19 @@
       <td>11044.0</td>
       <td>51.86</td>
       <td>444.0</td>
+      <td>10810.0</td>
+      <td>58.48</td>
+      <td>449.0</td>
     </tr>
   </tbody>
 </table>
+        </div>
+        <button class="scroll-btn scroll-up" onclick="scrollTable(-1)" title="Scroll Up">
+          <i class="fas fa-chevron-up"></i>
+        </button>
+        <button class="scroll-btn scroll-down" onclick="scrollTable(1)" title="Scroll Down">
+          <i class="fas fa-chevron-down"></i>
+        </button>
       </div>
     </div>
 
@@ -379607,19 +381305,6 @@
       </button>
     </div>
 
-    <!-- Non Performers Tab -->
-    <div id="nonPerformers" class="tabcontent">
-      <h3><i class="fas fa-thumbs-down"></i> Top 10 Non-Performing Stocks</h3>
-
-      <div class="info-panel" id="nonPerformersList">
-        <p>Click "Show Non Performers" to display the list of top 10 stocks with lowest delivery percentage.</p>
-      </div>
-
-      <button onclick="showNonPerformers()" id="showNonPerformersBtn">
-        <i class="fas fa-list"></i> Show Non Performers
-      </button>
-    </div>
-
     <!-- Rank Changes Tab -->
     <div id="rankChanges" class="tabcontent">
       <h3><i class="fas fa-arrow-up"></i> Top 10 Rank Improvers</h3>
@@ -379630,6 +381315,23 @@
 
       <button onclick="showRankChanges()" id="showRankChangesBtn">
         <i class="fas fa-list"></i> Show Rank Changes
+      </button>
+    </div>
+
+    <!-- History Rank Tab -->
+    <div id="historyRank" class="tabcontent">
+      <h3><i class="fas fa-history"></i> Top 10 Rank Improvers by Date</h3>
+
+      <div class="info-panel" id="historyRankList">
+        <p>Click "Show History Rank" to display top 10 rank improvers for each date transition.</p>
+      </div>
+
+      <button onclick="showHistoryRank()" id="showHistoryRankBtn">
+        <i class="fas fa-list"></i> Show History Rank
+      </button>
+
+      <button onclick="showHistoryRankSummary()" id="showHistoryRankSummaryBtn">
+        <i class="fas fa-summary"></i> Summary
       </button>
     </div>
   </div>
@@ -379647,7 +381349,61 @@ function openTab(evt, tabName) {
     tablinks[i].classList.remove("active");
   }
   document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.classList.add("active");
+  if (evt && evt.currentTarget) {
+    evt.currentTarget.classList.add("active");
+  }
+  updateSidebarActive(tabName);
+  toggleMenu(false);
+  const dashboardStats = document.querySelector('.dashboard-stats');
+  if (dashboardStats) dashboardStats.style.display = 'none';
+}
+
+function openTabFromMenu(evt, tabName) {
+  const tabcontent = document.getElementsByClassName("tabcontent");
+  for (let i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  const tablinks = document.getElementsByClassName("tablinks");
+  for (let i = 0; i < tablinks.length; i++) {
+    tablinks[i].classList.remove("active");
+  }
+  document.getElementById(tabName).style.display = "block";
+  if (evt && evt.currentTarget) {
+    evt.currentTarget.classList.add("active");
+  }
+  updateSidebarActive(tabName);
+  toggleMenu(false);
+  const dashboardStats = document.querySelector('.dashboard-stats');
+  if (dashboardStats) dashboardStats.style.display = 'none';
+}
+
+function updateSidebarActive(tabName) {
+  const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  sidebarLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('onclick').includes("'" + tabName + "'")) {
+      link.classList.add('active');
+    }
+  });
+}
+
+function toggleMenu(forceState) {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const isOpen = sidebar.classList.contains('open');
+  const shouldOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
+
+  if (shouldOpen) {
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+  } else {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+}
+
+function closeMenuOnOverlay() {
+  toggleMenu(false);
 }
 
 // ---- DASHBOARD STATS ----
@@ -380060,8 +381816,8 @@ function arrangeRank() {
   rows.sort((a, b) => {
     const aCell = a.cells[rankIndex]?.textContent.trim() || '';
     const bCell = b.cells[rankIndex]?.textContent.trim() || '';
-    const aBlank = (aCell === '' || aCell === '-');
-    const bBlank = (bCell === '' || bCell === '-');
+    const aBlank = (aCell === '' || aCell === '-' || aCell.toLowerCase() === 'nan');
+    const bBlank = (bCell === '' || bCell === '-' || bCell.toLowerCase() === 'nan');
     if (aBlank && bBlank) return 0;
     if (aBlank) return 1;
     if (bBlank) return -1;
@@ -380109,6 +381865,13 @@ function downloadExcel() {
   XLSX.writeFile(wb, "IntradayMarketData.xlsx");
 }
 
+function scrollTable(direction) {
+  const area = document.getElementById('tableScrollArea');
+  if (!area) return;
+  const rowHeight = 45;
+  area.scrollBy({ top: direction * rowHeight, behavior: 'smooth' });
+}
+
 // ---- STOCK ANALYSIS (Chart.js) ----
 let stockChart;
 function loadStockList() {
@@ -380144,7 +381907,7 @@ function updateChart() {
 
   // Build ordered list of unique dates found in headers (excluding the first header which is symbol name)
   const dates = [];
-  const mapping = {}; // mapping[date] = { marketIdx: idx or null, deliveryIdx: idx or null }
+  const mapping = {}; // mapping[date] = { marketIdx: idx or null, deliveryIdx: idx or null, rankIdx: idx or null }
 
   for (let i = 1; i < headers.length; i++) {
     const h = headers[i];
@@ -380152,14 +381915,14 @@ function updateChart() {
     if (!m) continue;
     const d = m[0];
     if (!dates.includes(d)) dates.push(d);
-    if (!mapping[d]) mapping[d] = { marketIdx: null, deliveryIdx: null };
+    if (!mapping[d]) mapping[d] = { marketIdx: null, deliveryIdx: null, rankIdx: null };
     const lower = h.toLowerCase();
     if (lower.includes('market')) {
       mapping[d].marketIdx = i; // column index in table (th/td)
     } else if (lower.includes('delivery')) {
       mapping[d].deliveryIdx = i;
     } else if (lower.includes('rank')) {
-      // intentionally ignore rank for plotting
+      mapping[d].rankIdx = i;
     } else {
       // if header does not explicitly include 'market' or 'delivery', try to guess by keyword
       // default: do nothing
@@ -380169,12 +381932,14 @@ function updateChart() {
   // Build arrays of data in the same order as dates
   const marketCapData = [];
   const deliveryData = [];
+  const rankData = [];
   const labels = dates.slice(); // copy
 
   dates.forEach(d => {
-    const map = mapping[d] || {marketIdx:null, deliveryIdx:null};
+    const map = mapping[d] || {marketIdx:null, deliveryIdx:null, rankIdx:null};
     let marketVal = 0;
     let deliveryVal = 0;
+    let rankVal = 0;
     if (map.marketIdx !== null) {
       const txt = (row.cells[map.marketIdx] && row.cells[map.marketIdx].textContent) ? row.cells[map.marketIdx].textContent.trim().replace(/,/g,'').replace('%','') : '';
       marketVal = parseFloat(txt) || 0;
@@ -380183,8 +381948,13 @@ function updateChart() {
       const txt = (row.cells[map.deliveryIdx] && row.cells[map.deliveryIdx].textContent) ? row.cells[map.deliveryIdx].textContent.trim().replace(/,/g,'').replace('%','') : '';
       deliveryVal = parseFloat(txt) || 0;
     }
+    if (map.rankIdx !== null) {
+      const txt = (row.cells[map.rankIdx] && row.cells[map.rankIdx].textContent) ? row.cells[map.rankIdx].textContent.trim().replace(/,/g,'') : '';
+      rankVal = parseFloat(txt) || 0;
+    }
     marketCapData.push(marketVal);
     deliveryData.push(deliveryVal);
+    rankData.push(rankVal);
   });
 
   // Calculate market cap changes for coloring
@@ -380234,6 +382004,18 @@ function updateChart() {
           fill: false,
           tension: 0.3,
           yAxisID: 'y'
+        },
+        {
+          label: 'Rank',
+          type: 'line',
+          data: rankData,
+          borderColor: 'rgba(255, 159, 64, 0.9)',
+          backgroundColor: 'rgba(255, 159, 64, 0.3)',
+          fill: false,
+          tension: 0.3,
+          yAxisID: 'y2',
+          pointRadius: 4,
+          pointHoverRadius: 6
         }
       ]
     },
@@ -380248,7 +382030,7 @@ function updateChart() {
         legend: { position: 'top' },
         title: {
           display: true,
-          text: 'Market Cap (Bar) vs Delivery Qty (Line) for ' + stock
+          text: 'Market Cap (Bar) vs Delivery Qty (Line) vs Rank (Line) for ' + stock
         }
       },
       scales: {
@@ -380277,6 +382059,24 @@ function updateChart() {
           beginAtZero: true,
           display: false,
           position: 'right'
+        },
+        // Tertiary y for Rank (visible)
+        y2: {
+          beginAtZero: true,
+          reverse: true,
+          title: {
+            display: true,
+            text: 'Rank'
+          },
+          position: 'right',
+          grid: {
+            drawOnChartArea: false
+          },
+          ticks: {
+            callback: function(value, index, ticks) {
+              return value;
+            }
+          }
         }
       }
     }
@@ -380576,53 +382376,6 @@ function showTopPerformers() {
   infoPanel.appendChild(list);
 }
 
-function showNonPerformers() {
-  const table = document.getElementById('marketTable');
-  const headers = Array.from(table.querySelectorAll('th'));
-  const rows = Array.from(table.querySelectorAll('tbody tr'));
-
-  // Find the latest delivery column
-  let deliveryColIndex = -1;
-  for (let i = headers.length - 1; i >= 1; i--) {
-    const headerText = headers[i].textContent.trim().toLowerCase();
-    if (headerText.includes('delivery')) {
-      deliveryColIndex = i;
-      break;
-    }
-  }
-
-  if (deliveryColIndex === -1) {
-    alert('No delivery columns found!');
-    return;
-  }
-
-  // Collect stock data with delivery values
-  const stockData = [];
-  rows.forEach(row => {
-    const stockName = row.cells[0].textContent.trim();
-    const deliveryText = row.cells[deliveryColIndex]?.textContent.trim().replace(/,/g, '').replace('%', '') || '';
-    const delivery = parseFloat(deliveryText);
-    if (!isNaN(delivery)) {
-      stockData.push({ name: stockName, delivery: delivery });
-    }
-  });
-
-  // Sort by delivery ascending (lowest first) and take top 10
-  stockData.sort((a, b) => a.delivery - b.delivery);
-  const bottom10 = stockData.slice(0, 10);
-
-  // Display in info panel
-  const infoPanel = document.getElementById('nonPerformersList');
-  infoPanel.innerHTML = '<h4>Top 10 Non-Performing Stocks by Delivery Percentage</h4>';
-  const list = document.createElement('ol');
-  bottom10.forEach((stock, index) => {
-    const item = document.createElement('li');
-    item.innerHTML = `<strong>${stock.name}</strong> - ${stock.delivery.toFixed(2)}%`;
-    list.appendChild(item);
-  });
-  infoPanel.appendChild(list);
-}
-
 function showRankChanges() {
   const table = document.getElementById('marketTable');
   const headers = Array.from(table.querySelectorAll('th'));
@@ -380676,6 +382429,237 @@ function showRankChanges() {
     list.appendChild(item);
   });
   infoPanel.appendChild(list);
+}
+
+function showHistoryRank() {
+  const table = document.getElementById('marketTable');
+  const headers = Array.from(table.querySelectorAll('th'));
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  const datePattern = /^\d{4}-\d{2}-\d{2}/;
+
+  // Collect all rank columns with their dates
+  const rankColumns = [];
+  headers.forEach((header, index) => {
+    if (index === 0) return;
+    const text = header.textContent.trim();
+    const match = text.match(datePattern);
+    if (match && text.toLowerCase().includes('rank')) {
+      rankColumns.push({ index: index, date: match[0] });
+    }
+  });
+
+  if (rankColumns.length < 2) {
+    alert('Need at least 2 rank date columns for history!');
+    return;
+  }
+
+  // Sort rank columns by date
+  rankColumns.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const infoPanel = document.getElementById('historyRankList');
+  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers by Date Transition</h4>';
+
+  // For each consecutive pair of dates, find top 10 improvers (newest first)
+  for (let i = rankColumns.length - 1; i >= 1; i--) {
+    const prevCol = rankColumns[i - 1];
+    const currCol = rankColumns[i];
+    const dateLabel = currCol.date;
+
+    const stockData = [];
+    rows.forEach(row => {
+      const stockName = row.cells[0].textContent.trim();
+      const prevRankText = row.cells[prevCol.index]?.textContent.trim().replace(/[^0-9]/g, '') || '';
+      const currRankText = row.cells[currCol.index]?.textContent.trim().replace(/[^0-9]/g, '') || '';
+      const prevRank = parseInt(prevRankText, 10);
+      const currRank = parseInt(currRankText, 10);
+
+      if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0) {
+        const improvement = prevRank - currRank;
+        if (improvement > 0) {
+          stockData.push({
+            name: stockName,
+            prevRank: prevRank,
+            currRank: currRank,
+            improvement: improvement
+          });
+        }
+      }
+    });
+
+    stockData.sort((a, b) => b.improvement - a.improvement);
+    const top10 = stockData.slice(0, 10);
+
+    const section = document.createElement('div');
+    section.style.marginBottom = '20px';
+    section.style.padding = '15px';
+    section.style.background = '#f9fafb';
+    section.style.borderRadius = '8px';
+    section.style.borderLeft = '4px solid var(--accent)';
+
+    const title = document.createElement('h5');
+    title.textContent = dateLabel;
+    title.style.marginBottom = '10px';
+    title.style.color = 'var(--secondary)';
+    section.appendChild(title);
+
+    if (top10.length === 0) {
+      const noData = document.createElement('p');
+      noData.textContent = 'No rank improvements found for this period.';
+      noData.style.color = 'var(--text-light)';
+      section.appendChild(noData);
+    } else {
+      const tableEl = document.createElement('table');
+      tableEl.style.width = '100%';
+      tableEl.style.borderCollapse = 'collapse';
+      tableEl.style.fontSize = '0.9rem';
+
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      ['Rank', 'Stock', 'Previous Rank', 'Current Rank', 'Improvement'].forEach(text => {
+        const th = document.createElement('th');
+        th.textContent = text;
+        th.style.padding = '8px 12px';
+        th.style.background = 'var(--primary)';
+        th.style.color = 'white';
+        th.style.textAlign = 'left';
+        th.style.fontFamily = "'Montserrat', sans-serif";
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      tableEl.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      top10.forEach((stock, idx) => {
+        const tr = document.createElement('tr');
+        if (idx % 2 === 1) tr.style.background = '#f0f7ff';
+
+        const tdRank = document.createElement('td');
+        tdRank.textContent = idx + 1;
+        tdRank.style.padding = '8px 12px';
+        tdRank.style.fontWeight = '600';
+
+        const tdName = document.createElement('td');
+        tdName.textContent = stock.name;
+        tdName.style.padding = '8px 12px';
+        tdName.style.fontWeight = '500';
+
+        const tdPrev = document.createElement('td');
+        tdPrev.textContent = stock.prevRank / 10;
+        tdPrev.style.padding = '8px 12px';
+
+        const tdCurr = document.createElement('td');
+        tdCurr.textContent = stock.currRank / 10;
+        tdCurr.style.padding = '8px 12px';
+        tdCurr.style.color = 'var(--success)';
+        tdCurr.style.fontWeight = '600';
+
+        const tdImprove = document.createElement('td');
+        tdImprove.textContent = '+' + (stock.improvement / 10);
+        tdImprove.style.padding = '8px 12px';
+        tdImprove.style.color = 'var(--success)';
+        tdImprove.style.fontWeight = '700';
+
+        tr.appendChild(tdRank);
+        tr.appendChild(tdName);
+        tr.appendChild(tdPrev);
+        tr.appendChild(tdCurr);
+        tr.appendChild(tdImprove);
+        tbody.appendChild(tr);
+      });
+      tableEl.appendChild(tbody);
+      section.appendChild(tableEl);
+    }
+
+    infoPanel.appendChild(section);
+  }
+}
+
+function showHistoryRankSummary() {
+  const table = document.getElementById('marketTable');
+  const headers = Array.from(table.querySelectorAll('th'));
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  const datePattern = /^\d{4}-\d{2}-\d{2}/;
+
+  const rankColumns = [];
+  headers.forEach((header, index) => {
+    if (index === 0) return;
+    const text = header.textContent.trim();
+    const match = text.match(datePattern);
+    if (match && text.toLowerCase().includes('rank')) {
+      rankColumns.push({ index: index, date: match[0] });
+    }
+  });
+
+  if (rankColumns.length < 2) {
+    alert('Need at least 2 rank date columns for history summary!');
+    return;
+  }
+
+  rankColumns.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Get last 3 transitions
+  const transitions = [];
+  for (let i = rankColumns.length - 1; i >= 1 && transitions.length < 3; i--) {
+    transitions.push({
+      prev: rankColumns[i - 1],
+      curr: rankColumns[i]
+    });
+  }
+
+  const dailyTop10 = [];
+  transitions.forEach(trans => {
+    const stockData = [];
+    rows.forEach(row => {
+      const stockName = row.cells[0].textContent.trim();
+      const prevRankText = row.cells[trans.prev.index]?.textContent.trim().replace(/[^0-9]/g, '') || '';
+      const currRankText = row.cells[trans.curr.index]?.textContent.trim().replace(/[^0-9]/g, '') || '';
+      const prevRank = parseInt(prevRankText, 10);
+      const currRank = parseInt(currRankText, 10);
+
+      if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0) {
+        const improvement = prevRank - currRank;
+        if (improvement > 0) {
+          stockData.push({
+            name: stockName,
+            prevRank: prevRank,
+            currRank: currRank,
+            improvement: improvement
+          });
+        }
+      }
+    });
+
+    stockData.sort((a, b) => b.improvement - a.improvement);
+    const top10 = stockData.slice(0, 10).map(s => s.name);
+    dailyTop10.push(top10);
+  });
+
+  // Find common stocks across last 3 days
+  const commonStocks = dailyTop10.reduce((acc, names) => {
+    return acc.filter(name => names.includes(name));
+  });
+
+  const infoPanel = document.getElementById('historyRankList');
+  infoPanel.innerHTML = '<h4>Summary: Stocks in Top 10 Rank Improvers for Last 3 Days</h4>';
+
+  if (commonStocks.length === 0) {
+    const noData = document.createElement('p');
+    noData.textContent = 'No stocks appeared in Top 10 Rank Improvers across all last 3 days.';
+    noData.style.color = 'var(--text-light)';
+    infoPanel.appendChild(noData);
+  } else {
+    const list = document.createElement('ol');
+    commonStocks.forEach(stockName => {
+      const item = document.createElement('li');
+      item.innerHTML = '<strong>' + stockName + '</strong>';
+      item.style.padding = '8px 12px';
+      item.style.marginBottom = '6px';
+      item.style.background = '#e8f5e9';
+      item.style.borderRadius = '6px';
+      list.appendChild(item);
+    });
+    infoPanel.appendChild(list);
+  }
 }
 
 let performanceChart;
