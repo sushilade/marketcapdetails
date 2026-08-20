@@ -382816,16 +382816,20 @@
     <div id="historyRank" class="tabcontent">
       <h3><i class="fas fa-history"></i> Top 10 Rank Improvers by Date</h3>
 
+      <div class="controls" style="margin-bottom: 20px;">
+        <label for="historyRankDatePicker" style="font-weight: 600; color: var(--primary); margin-right: 10px;">Select Date:</label>
+        <input type="date" id="historyRankDatePicker" onchange="showHistoryRankByDate()" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+        <button onclick="clearHistoryRankDate()" id="clearHistoryRankDateBtn" style="margin-left: 10px; width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
       <div class="info-panel" id="historyRankList">
         <p>Click "Show History Rank" to display top 10 rank improvers for each date transition.</p>
       </div>
 
       <button onclick="showHistoryRank()" id="showHistoryRankBtn">
         <i class="fas fa-list"></i> Show History Rank
-      </button>
-
-      <button onclick="showHistoryRankSummary()" id="showHistoryRankSummaryBtn">
-        <i class="fas fa-summary"></i> Summary
       </button>
     </div>
   </div>
@@ -383925,6 +383929,8 @@ function showRankChanges() {
   infoPanel.appendChild(list);
 }
 
+let historyRankData = null;
+
 function showHistoryRank() {
   const table = document.getElementById('marketTable');
   const headers = Array.from(table.querySelectorAll('th'));
@@ -383950,15 +383956,12 @@ function showHistoryRank() {
   // Sort rank columns by date
   rankColumns.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const infoPanel = document.getElementById('historyRankList');
-  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers by Date Transition</h4>';
-
-  // For each consecutive pair of dates, find top 10 improvers (newest first)
-  for (let i = rankColumns.length - 1; i >= 1; i--) {
+  // Pre-compute top 10 improvers for each date transition
+  const dailyTop10Map = {};
+  const dailyTop10Stocks = {};
+  for (let i = 1; i < rankColumns.length; i++) {
     const prevCol = rankColumns[i - 1];
     const currCol = rankColumns[i];
-    const dateLabel = currCol.date;
-
     const stockData = [];
     rows.forEach(row => {
       const stockName = row.cells[0].textContent.trim();
@@ -383982,6 +383985,44 @@ function showHistoryRank() {
 
     stockData.sort((a, b) => b.improvement - a.improvement);
     const top10 = stockData.slice(0, 10);
+    dailyTop10Map[currCol.date] = top10;
+    top10.forEach(s => {
+      if (!dailyTop10Stocks[s.name]) dailyTop10Stocks[s.name] = [];
+      dailyTop10Stocks[s.name].push(currCol.date);
+    });
+  }
+
+  historyRankData = {
+    dailyTop10Map: dailyTop10Map,
+    dailyTop10Stocks: dailyTop10Stocks,
+    rankColumns: rankColumns
+  };
+
+  // Populate date picker range
+  const datePicker = document.getElementById('historyRankDatePicker');
+  datePicker.value = '';
+  if (rankColumns.length >= 2) {
+    const minDate = rankColumns[1].date;
+    const maxDate = rankColumns[rankColumns.length - 1].date;
+    datePicker.min = minDate;
+    datePicker.max = maxDate;
+  }
+
+  renderHistoryRankAllDates();
+}
+
+function renderHistoryRankAllDates() {
+  if (!historyRankData) return;
+  const { dailyTop10Map, dailyTop10Stocks, rankColumns } = historyRankData;
+
+  const infoPanel = document.getElementById('historyRankList');
+  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers by Date Transition</h4>';
+
+  for (let i = rankColumns.length - 1; i >= 1; i--) {
+    const prevCol = rankColumns[i - 1];
+    const currCol = rankColumns[i];
+    const dateLabel = currCol.date;
+    const top10 = dailyTop10Map[currCol.date] || [];
 
     const section = document.createElement('div');
     section.style.marginBottom = '20px';
@@ -384009,7 +384050,7 @@ function showHistoryRank() {
 
       const thead = document.createElement('thead');
       const headerRow = document.createElement('tr');
-      ['Rank', 'Stock', 'Previous Rank', 'Current Rank', 'Improvement'].forEach(text => {
+      ['Rank', 'Stock', 'Also In Top 10 Dates', 'Previous Rank', 'Current Rank', 'Improvement'].forEach(text => {
         const th = document.createElement('th');
         th.textContent = text;
         th.style.padding = '8px 12px';
@@ -384027,6 +384068,10 @@ function showHistoryRank() {
         const tr = document.createElement('tr');
         if (idx % 2 === 1) tr.style.background = '#f0f7ff';
 
+        const prevDates = (dailyTop10Stocks[stock.name] || [])
+          .filter(d => d !== currCol.date)
+          .sort((a, b) => new Date(b) - new Date(a));
+
         const tdRank = document.createElement('td');
         tdRank.textContent = idx + 1;
         tdRank.style.padding = '8px 12px';
@@ -384036,6 +384081,12 @@ function showHistoryRank() {
         tdName.textContent = stock.name;
         tdName.style.padding = '8px 12px';
         tdName.style.fontWeight = '500';
+
+        const tdDates = document.createElement('td');
+        tdDates.textContent = prevDates.length > 0 ? prevDates.join(', ') : '-';
+        tdDates.style.padding = '8px 12px';
+        tdDates.style.color = '#e65100';
+        tdDates.style.fontWeight = '500';
 
         const tdPrev = document.createElement('td');
         tdPrev.textContent = stock.prevRank / 10;
@@ -384055,6 +384106,7 @@ function showHistoryRank() {
 
         tr.appendChild(tdRank);
         tr.appendChild(tdName);
+        tr.appendChild(tdDates);
         tr.appendChild(tdPrev);
         tr.appendChild(tdCurr);
         tr.appendChild(tdImprove);
@@ -384068,92 +384120,119 @@ function showHistoryRank() {
   }
 }
 
-function showHistoryRankSummary() {
-  const table = document.getElementById('marketTable');
-  const headers = Array.from(table.querySelectorAll('th'));
-  const rows = Array.from(table.querySelectorAll('tbody tr'));
-  const datePattern = /^\d{4}-\d{2}-\d{2}/;
+function showHistoryRankByDate() {
+  const datePicker = document.getElementById('historyRankDatePicker');
+  const selectedDate = datePicker.value;
+  if (!selectedDate) {
+    renderHistoryRankAllDates();
+    return;
+  }
+  if (!historyRankData) {
+    renderHistoryRankAllDates();
+    return;
+  }
+  const validDates = historyRankData.rankColumns.slice(1).map(r => r.date);
+  if (!validDates.includes(selectedDate)) {
+    alert('Selected date is not available in rank history.');
+    return;
+  }
+  renderHistoryRankForDate(selectedDate);
+}
 
-  const rankColumns = [];
-  headers.forEach((header, index) => {
-    if (index === 0) return;
-    const text = header.textContent.trim();
-    const match = text.match(datePattern);
-    if (match && text.toLowerCase().includes('rank')) {
-      rankColumns.push({ index: index, date: match[0] });
-    }
-  });
+function clearHistoryRankDate() {
+  const datePicker = document.getElementById('historyRankDatePicker');
+  datePicker.value = '';
+  renderHistoryRankAllDates();
+}
 
-  if (rankColumns.length < 2) {
-    alert('Need at least 2 rank date columns for history summary!');
+function renderHistoryRankForDate(selectedDate) {
+  if (!historyRankData) return;
+  const { dailyTop10Map, dailyTop10Stocks, rankColumns } = historyRankData;
+  const top10 = dailyTop10Map[selectedDate] || [];
+  const currCol = rankColumns.find(r => r.date === selectedDate);
+
+  const infoPanel = document.getElementById('historyRankList');
+  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers - ' + selectedDate + '</h4>';
+
+  if (top10.length === 0) {
+    const noData = document.createElement('p');
+    noData.textContent = 'No rank improvements found for this date.';
+    noData.style.color = 'var(--text-light)';
+    infoPanel.appendChild(noData);
     return;
   }
 
-  rankColumns.sort((a, b) => new Date(a.date) - new Date(b.date));
+  const tableEl = document.createElement('table');
+  tableEl.style.width = '100%';
+  tableEl.style.borderCollapse = 'collapse';
+  tableEl.style.fontSize = '0.9rem';
 
-  // Get last 3 transitions
-  const transitions = [];
-  for (let i = rankColumns.length - 1; i >= 1 && transitions.length < 3; i--) {
-    transitions.push({
-      prev: rankColumns[i - 1],
-      curr: rankColumns[i]
-    });
-  }
-
-  const dailyTop10 = [];
-  transitions.forEach(trans => {
-    const stockData = [];
-    rows.forEach(row => {
-      const stockName = row.cells[0].textContent.trim();
-      const prevRankText = row.cells[trans.prev.index]?.textContent.trim().replace(/[^0-9]/g, '') || '';
-      const currRankText = row.cells[trans.curr.index]?.textContent.trim().replace(/[^0-9]/g, '') || '';
-      const prevRank = parseInt(prevRankText, 10);
-      const currRank = parseInt(currRankText, 10);
-
-      if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0) {
-        const improvement = prevRank - currRank;
-        if (improvement > 0) {
-          stockData.push({
-            name: stockName,
-            prevRank: prevRank,
-            currRank: currRank,
-            improvement: improvement
-          });
-        }
-      }
-    });
-
-    stockData.sort((a, b) => b.improvement - a.improvement);
-    const top10 = stockData.slice(0, 10).map(s => s.name);
-    dailyTop10.push(top10);
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  ['Rank', 'Stock', 'Also In Top 10 Dates', 'Previous Rank', 'Current Rank', 'Improvement'].forEach(text => {
+    const th = document.createElement('th');
+    th.textContent = text;
+    th.style.padding = '8px 12px';
+    th.style.background = 'var(--primary)';
+    th.style.color = 'white';
+    th.style.textAlign = 'left';
+    th.style.fontFamily = "'Montserrat', sans-serif";
+    headerRow.appendChild(th);
   });
+  thead.appendChild(headerRow);
+  tableEl.appendChild(thead);
 
-  // Find common stocks across last 3 days
-  const commonStocks = dailyTop10.reduce((acc, names) => {
-    return acc.filter(name => names.includes(name));
+  const tbody = document.createElement('tbody');
+  top10.forEach((stock, idx) => {
+    const tr = document.createElement('tr');
+    if (idx % 2 === 1) tr.style.background = '#f0f7ff';
+
+    const prevDates = (historyRankData.dailyTop10Stocks[stock.name] || [])
+      .filter(d => d !== selectedDate)
+      .sort((a, b) => new Date(b) - new Date(a));
+
+    const tdRank = document.createElement('td');
+    tdRank.textContent = idx + 1;
+    tdRank.style.padding = '8px 12px';
+    tdRank.style.fontWeight = '600';
+
+    const tdName = document.createElement('td');
+    tdName.textContent = stock.name;
+    tdName.style.padding = '8px 12px';
+    tdName.style.fontWeight = '500';
+
+    const tdDates = document.createElement('td');
+    tdDates.textContent = prevDates.length > 0 ? prevDates.join(', ') : '-';
+    tdDates.style.padding = '8px 12px';
+    tdDates.style.color = '#e65100';
+    tdDates.style.fontWeight = '500';
+
+    const tdPrev = document.createElement('td');
+    tdPrev.textContent = stock.prevRank / 10;
+    tdPrev.style.padding = '8px 12px';
+
+    const tdCurr = document.createElement('td');
+    tdCurr.textContent = stock.currRank / 10;
+    tdCurr.style.padding = '8px 12px';
+    tdCurr.style.color = 'var(--success)';
+    tdCurr.style.fontWeight = '600';
+
+    const tdImprove = document.createElement('td');
+    tdImprove.textContent = '+' + (stock.improvement / 10);
+    tdImprove.style.padding = '8px 12px';
+    tdImprove.style.color = 'var(--success)';
+    tdImprove.style.fontWeight = '700';
+
+    tr.appendChild(tdRank);
+    tr.appendChild(tdName);
+    tr.appendChild(tdDates);
+    tr.appendChild(tdPrev);
+    tr.appendChild(tdCurr);
+    tr.appendChild(tdImprove);
+    tbody.appendChild(tr);
   });
-
-  const infoPanel = document.getElementById('historyRankList');
-  infoPanel.innerHTML = '<h4>Summary: Stocks in Top 10 Rank Improvers for Last 3 Days</h4>';
-
-  if (commonStocks.length === 0) {
-    const noData = document.createElement('p');
-    noData.textContent = 'No stocks appeared in Top 10 Rank Improvers across all last 3 days.';
-    noData.style.color = 'var(--text-light)';
-    infoPanel.appendChild(noData);
-  } else {
-    const list = document.createElement('ol');
-    commonStocks.forEach(stockName => {
-      const item = document.createElement('li');
-      item.innerHTML = '<strong>' + stockName + '</strong>';
-      item.style.padding = '8px 12px';
-      item.style.marginBottom = '6px';
-      item.style.background = '#e8f5e9';
-      item.style.borderRadius = '6px';
-      list.appendChild(item);
-    });
-    infoPanel.appendChild(list);
-  }
+  tableEl.appendChild(tbody);
+  infoPanel.appendChild(tableEl);
 }
 
 let performanceChart;
