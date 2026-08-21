@@ -751,6 +751,14 @@
     .tabcontent {
       animation: fadeIn 0.4s ease;
     }
+
+    #dataView {
+      animation: none !important;
+    }
+
+    #dataView .table-container {
+      overflow-x: hidden !important;
+    }
     
     .sidebar-link {
       animation: slideInLeft 0.3s ease forwards;
@@ -384431,22 +384439,37 @@
     <div id="topPerformers" class="tabcontent">
       <h3><i class="fas fa-trophy"></i> Top 10 Performing Stocks</h3>
 
-      <div class="info-panel" id="topPerformersList">
-        <p>Click "Show Top Performers" to display the list of top 10 stocks by delivery percentage.</p>
-      </div>
+      <div class="tab-container" style="margin-bottom: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04); overflow: hidden;">
+        <div style="display: flex; background: #f1f5f9;">
+          <button onclick="switchTopPerformersTab('regular')" id="topPerformersRegularTab" style="flex: 1; padding: 14px 20px; border: none; background: white; color: var(--primary); font-weight: 700; cursor: pointer; font-size: 14px; border-bottom: 3px solid var(--accent); transition: all 0.3s;">
+            <i class="fas fa-table"></i> Regular
+          </button>
+          <button onclick="switchTopPerformersTab('duration')" id="topPerformersDurationTab" style="flex: 1; padding: 14px 20px; border: none; background: #f1f5f9; color: var(--text-light); font-weight: 600; cursor: pointer; font-size: 14px; border-bottom: 3px solid transparent; transition: all 0.3s;">
+            <i class="fas fa-calendar-week"></i> Duration
+          </button>
+        </div>
 
-      <button onclick="const d=getTopPerformersDuration();showTopPerformers(d?d.start:'',d?d.end:'');" id="showTopPerformersBtn">
-        <i class="fas fa-list"></i> Show Top Performers
-      </button>
+        <div style="padding: 20px;">
+          <div id="topPerformersRegularControl">
+            <div class="info-panel" id="topPerformersList">
+              <p>Click "Show Top Performers" to display the list of top 10 stocks by delivery percentage.</p>
+            </div>
 
-      <div class="controls" id="topPerformersDuration" style="margin-top: 20px; padding: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);">
-        <label for="topPerformersStartDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem;">Start Date:</label>
-        <input type="date" id="topPerformersStartDate" onchange="filterTopPerformersByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
-        <label for="topPerformersEndDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem; margin-left: 12px;">End Date:</label>
-        <input type="date" id="topPerformersEndDate" onchange="filterTopPerformersByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
-        <button onclick="clearTopPerformersDuration()" id="clearTopPerformersDurationBtn" style="margin-left: 12px; width: 42px; height: 42px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 10px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s;">
-          <i class="fas fa-times"></i>
-        </button>
+            <button onclick="showTopPerformers()" id="showTopPerformersBtn" style="margin-top: 15px;">
+              <i class="fas fa-list"></i> Show Top Performers
+            </button>
+          </div>
+
+          <div id="topPerformersDurationControl" style="display: none;">
+            <label for="topPerformersStartDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem;">Start Date:</label>
+            <input type="date" id="topPerformersStartDate" onchange="filterTopPerformersByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
+            <label for="topPerformersEndDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem; margin-left: 12px;">End Date:</label>
+            <input type="date" id="topPerformersEndDate" onchange="filterTopPerformersByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
+            <button onclick="clearTopPerformersDuration()" id="clearTopPerformersDurationBtn" style="margin-left: 12px; width: 42px; height: 42px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 10px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s;">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="chart-container" id="topPerformersChartContainer" style="margin-top: 24px; display: none;">
@@ -384474,19 +384497,35 @@
     <div id="historyRank" class="tabcontent">
       <h3><i class="fas fa-history"></i> Top 10 Rank Improvers by Date</h3>
 
-      <div class="controls" style="margin-bottom: 20px; padding: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);">
-        <label for="historyRankDatePicker" style="font-weight: 700; color: var(--primary); margin-right: 12px; font-size: 0.95rem;">Select Date:</label>
-        <input type="date" id="historyRankDatePicker" onchange="showHistoryRankByDate()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
-        <button onclick="clearHistoryRankDate()" id="clearHistoryRankDateBtn" style="margin-left: 12px; width: 42px; height: 42px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 10px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s;">
-          <i class="fas fa-times"></i>
-        </button>
-        <label for="historyRankStartDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem; margin-left: 16px;">Start Date:</label>
-        <input type="date" id="historyRankStartDate" onchange="filterHistoryRankByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
-        <label for="historyRankEndDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem; margin-left: 12px;">End Date:</label>
-        <input type="date" id="historyRankEndDate" onchange="filterHistoryRankByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
-        <button onclick="clearHistoryRankDuration()" id="clearHistoryRankDurationBtn" style="margin-left: 12px; width: 42px; height: 42px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 10px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s;">
-          <i class="fas fa-times"></i>
-        </button>
+      <div class="tab-container" style="margin-bottom: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04); overflow: hidden;">
+        <div style="display: flex; background: #f1f5f9;">
+          <button onclick="switchHistoryRankTab('single')" id="historyRankSingleTab" style="flex: 1; padding: 14px 20px; border: none; background: white; color: var(--primary); font-weight: 700; cursor: pointer; font-size: 14px; border-bottom: 3px solid var(--accent); transition: all 0.3s;">
+            <i class="fas fa-calendar-day"></i> Select Date
+          </button>
+          <button onclick="switchHistoryRankTab('duration')" id="historyRankDurationTab" style="flex: 1; padding: 14px 20px; border: none; background: #f1f5f9; color: var(--text-light); font-weight: 600; cursor: pointer; font-size: 14px; border-bottom: 3px solid transparent; transition: all 0.3s;">
+            <i class="fas fa-calendar-week"></i> Duration Date
+          </button>
+        </div>
+
+        <div style="padding: 20px;">
+          <div id="historyRankSingleControl">
+            <label for="historyRankDatePicker" style="font-weight: 700; color: var(--primary); margin-right: 12px; font-size: 0.95rem;">Select Date:</label>
+            <input type="date" id="historyRankDatePicker" onchange="showHistoryRankByDate()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
+            <button onclick="clearHistoryRankDate()" id="clearHistoryRankDateBtn" style="margin-left: 12px; width: 42px; height: 42px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 10px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s;">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div id="historyRankDurationControl" style="display: none;">
+            <label for="historyRankStartDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem;">Start Date:</label>
+            <input type="date" id="historyRankStartDate" onchange="filterHistoryRankByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
+            <label for="historyRankEndDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem; margin-left: 12px;">End Date:</label>
+            <input type="date" id="historyRankEndDate" onchange="filterHistoryRankByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
+            <button onclick="clearHistoryRankDuration()" id="clearHistoryRankDurationBtn" style="margin-left: 12px; width: 42px; height: 42px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 10px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s;">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="info-panel" id="historyRankList">
@@ -385203,6 +385242,17 @@ function updateChart(startDate, endDate) {
           yAxisID: 'y'
         },
         {
+          label: 'Threshold (70)',
+          type: 'line',
+          data: Array(labels.length).fill(70),
+          borderColor: 'rgba(239, 68, 68, 0.8)',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          fill: false,
+          yAxisID: 'y'
+        },
+        {
           label: 'Rank',
           type: 'line',
           data: rankData,
@@ -385224,7 +385274,14 @@ function updateChart(startDate, endDate) {
         intersect: false
       },
       plugins: {
-        legend: { position: 'top' },
+        legend: {
+          position: 'top',
+          labels: {
+            filter: function(legendItem, chartData) {
+              return chartData.datasets[legendItem.datasetIndex].label !== 'Threshold (70)';
+            }
+          }
+        },
         title: {
           display: true,
           text: 'Market Cap (Bar) vs Delivery Qty (Line) vs Rank (Line) for ' + stock
@@ -385552,7 +385609,7 @@ function showTop50MarketCap() {
   }
 }
 
-function showTopPerformers(startDate, endDate) {
+function showTopPerformers() {
   const table = document.getElementById('marketTable');
   const headers = Array.from(table.querySelectorAll('th'));
   const rows = Array.from(table.querySelectorAll('tbody tr'));
@@ -385597,6 +385654,12 @@ function showTopPerformers(startDate, endDate) {
     list.appendChild(item);
   });
   infoPanel.appendChild(list);
+}
+
+function showTopPerformersDuration(startDate, endDate) {
+  const table = document.getElementById('marketTable');
+  const headers = Array.from(table.querySelectorAll('th'));
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
 
   const allDeliveryIndices = [];
   const deliveryDateMap = {};
@@ -385630,48 +385693,6 @@ function showTopPerformers(startDate, endDate) {
 
   stockDeliveryCounts.sort((a, b) => b.count - a.count);
   const top10counts = stockDeliveryCounts.slice(0, 10);
-
-  const qtySection = document.createElement('div');
-  qtySection.style.marginTop = '24px';
-  qtySection.style.padding = '18px';
-  qtySection.style.background = 'linear-gradient(135deg, #e8f5e9 0%, #f1f8f2 100%)';
-  qtySection.style.borderRadius = '12px';
-  qtySection.style.borderLeft = '5px solid #10b981';
-  qtySection.style.boxShadow = '0 4px 15px rgba(16, 185, 129, 0.1)';
-
-  const qtyTitle = document.createElement('h5');
-  qtyTitle.textContent = '🏆 Top 10 by Delivery Qty > 70, Dates Count';
-  qtyTitle.style.marginBottom = '12px';
-  qtyTitle.style.color = '#059669';
-  qtyTitle.style.fontFamily = "'Montserrat', sans-serif";
-  qtyTitle.style.fontWeight = '700';
-  qtySection.appendChild(qtyTitle);
-
-  const qtyList = document.createElement('ol');
-  top10counts.forEach((stock) => {
-    const item = document.createElement('li');
-    const btn = document.createElement('button');
-    btn.textContent = 'Show Details';
-    btn.style.marginRight = '8px';
-    btn.style.padding = '4px 10px';
-    btn.style.border = 'none';
-    btn.style.borderRadius = '4px';
-    btn.style.background = 'var(--primary)';
-    btn.style.color = 'white';
-    btn.style.cursor = 'pointer';
-    btn.style.fontSize = '0.75rem';
-    btn.onclick = function() { showStockDetails(stock.name, 'topPerformers'); };
-    item.appendChild(btn);
-    item.appendChild(document.createTextNode(' '));
-    const nameSpan = document.createElement('strong');
-    nameSpan.textContent = stock.name;
-    item.appendChild(nameSpan);
-    item.appendChild(document.createTextNode(' - ' + stock.count + ' dates'));
-    item.style.padding = '6px 0';
-    qtyList.appendChild(item);
-  });
-  qtySection.appendChild(qtyList);
-  infoPanel.appendChild(qtySection);
 
   const chartContainer = document.getElementById('topPerformersChartContainer');
   if (top10counts.length > 0) {
@@ -385757,6 +385778,37 @@ function showTopPerformers(startDate, endDate) {
   }
 }
 
+function switchTopPerformersTab(mode) {
+  const regularControl = document.getElementById('topPerformersRegularControl');
+  const durationControl = document.getElementById('topPerformersDurationControl');
+  const regularTab = document.getElementById('topPerformersRegularTab');
+  const durationTab = document.getElementById('topPerformersDurationTab');
+  const chartContainer = document.getElementById('topPerformersChartContainer');
+
+  if (!regularControl || !durationControl || !regularTab || !durationTab) return;
+
+  if (mode === 'regular') {
+    regularControl.style.display = 'block';
+    durationControl.style.display = 'none';
+    if (chartContainer) chartContainer.style.display = 'none';
+    regularTab.style.background = 'white';
+    regularTab.style.color = 'var(--primary)';
+    regularTab.style.borderBottom = '3px solid var(--accent)';
+    durationTab.style.background = '#f1f5f9';
+    durationTab.style.color = 'var(--text-light)';
+    durationTab.style.borderBottom = '3px solid transparent';
+  } else {
+    regularControl.style.display = 'none';
+    durationControl.style.display = 'block';
+    regularTab.style.background = '#f1f5f9';
+    regularTab.style.color = 'var(--text-light)';
+    regularTab.style.borderBottom = '3px solid transparent';
+    durationTab.style.background = 'white';
+    durationTab.style.color = 'var(--primary)';
+    durationTab.style.borderBottom = '3px solid var(--accent)';
+  }
+}
+
 function getTopPerformersDuration() {
   const startInput = document.getElementById('topPerformersStartDate');
   const endInput = document.getElementById('topPerformersEndDate');
@@ -385772,7 +385824,7 @@ function getTopPerformersDuration() {
 function filterTopPerformersByDuration() {
   const duration = getTopPerformersDuration();
   if (!duration) return;
-  showTopPerformers(duration.start, duration.end);
+  showTopPerformersDuration(duration.start, duration.end);
 }
 
 function clearTopPerformersDuration() {
@@ -385780,7 +385832,7 @@ function clearTopPerformersDuration() {
   const endInput = document.getElementById('topPerformersEndDate');
   if (startInput) startInput.value = '';
   if (endInput) endInput.value = '';
-  showTopPerformers();
+  showTopPerformersDuration('', '');
 }
 
 function showRankChanges() {
@@ -386135,6 +386187,35 @@ function renderHistoryRankAllDates(startDate, endDate) {
     }
 
     infoPanel.appendChild(section);
+  }
+}
+
+function switchHistoryRankTab(mode) {
+  const singleControl = document.getElementById('historyRankSingleControl');
+  const durationControl = document.getElementById('historyRankDurationControl');
+  const singleTab = document.getElementById('historyRankSingleTab');
+  const durationTab = document.getElementById('historyRankDurationTab');
+
+  if (!singleControl || !durationControl || !singleTab || !durationTab) return;
+
+  if (mode === 'single') {
+    singleControl.style.display = 'block';
+    durationControl.style.display = 'none';
+    singleTab.style.background = 'white';
+    singleTab.style.color = 'var(--primary)';
+    singleTab.style.borderBottom = '3px solid var(--accent)';
+    durationTab.style.background = '#f1f5f9';
+    durationTab.style.color = 'var(--text-light)';
+    durationTab.style.borderBottom = '3px solid transparent';
+  } else {
+    singleControl.style.display = 'none';
+    durationControl.style.display = 'block';
+    singleTab.style.background = '#f1f5f9';
+    singleTab.style.color = 'var(--text-light)';
+    singleTab.style.borderBottom = '3px solid transparent';
+    durationTab.style.background = 'white';
+    durationTab.style.color = 'var(--primary)';
+    durationTab.style.borderBottom = '3px solid var(--accent)';
   }
 }
 
@@ -386603,6 +386684,8 @@ document.addEventListener('DOMContentLoaded', function() {
   updateDashboardStats();
   populateStockSuggestions();
   setDatePickerRanges();
+  switchHistoryRankTab('single');
+  switchTopPerformersTab('regular');
 
   document.getElementById('searchInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') searchStock();
