@@ -385650,7 +385650,16 @@ function showTopPerformers() {
   const list = document.createElement('ol');
   top10.forEach((stock, index) => {
     const item = document.createElement('li');
-    item.innerHTML = `<strong>${stock.name}</strong> - ${stock.delivery.toFixed(2)}%`;
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = stock.name;
+    nameSpan.style.fontWeight = '700';
+    nameSpan.style.color = 'var(--primary)';
+    nameSpan.style.cursor = 'pointer';
+    nameSpan.style.textDecoration = 'underline';
+    nameSpan.onclick = function() { showStockDetails(stock.name, 'topPerformers'); };
+    const deliveryText = document.createTextNode(' - ' + stock.delivery.toFixed(2) + '%');
+    item.appendChild(nameSpan);
+    item.appendChild(deliveryText);
     list.appendChild(item);
   });
   infoPanel.appendChild(list);
@@ -385737,6 +385746,18 @@ function showTopPerformersDuration(startDate, endDate) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        onClick: (event, elements, chart) => {
+          if (elements.length > 0) {
+            const index = elements[0].index;
+            const label = chart.data.labels[index];
+            if (label) {
+              showStockDetails(label, 'topPerformers');
+            }
+          }
+        },
+        onHover: (event, chartElement, chart) => {
+          event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
+        },
         plugins: {
           legend: { display: false },
           title: {
