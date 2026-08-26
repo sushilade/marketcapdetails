@@ -3305,7 +3305,7 @@ document.addEventListener('DOMContentLoaded', function() {{
 "1"
 """
 
-with open("intraday_web.html", "w", encoding="utf-8") as f:
+with open("index.html", "w", encoding="utf-8") as f:
     f.write(html_content)
 
-print("Enhanced HTML file 'intraday_web.html' created with modern design!")
+print("Enhanced HTML file 'index.html' created with modern design!")
