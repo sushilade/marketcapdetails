@@ -4,6 +4,7 @@ on:
   schedule:
     # Run at 8:30 PM IST (3:00 PM UTC) Monday-Friday
     - cron: '0 15 * * 1-5'
+  workflow_dispatch:
 
 jobs:
   update:
