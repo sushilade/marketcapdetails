@@ -2,8 +2,8 @@ name: Update Stock Data
 
 on:
   schedule:
-    # Run at 7:30 PM IST (2:00 PM UTC) Monday-Friday
-    - cron: '0 14 * * 1-5'
+    # Run at 7:35 PM IST (2:05 PM UTC) Monday-Friday
+    - cron: '5 14 * * 1-5'
 
 jobs:
   update:
