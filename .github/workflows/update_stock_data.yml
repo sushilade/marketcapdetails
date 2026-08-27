@@ -2,8 +2,8 @@ name: Update Stock Data
 
 on:
   schedule:
-    # Run at 7:20 PM IST (1:50 PM UTC) Monday-Friday
-    - cron: '50 13 * * 1-5'
+    # Run at 7:30 PM IST (2:00 PM UTC) Monday-Friday
+    - cron: '0 14 * * 1-5'
 
 jobs:
   update:
@@ -22,18 +22,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas openpyxl nse
+          pip install -r requirements.txt
 
       - name: Check if market holiday
         id: holiday
         run: |
           result=$(python check_holiday.py)
           echo "result=$result" >> $GITHUB_OUTPUT
-          if [ "$result" = "HOLIDAY" ]; then
-            echo "Today is a market holiday. Skipping update."
-          else
-            echo "Today is a working day. Proceeding with update."
-          fi
+          echo "Holiday check result: $result"
 
       - name: Run apinse.py
         if: steps.holiday.outputs.result == 'WORKING'
