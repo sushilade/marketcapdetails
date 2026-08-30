@@ -1670,39 +1670,9 @@ function openTradingView() {{
     alert('Please select a stock first.');
     return;
   }}
-  // Create modal overlay
-  let modal = document.getElementById('tradingViewModal');
-  if (!modal) {{
-    modal = document.createElement('div');
-    modal.id = 'tradingViewModal';
-    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;';
-    modal.innerHTML = `
-      <div style="position:relative; width:90%; height:85%; background:white; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:linear-gradient(135deg,#1e293b 0%,#334155 100%); color:white;">
-          <h3 style="margin:0; font-family:'Montserrat',sans-serif; font-size:1.1rem;"><i class="fas fa-chart-line"></i> <span id="tvStockName"></span> - TradingView Chart</h3>
-          <button onclick="closeTradingView()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all 0.3s;"><i class="fas fa-times"></i></button>
-        </div>
-        <iframe id="tradingViewFrame" style="width:100%; height:calc(100% - 60px); border:none;" src=""></iframe>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    modal.addEventListener('click', function(e) {{
-      if (e.target === modal) closeTradingView();
-    }});
-  }}
-  document.getElementById('tvStockName').textContent = stock;
-  // Use TradingView's embeddable symbol overview widget
-  const tvUrl = 'https://s.tradingview.com/external-embedding/embed-widget-symbol-overview/?symbol=NSE%3A' + encodeURIComponent(stock) + '&locale=en';
-  document.getElementById('tradingViewFrame').src = tvUrl;
-  modal.style.display = 'flex';
-}}
-
-function closeTradingView() {{
-  const modal = document.getElementById('tradingViewModal');
-  if (modal) {{
-    modal.style.display = 'none';
-    document.getElementById('tradingViewFrame').src = '';
-  }}
+  // Open TradingView with the selected stock symbol (NSE exchange)
+  const tradingViewUrl = 'https://www.tradingview.com/chart/?symbol=NSE:' + encodeURIComponent(stock);
+  window.open(tradingViewUrl, '_blank');
 }}
 
 function updateMarketCapExtremes(stock, dates, marketCapData) {{
