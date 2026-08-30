@@ -982,9 +982,9 @@ html_content = f"""<!DOCTYPE html>
           <i class="fas fa-chart-line"></i> View on TradingView
         </button>
         <label for="stockAnalysisStartDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem; margin-left: 20px;">Start Date:</label>
-        <input type="date" id="stockAnalysisStartDate" onchange="filterStockAnalysisByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
+        <input type="date" id="stockAnalysisStartDate" onchange="filterStockAnalysisByDuration()" style="padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: #f8fafc; transition: all 0.3s; width: 140px;">
         <label for="stockAnalysisEndDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem; margin-left: 12px;">End Date:</label>
-        <input type="date" id="stockAnalysisEndDate" onchange="filterStockAnalysisByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
+        <input type="date" id="stockAnalysisEndDate" onchange="filterStockAnalysisByDuration()" style="padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: #f8fafc; transition: all 0.3s; width: 140px;">
         <button onclick="clearStockAnalysisDuration()" id="clearStockAnalysisDurationBtn" style="margin-left: 12px; width: 42px; height: 42px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 10px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s;">
           <i class="fas fa-times"></i>
         </button>
