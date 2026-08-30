@@ -978,6 +978,9 @@ html_content = f"""<!DOCTYPE html>
       <div class="controls" style="margin-bottom: 20px; padding: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);">
         <label for="stockSelect" style="font-weight: 700; color: var(--primary); margin-right: 12px; font-size: 0.95rem;">Select Stock:</label>
         <select id="stockSelect" onchange="const d=getStockAnalysisDuration();updateChart(d?d.start:'',d?d.end:'');" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s; min-width: 200px;"></select>
+        <button onclick="openTradingView()" style="margin-left: 15px; padding: 12px 20px; background: linear-gradient(135deg, #2962FF 0%, #1E53E5 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(41, 98, 255, 0.3); transition: all 0.3s;">
+          <i class="fas fa-chart-line"></i> View on TradingView
+        </button>
         <label for="stockAnalysisStartDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem; margin-left: 20px;">Start Date:</label>
         <input type="date" id="stockAnalysisStartDate" onchange="filterStockAnalysisByDuration()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s;">
         <label for="stockAnalysisEndDate" style="font-weight: 700; color: var(--primary); margin-right: 8px; font-size: 0.95rem; margin-left: 12px;">End Date:</label>
@@ -1659,6 +1662,17 @@ function scrollTable(direction) {{
   if (!area) return;
   const rowHeight = 45;
   area.scrollBy({{ top: direction * rowHeight, behavior: 'smooth' }});
+}}
+
+function openTradingView() {{
+  const stock = document.getElementById('stockSelect').value;
+  if (!stock) {{
+    alert('Please select a stock first.');
+    return;
+  }}
+  // Open TradingView with the selected stock symbol (NSE exchange)
+  const tradingViewUrl = 'https://www.tradingview.com/chart/?symbol=NSE:' + encodeURIComponent(stock);
+  window.open(tradingViewUrl, '_blank');
 }}
 
 function updateMarketCapExtremes(stock, dates, marketCapData) {{
