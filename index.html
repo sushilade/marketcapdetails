@@ -392583,7 +392583,9 @@ function openTradingView() {
     });
   }
   document.getElementById('tvStockName').textContent = stock;
-  document.getElementById('tradingViewFrame').src = 'https://www.tradingview.com/chart/?symbol=NSE:' + encodeURIComponent(stock);
+  // Use TradingView's embeddable symbol overview widget
+  const tvUrl = 'https://s.tradingview.com/external-embedding/embed-widget-symbol-overview/?symbol=NSE%3A' + encodeURIComponent(stock) + '&locale=en';
+  document.getElementById('tradingViewFrame').src = tvUrl;
   modal.style.display = 'flex';
 }
 
