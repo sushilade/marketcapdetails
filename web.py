@@ -992,6 +992,15 @@ html_content = f"""<!DOCTYPE html>
           <canvas id="stockChart"></canvas>
         </div>
       </div>
+      <div class="info-panel" id="marketCapExtremes" style="margin-top: 20px;">
+        <h4><i class="fas fa-chart-bar"></i> Market Cap Extremes</h4>
+        <div id="highestMarketCap" style="margin-top: 10px; padding: 12px; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-radius: 8px; border-left: 4px solid #28a745;">
+          <strong>Highest Market Cap:</strong> <span id="highestMCValue">-</span> on <span id="highestMCDate">-</span>
+        </div>
+        <div id="lowestMarketCap" style="margin-top: 10px; padding: 12px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 8px; border-left: 4px solid #dc3545;">
+          <strong>Lowest Market Cap:</strong> <span id="lowestMCValue">-</span> on <span id="lowestMCDate">-</span>
+        </div>
+      </div>
     </div>
 
     <!-- Market Overview Tab -->
@@ -1652,6 +1661,39 @@ function scrollTable(direction) {{
   area.scrollBy({{ top: direction * rowHeight, behavior: 'smooth' }});
 }}
 
+function updateMarketCapExtremes(stock, dates, marketCapData) {{
+  if (!dates.length || !marketCapData.length) {{
+    document.getElementById('highestMCValue').textContent = '-';
+    document.getElementById('highestMCDate').textContent = '-';
+    document.getElementById('lowestMCValue').textContent = '-';
+    document.getElementById('lowestMCDate').textContent = '-';
+    return;
+  }}
+
+  let highestVal = -Infinity;
+  let lowestVal = Infinity;
+  let highestDate = '';
+  let lowestDate = '';
+
+  for (let i = 0; i < marketCapData.length; i++) {{
+    const val = marketCapData[i];
+    const date = dates[i];
+    if (val > highestVal) {{
+      highestVal = val;
+      highestDate = date;
+    }}
+    if (val < lowestVal && val > 0) {{
+      lowestVal = val;
+      lowestDate = date;
+    }}
+  }}
+
+  document.getElementById('highestMCValue').textContent = highestVal > 0 ? highestVal.toLocaleString() + ' Cr' : '-';
+  document.getElementById('highestMCDate').textContent = highestDate || '-';
+  document.getElementById('lowestMCValue').textContent = lowestVal < Infinity ? lowestVal.toLocaleString() + ' Cr' : '-';
+  document.getElementById('lowestMCDate').textContent = lowestDate || '-';
+}}
+
 // ---- STOCK ANALYSIS (Chart.js) ----
 let stockChart;
 function loadStockList() {{
@@ -1770,6 +1812,9 @@ function updateChart(startDate, endDate) {{
     deliveryData.push(deliveryVal);
     rankData.push(rankVal);
   }});
+
+  // Find highest and lowest market cap dates
+  updateMarketCapExtremes(stock, filteredDates, marketCapData);
 
   // Calculate market cap changes for coloring
   const marketCapColors = [];
