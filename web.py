@@ -1705,13 +1705,149 @@ function toggleIndicatorMenu(event) {{
 function showIndicatorOption(option) {{
   if (option === 'candle') {{
     showCandleCombinationScript();
+  }} else if (option === 'intraday') {{
+    showIntradayScript();
   }} else {{
-    const messages = {{
-      'intraday': 'INTRADAY indicator selected',
-      'options': 'OPTIONS TRADE indicator selected'
-    }};
-    alert(messages[option]);
+    alert('OPTIONS TRADE indicator selected');
   }}
+}}
+
+function showIntradayScript() {{
+  let modal = document.getElementById('intradayScriptModal');
+  if (!modal) {{
+    modal = document.createElement('div');
+    modal.id = 'intradayScriptModal';
+    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;';
+    modal.innerHTML = `
+      <div style="position:relative; width:80%; max-width:900px; height:80%; background:#1e1e1e; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:linear-gradient(135deg,#1e293b 0%,#334155 100%); color:white;">
+          <h3 style="margin:0; font-family:'Montserrat',sans-serif; font-size:1.1rem;"><i class="fas fa-bolt"></i> INTRADAY - Pine Script</h3>
+          <div style="display:flex; gap:10px;">
+            <button onclick="copyIntradayScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; gap:5px; transition:all 0.3s;"><i class="fas fa-copy"></i> Copy</button>
+            <button onclick="closeIntradayScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all 0.3s;"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div style="flex:1; overflow:auto; padding:20px;">
+          <pre id="intradayScriptCode" style="margin:0; padding:20px; background:#2d2d2d; border-radius:8px; color:#d4d4d4; font-family:'Consolas','Monaco',monospace; font-size:13px; line-height:1.6; white-space:pre-wrap; word-wrap:break-word;"></pre>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) {{
+      if (e.target === modal) closeIntradayScript();
+    }});
+  }}
+  const scriptCode = `// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © sharaaU7
+//@version=4
+
+study("Stocks Screener", overlay = true)
+
+stock = input(defval= "List1" ,title =  "Select Stock List", options = ["List1","List2","List3","List4","List5","List6"])
+
+resolution = timeframe.period 
+COP = resolution == "1D" or resolution == "D" ? 2 : (resolution == "W" or resolution == "M" ? 6 : 0)
+
+msg_strings = array.new_string(2)
+array.set(msg_strings, 0, "")
+array.set(msg_strings, 1, "")
+f_triggerHLCro(_ticker) =>
+    _LB = close > high[1]
+    _SS = close < low[1]
+    cl_val = close
+    hi_val = high[1]
+    lo_val = low[1]
+    p_chg = ((close - close[1])/close[1])*100
+
+    [_co, _cu, val_c0, val_hi, val_lo, chg_p] = security(_ticker, resolution, [_LB, _SS, cl_val, hi_val, lo_val, p_chg])
+    _msg = _ticker + "     " + tostring(((chg_p * 10) / 10),'#.##') + "%"  + "       ( LTP " + tostring(val_c0) + "/- )      " 
+    
+    // Only trigger alerts if the percentage change is greater than 2% (positive or negative)
+       
+    if _co
+        _msg := _msg  
+        if chg_p >= COP
+            array.set(msg_strings, 0, array.get(msg_strings, 0) + " \\n" + _msg)
+            alert(_msg,  alert.freq_once_per_bar_close)
+        
+        
+    else if _cu
+        _msg := _msg  
+        if chg_p <= (-1) * COP
+            array.set(msg_strings, 1, array.get(msg_strings, 1) + " \\n" + _msg)
+            alert(_msg,  alert.freq_once_per_bar_close)
+    
+label lLabel = label.new(time, close, color=color.green, size=size.normal, xloc=xloc.bar_time, yloc = yloc.belowbar, style=label.style_label_upper_left, textcolor=color.white, textalign=text.align_left)
+label sLabel = label.new(time, close, color=color.red  , size=size.normal, xloc=xloc.bar_time, yloc = yloc.abovebar,style=label.style_label_lower_left, textcolor=color.white, textalign=text.align_left)
+
+
+label.delete(lLabel[1])
+label.delete(sLabel[1]) 
+
+array.set(msg_strings, 0, "                            BUY")
+array.set(msg_strings, 1, "                             SELL")
+label.set_text(lLabel, "")
+label.set_text(sLabel, "")
+f_triggerHLCro(stock=="List1" ?  "AARTIIND" :  stock == "List2" ? "BPCL" :  stock == "List3" ? "GODREJCP" :  stock == "List4" ? "JKCEMENT" :  stock == "List5" ? "NMDC" :  stock == "List6" ? "TATACHEM" :  na)
+f_triggerHLCro(stock=="List1" ?  "ABB" :  stock == "List2" ? "BRITANNIA" :  stock == "List3" ? "GODREJPROP" :  stock == "List4" ? "JSL" :  stock == "List5" ? "NTPC" :  stock == "List6" ? "TATACOMM" :  na)
+f_triggerHLCro(stock=="List1" ?  "ABBOTINDIA" :  stock == "List2" ? "BSE" :  stock == "List3" ? "GRANULES" :  stock == "List4" ? "JSWENERGY" :  stock == "List5" ? "NYKAA" :  stock == "List6" ? "TATACONSUM" :  na)
+f_triggerHLCro(stock=="List1" ?  "ABCAPITAL" :  stock == "List2" ? "BSOFT" :  stock == "List3" ? "GRASIM" :  stock == "List4" ? "JSWSTEEL" :  stock == "List5" ? "OBEROIRLTY" :  stock == "List6" ? "TATAELXSI" :  na)
+f_triggerHLCro(stock=="List1" ?  "ABFRL" :  stock == "List2" ? "CAMS" :  stock == "List3" ? "GUJGASLTD" :  stock == "List4" ? "JUBLFOOD" :  stock == "List5" ? "OFSS" :  stock == "List6" ? "TATAMOTORS" :  na)
+f_triggerHLCro(stock=="List1" ?  "ACC" :  stock == "List2" ? "CANBK" :  stock == "List3" ? "HAL" :  stock == "List4" ? "KALYANKJIL" :  stock == "List5" ? "OIL" :  stock == "List6" ? "TATAPOWER" :  na)
+f_triggerHLCro(stock=="List1" ?  "ADANIENSOL" :  stock == "List2" ? "CANFINHOME" :  stock == "List3" ? "HAVELLS" :  stock == "List4" ? "KEI" :  stock == "List5" ? "ONGC" :  stock == "List6" ? "TATASTEEL" :  na)
+f_triggerHLCro(stock=="List1" ?  "ADANIENT" :  stock == "List2" ? "CDSL" :  stock == "List3" ? "HCLTECH" :  stock == "List4" ? "KOTAKBANK" :  stock == "List5" ? "PAGEIND" :  stock == "List6" ? "TCS" :  na)
+f_triggerHLCro(stock=="List1" ?  "ADANIGREEN" :  stock == "List2" ? "CESC" :  stock == "List3" ? "HDFCAMC" :  stock == "List4" ? "KPITTECH" :  stock == "List5" ? "PAYTM" :  stock == "List6" ? "TECHM" :  na)
+f_triggerHLCro(stock=="List1" ?  "ADANIPORTS" :  stock == "List2" ? "CGPOWER" :  stock == "List3" ? "HDFCBANK" :  stock == "List4" ? "LALPATHLAB" :  stock == "List5" ? "PEL" :  stock == "List6" ? "TIINDIA" :  na)
+f_triggerHLCro(stock=="List1" ?  "ALKEM" :  stock == "List2" ? "CHAMBLFERT" :  stock == "List3" ? "HDFCLIFE" :  stock == "List4" ? "LAURUSLABS" :  stock == "List5" ? "PERSISTENT" :  stock == "List6" ? "TITAN" :  na)
+f_triggerHLCro(stock=="List1" ?  "AMBUJACEM" :  stock == "List2" ? "CHOLAFIN" :  stock == "List3" ? "HEROMOTOCO" :  stock == "List4" ? "LICHSGFIN" :  stock == "List5" ? "PETRONET" :  stock == "List6" ? "TORNTPHARM" :  na)
+f_triggerHLCro(stock=="List1" ?  "ANGELONE" :  stock == "List2" ? "CIPLA" :  stock == "List3" ? "HFCL" :  stock == "List4" ? "LICI" :  stock == "List5" ? "PFC" :  stock == "List6" ? "TRENT" :  na)
+f_triggerHLCro(stock=="List1" ?  "APLAPOLLO" :  stock == "List2" ? "COALINDIA" :  stock == "List3" ? "HINDALCO" :  stock == "List4" ? "LODHA" :  stock == "List5" ? "PIDILITIND" :  stock == "List6" ? "TVSMOTOR" :  na)
+f_triggerHLCro(stock=="List1" ?  "APOLLOHOSP" :  stock == "List2" ? "COFORGE" :  stock == "List3" ? "HINDCOPPER" :  stock == "List4" ? "LT" :  stock == "List5" ? "PIIND" :  stock == "List6" ? "UBL" :  na)
+f_triggerHLCro(stock=="List1" ?  "APOLLOTYRE" :  stock == "List2" ? "COLPAL" :  stock == "List3" ? "HINDPETRO" :  stock == "List4" ? "LTF" :  stock == "List5" ? "PNB" :  stock == "List6" ? "ULTRACEMCO" :  na)
+f_triggerHLCro(stock=="List1" ?  "ASHOKLEY" :  stock == "List2" ? "CONCOR" :  stock == "List3" ? "HINDUNILVR" :  stock == "List4" ? "LTIM" :  stock == "List5" ? "POLICYBZR" :  stock == "List6" ? "UNIONBANK" :  na)
+f_triggerHLCro(stock=="List1" ?  "ASIANPAINT" :  stock == "List2" ? "COROMANDEL" :  stock == "List3" ? "HUDCO" :  stock == "List4" ? "LTTS" :  stock == "List5" ? "POLYCAB" :  stock == "List6" ? "UNITDSPR" :  na)
+f_triggerHLCro(stock=="List1" ?  "ASTRAL" :  stock == "List2" ? "CROMPTON" :  stock == "List3" ? "ICICIBANK" :  stock == "List4" ? "LUPIN" :  stock == "List5" ? "POONAWALLA" :  stock == "List6" ? "UPL" :  na)
+f_triggerHLCro(stock=="List1" ?  "ATGL" :  stock == "List2" ? "CUB" :  stock == "List3" ? "ICICIGI" :  stock == "List4" ? "M&M" :  stock == "List5" ? "POWERGRID" :  stock == "List6" ? "VBL" :  na)
+f_triggerHLCro(stock=="List1" ?  "ATUL" :  stock == "List2" ? "CUMMINSIND" :  stock == "List3" ? "ICICIPRULI" :  stock == "List4" ? "M&MFIN" :  stock == "List5" ? "PRESTIGE" :  stock == "List6" ? "VEDL" :  na)
+f_triggerHLCro(stock=="List1" ?  "AUBANK" :  stock == "List2" ? "CYIENT" :  stock == "List3" ? "IDEA" :  stock == "List4" ? "MANAPPURAM" :  stock == "List5" ? "PVRINOX" :  stock == "List6" ? "VOLTAS" :  na)
+f_triggerHLCro(stock=="List1" ?  "AUROPHARMA" :  stock == "List2" ? "DABUR" :  stock == "List3" ? "IDFCFIRSTB" :  stock == "List4" ? "MARICO" :  stock == "List5" ? "RAMCOCEM" :  stock == "List6" ? "WIPRO" :  na)
+f_triggerHLCro(stock=="List1" ?  "AXISBANK" :  stock == "List2" ? "DALBHARAT" :  stock == "List3" ? "IEX" :  stock == "List4" ? "MARUTI" :  stock == "List5" ? "RBLBANK" :  stock == "List6" ? "YESBANK" :  na)
+f_triggerHLCro(stock=="List1" ?  "BAJAJ_AUTO" :  stock == "List2" ? "DEEPAKNTR" :  stock == "List3" ? "IGL" :  stock == "List4" ? "MAXHEALTH" :  stock == "List5" ? "RECLTD" :  stock == "List6" ? "ETERNAL" :  na)
+f_triggerHLCro(stock=="List1" ?  "BAJAJFINSV" :  stock == "List2" ? "DELHIVERY" :  stock == "List3" ? "INDHOTEL" :  stock == "List4" ? "MCX" :  stock == "List5" ? "RELIANCE" :  stock == "List6" ? "ZYDUSLIFE" :  na)
+f_triggerHLCro(stock=="List1" ?  "BAJFINANCE" :  stock == "List2" ? "DIVISLAB" :  stock == "List3" ? "INDIAMART" :  stock == "List4" ? "METROPOLIS" :  stock == "List5" ? "SAIL" :  stock == "List6" ? "sci" :  na)
+f_triggerHLCro(stock=="List1" ?  "BALKRISIND" :  stock == "List2" ? "DIXON" :  stock == "List3" ? "INDIANB" :  stock == "List4" ? "MFSL" :  stock == "List5" ? "SBICARD" :  stock == "List6" ? "advanihotr" :  na)
+f_triggerHLCro(stock=="List1" ?  "BANDHANBNK" :  stock == "List2" ? "DLF" :  stock == "List3" ? "INDIGO" :  stock == "List4" ? "MGL" :  stock == "List5" ? "SBILIFE" :  stock == "List6" ? "asterdm" :  na)
+f_triggerHLCro(stock=="List1" ?  "BANKBARODA" :  stock == "List2" ? "DMART" :  stock == "List3" ? "INDUSINDBK" :  stock == "List4" ? "MANINFRA" :  stock == "List5" ? "SBIN" :  stock == "List6" ? "CASTROLIND" :  na)
+f_triggerHLCro(stock=="List1" ?  "BANKINDIA" :  stock == "List2" ? "DRREDDY" :  stock == "List3" ? "INDUSTOWER" :  stock == "List4" ? "MOTHERSON" :  stock == "List5" ? "SHREECEM" :  stock == "List6" ? "embdl" :  na)
+f_triggerHLCro(stock=="List1" ?  "BANKNIFTY" :  stock == "List2" ? "EICHERMOT" :  stock == "List3" ? "INFY" :  stock == "List4" ? "MPHASIS" :  stock == "List5" ? "SHRIRAMFIN" :  stock == "List6" ? "gsfc" :  na)
+f_triggerHLCro(stock=="List1" ?  "BATAINDIA" :  stock == "List2" ? "ESCORTS" :  stock == "List3" ? "IOC" :  stock == "List4" ? "MRF" :  stock == "List5" ? "SIEMENS" :  stock == "List6" ? "zeel" :  na)
+f_triggerHLCro(stock=="List1" ?  "BEL" :  stock == "List2" ? "EXIDEIND" :  stock == "List3" ? "IPCALAB" :  stock == "List4" ? "MUTHOOTFIN" :  stock == "List5" ? "SJVN" :  stock == "List6" ? "tnpetro" :  na)
+f_triggerHLCro(stock=="List1" ?  "BERGEPAINT" :  stock == "List2" ? "FEDERALBNK" :  stock == "List3" ? "IRB" :  stock == "List4" ? "NATIONALUM" :  stock == "List5" ? "SONACOMS" :  stock == "List6" ? "texrail" :  na)
+f_triggerHLCro(stock=="List1" ?  "BHARATFORG" :  stock == "List2" ? "FIVESTAR" :  stock == "List3" ? "IRCTC" :  stock == "List4" ? "NAUKRI" :  stock == "List5" ? "SRF" :  stock == "List6" ? "sequent" :  na)
+f_triggerHLCro(stock=="List1" ?  "BHARTIARTL" :  stock == "List2" ? "GAIL" :  stock == "List3" ? "IRFC" :  stock == "List4" ? "NAVINFLUOR" :  stock == "List5" ? "SUNPHARMA" :  stock == "List6" ? "sardaen" :  na)
+f_triggerHLCro(stock=="List1" ?  "BHEL" :  stock == "List2" ? "GLENMARK" :  stock == "List3" ? "ITC" :  stock == "List4" ? "NCC" :  stock == "List5" ? "SUNTV" :  stock == "List6" ? "ptc" :  na)
+f_triggerHLCro(stock=="List1" ?  "BIOCON" :  stock == "List2" ? "GMRAIRPORT" :  stock == "List3" ? "JINDALSTEL" :  stock == "List4" ? "NESTLEIND" :  stock == "List5" ? "SUPREMEIND" :  stock == "List6" ? "NACLIND" :  na)
+f_triggerHLCro(stock=="List1" ?  "BOSCHLTD" :  stock == "List2" ? "GNFC" :  stock == "List3" ? "JIOFIN" :  stock == "List4" ? "NHPC" :  stock == "List5" ? "SYNGENE" :  stock == "List6" ? "RAIN" :  na)
+
+
+label.set_text(lLabel, array.get(msg_strings, 0))
+label.set_text(sLabel, array.get(msg_strings, 1))`;
+  document.getElementById('intradayScriptCode').textContent = scriptCode;
+  modal.style.display = 'flex';
+}}
+
+function closeIntradayScript() {{
+  const modal = document.getElementById('intradayScriptModal');
+  if (modal) modal.style.display = 'none';
+}}
+
+function copyIntradayScript() {{
+  const code = document.getElementById('intradayScriptCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {{
+    alert('Pine Script copied to clipboard!');
+  }}).catch(() => {{
+    alert('Failed to copy. Please select and copy manually.');
+  }});
 }}
 
 function showCandleCombinationScript() {{
