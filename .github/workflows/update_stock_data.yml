@@ -2,8 +2,8 @@ name: Update Stock Data
 
 on:
   schedule:
-    # Run at 9:30 PM IST (4:00 PM UTC) Monday-Friday
-    - cron: '0 16 * * 1-5'
+    # Run at 6:00 PM IST (12:30 PM UTC) Monday-Friday
+    - cron: '30 12 * * 1-5'
   workflow_dispatch:
 
 jobs:
