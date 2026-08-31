@@ -863,6 +863,21 @@ html_content = f"""<!DOCTYPE html>
       <button class="sidebar-link" onclick="openTabFromMenu(event, 'historyRank')">
         <i class="fas fa-history"></i> History Rank
       </button>
+      <button class="sidebar-link" onclick="toggleIndicatorMenu(event)" id="indicatorBtn">
+        <i class="fas fa-lightbulb"></i> Indicator
+        <i class="fas fa-chevron-down" id="indicatorArrow" style="margin-left: auto; font-size: 12px; transition: transform 0.3s;"></i>
+      </button>
+      <div id="indicatorSubmenu" style="display: none; margin-left: 15px; margin-bottom: 10px;">
+        <button class="sidebar-link" onclick="showIndicatorOption('candle')" style="padding: 10px 15px; font-size: 13px; margin-bottom: 5px;">
+          <i class="fas fa-chart-bar"></i> CANDLE COMBINATION
+        </button>
+        <button class="sidebar-link" onclick="showIndicatorOption('intraday')" style="padding: 10px 15px; font-size: 13px; margin-bottom: 5px;">
+          <i class="fas fa-bolt"></i> INTRADAY
+        </button>
+        <button class="sidebar-link" onclick="showIndicatorOption('options')" style="padding: 10px 15px; font-size: 13px; margin-bottom: 5px;">
+          <i class="fas fa-layer-group"></i> OPTIONS TRADE
+        </button>
+      </div>
     </div>
   </div>
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMenuOnOverlay()"></div>
@@ -1673,6 +1688,27 @@ function openTradingView() {{
   // Open TradingView with the selected stock symbol (NSE exchange)
   const tradingViewUrl = 'https://www.tradingview.com/chart/?symbol=NSE:' + encodeURIComponent(stock);
   window.open(tradingViewUrl, '_blank');
+}}
+
+function toggleIndicatorMenu(event) {{
+  const submenu = document.getElementById('indicatorSubmenu');
+  const arrow = document.getElementById('indicatorArrow');
+  if (submenu.style.display === 'none') {{
+    submenu.style.display = 'block';
+    arrow.style.transform = 'rotate(180deg)';
+  }} else {{
+    submenu.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  }}
+}}
+
+function showIndicatorOption(option) {{
+  const messages = {{
+    'candle': 'CANDLE COMBINATION indicator selected',
+    'intraday': 'INTRADAY indicator selected',
+    'options': 'OPTIONS TRADE indicator selected'
+  }};
+  alert(messages[option]);
 }}
 
 function updateMarketCapExtremes(stock, dates, marketCapData) {{
