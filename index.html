@@ -392599,9 +392599,280 @@ function showIndicatorOption(option) {
     showCandleCombinationScript();
   } else if (option === 'intraday') {
     showIntradayScript();
-  } else {
-    alert('OPTIONS TRADE indicator selected');
+  } else if (option === 'options') {
+    showOptionsTradeScript();
   }
+}
+
+function showOptionsTradeScript() {
+  let modal = document.getElementById('optionsScriptModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'optionsScriptModal';
+    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;';
+    modal.innerHTML = `
+      <div style="position:relative; width:80%; max-width:900px; height:80%; background:#1e1e1e; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:linear-gradient(135deg,#1e293b 0%,#334155 100%); color:white;">
+          <h3 style="margin:0; font-family:'Montserrat',sans-serif; font-size:1.1rem;"><i class="fas fa-layer-group"></i> OPTIONS TRADE - Pine Script</h3>
+          <div style="display:flex; gap:10px;">
+            <button onclick="copyOptionsScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; gap:5px; transition:all 0.3s;"><i class="fas fa-copy"></i> Copy</button>
+            <button onclick="closeOptionsScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all 0.3s;"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div style="flex:1; overflow:auto; padding:20px;">
+          <pre id="optionsScriptCode" style="margin:0; padding:20px; background:#2d2d2d; border-radius:8px; color:#d4d4d4; font-family:'Consolas','Monaco',monospace; font-size:13px; line-height:1.6; white-space:pre-wrap; word-wrap:break-word;"></pre>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeOptionsScript();
+    });
+  }
+  const scriptCode = `// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © sharaaU7
+//@version=5
+indicator("Option Chain", overlay = true)
+var GRP2 = ""
+resolution  = "1D"
+resolution1  = "15"
+resolution2  = "5"
+resolution3  = "3"
+Index = input.string("NIFTY", title = "Indices", options=["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"], inline = "11", group = GRP2)
+strikediff = Index == "NIFTY" or Index == "FINNIFTY"  ? 50 : 100
+expiryDay = input.int(25, title = "Date", options = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31], inline = "21", group = GRP2)
+expiryMonth = input.int(7, title = " Month", options = [1,2,3,4,5,6,7,8,9,10,11,12], inline = "21", group = GRP2)
+expiryYear = input.int (2025, title = " Year", options = [2025,2026,2027], inline = "21", group = GRP2)
+var float nifty_spot_price = input.int(24530, "Indices Spot Price      ", inline = "11", group = GRP2)
+f_round_to_nearest_50(price) =>
+    math.round(price / strikediff) * strikediff
+nearest_strike_price = f_round_to_nearest_50(nifty_spot_price)
+
+c1 = nearest_strike_price+strikediff
+c2 = nearest_strike_price+strikediff+strikediff
+c3 = nearest_strike_price+strikediff+strikediff+strikediff
+c4 = nearest_strike_price+strikediff+strikediff+strikediff+strikediff
+p1 = nearest_strike_price-strikediff
+p2 = nearest_strike_price-strikediff-strikediff
+p3 = nearest_strike_price-strikediff-strikediff-strikediff
+p4 = nearest_strike_price-strikediff-strikediff-strikediff-strikediff
+// Convert month and day to strings with leading zero if necessary
+expiryMonthStr = expiryMonth < 10 ? "0" + str.tostring(expiryMonth) : str.tostring(expiryMonth)
+expiryDayStr = expiryDay < 10 ? "0" + str.tostring(expiryDay) : str.tostring(expiryDay)
+// Construct the symbol for the call option
+symbol =  str.tostring(Index)+ str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "C" + str.tostring(nearest_strike_price) + "  "
+symbol1 = str.tostring(Index) + str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "C" + str.tostring(c1) + "  "
+symbol2 = str.tostring(Index) + str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "C" + str.tostring(c2) + "  "
+symbol3 = str.tostring(Index) + str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "C" + str.tostring(c3) + "  "
+symbol4 = str.tostring(Index) + str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "C" + str.tostring(c4) + "  "
+symbol9 = str.tostring(Index) + str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "P" + str.tostring(p4) + "  "
+symbol8 = str.tostring(Index) + str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "P" + str.tostring(p3) + "  "
+symbol7 = str.tostring(Index) + str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "P" + str.tostring(p2) + "  "
+symbol6 = str.tostring(Index) + str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "P" + str.tostring(p1) + "  "
+symbol5 = str.tostring(Index) + str.tostring(expiryYear - 2000) + expiryMonthStr + expiryDayStr + "P" + str.tostring(nearest_strike_price) + "  "
+msg_strings = array.new_string(2)
+array.set(msg_strings, 0, "")
+array.set(msg_strings, 1, "")
+f_triggerHLCro(_ticker)=>
+    _LB = close > high[1]
+    _SS = close < low[1]
+    cl_val = close
+    hi_val = high[1]
+    lo_val = low[1]
+    p_chg  = ((close - close[1])/close[1])*100
+    [_co, _cu, val_c0, val_hi, val_lo, chg_p] = request.security(_ticker, resolution, [_LB, _SS, cl_val, hi_val, lo_val, p_chg])
+    _msg = _ticker +str.tostring(math.round(chg_p * 10) / 10) + "%"  +"   (LTP " + str.tostring(val_c0) + "/- )      " 
+      
+    if _co
+        _msg := _msg  
+        if chg_p >= 0
+            array.set(msg_strings, 0, array.get(msg_strings, 0) + " \n" + _msg)
+            alert(_msg,  alert.freq_once_per_bar_close)
+        
+    else if _cu
+        _msg := _msg  
+        if chg_p <= 0
+            array.set(msg_strings, 1, array.get(msg_strings, 1) + " \n" + _msg)
+            alert(_msg,  alert.freq_once_per_bar_close)
+    
+label lLabel = label.new( time, close,  color=#c3f7c4, size=size.normal, xloc=xloc.bar_time, yloc = yloc.belowbar, style=label.style_label_upper_left, textcolor=#141313, textalign=text.align_left)
+label sLabel = label.new(time, close, color=#f6a1a1  , size=size.normal, xloc=xloc.bar_time, yloc = yloc.abovebar, style=label.style_label_lower_left, textcolor=#1a1818, textalign=text.align_left)
+label.delete(lLabel[1])
+label.delete(sLabel[1])
+array.set(msg_strings, 0, "                   List-Day")
+array.set(msg_strings, 1, "                   List-Day")
+label.set_text(lLabel, "")
+label.set_text(sLabel, "")
+f_triggerHLCro(symbol)
+f_triggerHLCro(symbol1)
+f_triggerHLCro(symbol2)
+f_triggerHLCro(symbol3)
+f_triggerHLCro(symbol4)
+f_triggerHLCro(symbol5)
+f_triggerHLCro(symbol6)
+f_triggerHLCro(symbol7)
+f_triggerHLCro(symbol8)
+f_triggerHLCro(symbol9)
+label.set_text(lLabel, array.get(msg_strings, 0))
+label.set_text(sLabel, array.get(msg_strings, 1))
+printTable(txt) => var table t = table.new(position.bottom_right, 1, 1, frame_color  =color.blue, frame_width  = 5), table.cell(t, 0, 0, txt, text_size = size.normal, text_color = #ffee00, bgcolor = color.rgb(0, 0, 4))
+printTable("ROJ TRADE")
+// You can use any array function as it is Wing
+// Change the resolution if you want Hourly High alerts or 4 hourly alerts
+
+msg_strings1 = array.new_string(2)
+array.set(msg_strings1, 0, "")
+array.set(msg_strings1, 1, "")
+f_triggerHLCro1(_ticker1)=>
+    _LB1 = close > high[1]
+    _SS1 = close < low[1]
+    cl_val1 = close
+    hi_val1 = high[1]
+    lo_val1 = low[1]
+    p_chg1  = ((close - close[1])/close[1])*100
+    [_co1, _cu1, val_c01, val_hi1, val_lo1, chg_p1] = request.security(_ticker1, resolution1, [_LB1, _SS1, cl_val1, hi_val1, lo_val1, p_chg1])
+    _msg1 = _ticker1 +str.tostring(math.round(chg_p1 * 10) / 10) + "%"  +"   (LTP " + str.tostring(val_c01) + "/- )      " 
+      
+    if _co1
+        _msg1 := _msg1  
+        if chg_p1 >= 0
+            array.set(msg_strings1, 0, array.get(msg_strings1, 0) + " \n" + _msg1)
+            alert(_msg1,  alert.freq_once_per_bar_close)
+        
+    else if _cu1
+        _msg1 := _msg1  
+        if chg_p1 <= 0
+            array.set(msg_strings1, 1, array.get(msg_strings1, 1) + " \n" + _msg1)
+            alert(_msg1,  alert.freq_once_per_bar_close)
+    
+label lLabel1 = label.new( time, close,  color=#c3f7c4, size=size.normal, xloc=xloc.bar_time, yloc = yloc.belowbar, style=label.style_label_upper_right, textcolor=#141313, textalign=text.align_left)
+label sLabel1 = label.new(time, close, color=#f6a1a1  , size=size.normal, xloc=xloc.bar_time, yloc = yloc.abovebar, style=label.style_label_lower_right, textcolor=#1a1818, textalign=text.align_left)
+label.delete(lLabel1[1])
+label.delete(sLabel1[1])
+array.set(msg_strings1, 0, "                   List-15min")
+array.set(msg_strings1, 1, "                   List-15min")
+label.set_text(lLabel1, "")
+label.set_text(sLabel1, "")
+f_triggerHLCro1(symbol)
+f_triggerHLCro1(symbol1)
+f_triggerHLCro1(symbol2)
+f_triggerHLCro1(symbol3)
+f_triggerHLCro1(symbol4)
+f_triggerHLCro1(symbol5)
+f_triggerHLCro1(symbol6)
+f_triggerHLCro1(symbol7)
+f_triggerHLCro1(symbol8)
+f_triggerHLCro1(symbol9)
+label.set_text(lLabel1, array.get(msg_strings1, 0))
+label.set_text(sLabel1, array.get(msg_strings1, 1))
+
+msg_strings2 = array.new_string(2)
+array.set(msg_strings2, 0, "")
+array.set(msg_strings2, 1, "")
+f_triggerHLCro2(_ticker2)=>
+    _LB2 = close > high[1]
+    _SS2 = close < low[1]
+    cl_val2 = close
+    hi_val2 = high[1]
+    lo_val2 = low[1]
+    p_chg2  = ((close - close[1])/close[1])*100
+    [_co2, _cu2, val_c02, val_hi2, val_lo2, chg_p2] = request.security(_ticker2, resolution2, [_LB2, _SS2, cl_val2, hi_val2, lo_val2, p_chg2])
+    _msg2 = _ticker2 +str.tostring(math.round(chg_p2 * 10) / 10) + "%"  +"   (LTP " + str.tostring(val_c02) + "/- )      " 
+      
+    if _co2
+        _msg2 := _msg2  
+        if chg_p2 >= 0
+            array.set(msg_strings2, 0, array.get(msg_strings2, 0) + " \n" + _msg2)
+            alert(_msg2,  alert.freq_once_per_bar_close)
+        
+    else if _cu2
+        _msg2 := _msg2  
+        if chg_p2 <= 0
+            array.set(msg_strings2, 1, array.get(msg_strings2, 1) + " \n" + _msg2)
+            alert(_msg2,  alert.freq_once_per_bar_close)
+    
+label lLabel2 = label.new( time[1100], close,  color=#c3f7c4, size=size.normal, xloc=xloc.bar_time, yloc = yloc.price, style=label.style_label_upper_left, textcolor=#141313, textalign=text.align_left)
+label sLabel2 = label.new(time[1100], close, color=#f6a1a1  , size=size.normal, xloc=xloc.bar_time, yloc = yloc.price, style=label.style_label_lower_left, textcolor=#1a1818, textalign=text.align_left)
+label.delete(lLabel2[1])
+label.delete(sLabel2[1])
+array.set(msg_strings2, 0, "                   List-5min")
+array.set(msg_strings2, 1, "                   List-5min")
+label.set_text(lLabel2, "")
+label.set_text(sLabel2, "")
+f_triggerHLCro2(symbol)
+f_triggerHLCro2(symbol1)
+f_triggerHLCro2(symbol2)
+f_triggerHLCro2(symbol3)
+f_triggerHLCro2(symbol4)
+f_triggerHLCro2(symbol5)
+f_triggerHLCro2(symbol6)
+f_triggerHLCro2(symbol7)
+f_triggerHLCro2(symbol8)
+f_triggerHLCro2(symbol9)
+label.set_text(lLabel2, array.get(msg_strings2, 0))
+label.set_text(sLabel2, array.get(msg_strings2, 1))
+
+msg_strings3 = array.new_string(2)
+array.set(msg_strings3, 0, "")
+array.set(msg_strings3, 1, "")
+f_triggerHLCro3(_ticker3)=>
+    _LB3 = close > high[1]
+    _SS3 = close < low[1]
+    cl_val3 = close
+    hi_val3 = high[1]
+    lo_val3 = low[1]
+    p_chg3  = ((close - close[1])/close[1])*100
+    [_co3, _cu3, val_c03, val_hi3, val_lo3, chg_p3] = request.security(_ticker3, resolution3, [_LB3, _SS3, cl_val3, hi_val3, lo_val3, p_chg3])
+    _msg3 = _ticker3 +str.tostring(math.round(chg_p3 * 10) / 10) + "%"  +"   (LTP " + str.tostring(val_c03) + "/- )      " 
+      
+    if _co3
+        _msg3 := _msg3  
+        if chg_p3 >= 0
+            array.set(msg_strings3, 0, array.get(msg_strings3, 0) + " \n" + _msg3)
+            alert(_msg3,  alert.freq_once_per_bar_close)
+        
+    else if _cu3
+        _msg3 := _msg3  
+        if chg_p3 <= 0
+            array.set(msg_strings3, 1, array.get(msg_strings3, 1) + " \n" + _msg3)
+            alert(_msg3,  alert.freq_once_per_bar_close)
+    
+label lLabel3 = label.new( time[1100], close,  color=#c3f7c4, size=size.normal, xloc=xloc.bar_time, yloc = yloc.price, style=label.style_label_upper_right, textcolor=#141313, textalign=text.align_left)
+label sLabel3 = label.new(time[1100], close, color=#f6a1a1  , size=size.normal, xloc=xloc.bar_time, yloc = yloc.price, style=label.style_label_lower_right, textcolor=#1a1818, textalign=text.align_left)
+label.delete(lLabel3[1])
+label.delete(sLabel3[1])
+array.set(msg_strings3, 0, "                   List-3min")
+array.set(msg_strings3, 1, "                   List-3min")
+label.set_text(lLabel3, "")
+label.set_text(sLabel3, "")
+f_triggerHLCro3(symbol)
+f_triggerHLCro3(symbol1)
+f_triggerHLCro3(symbol2)
+f_triggerHLCro3(symbol3)
+f_triggerHLCro3(symbol4)
+f_triggerHLCro3(symbol5)
+f_triggerHLCro3(symbol6)
+f_triggerHLCro3(symbol7)
+f_triggerHLCro3(symbol8)
+f_triggerHLCro3(symbol9)
+label.set_text(lLabel3, array.get(msg_strings3, 0))
+label.set_text(sLabel3, array.get(msg_strings3, 1))`;
+  document.getElementById('optionsScriptCode').textContent = scriptCode;
+  modal.style.display = 'flex';
+}
+
+function closeOptionsScript() {
+  const modal = document.getElementById('optionsScriptModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function copyOptionsScript() {
+  const code = document.getElementById('optionsScriptCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    alert('Pine Script copied to clipboard!');
+  }).catch(() => {
+    alert('Failed to copy. Please select and copy manually.');
+  });
 }
 
 function showIntradayScript() {
