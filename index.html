@@ -834,6 +834,9 @@
         <button class="sidebar-link" onclick="showIndicatorOption('options')" style="padding: 10px 15px; font-size: 13px; margin-bottom: 5px;">
           <i class="fas fa-layer-group"></i> OPTIONS TRADE
         </button>
+        <button class="sidebar-link" onclick="showIndicatorOption('position')" style="padding: 10px 15px; font-size: 13px; margin-bottom: 5px;">
+          <i class="fas fa-calculator"></i> POSITION SIZING
+        </button>
       </div>
     </div>
   </div>
@@ -392601,7 +392604,236 @@ function showIndicatorOption(option) {
     showIntradayScript();
   } else if (option === 'options') {
     showOptionsTradeScript();
+  } else if (option === 'position') {
+    showPositionSizingScript();
   }
+}
+
+function showPositionSizingScript() {
+  let modal = document.getElementById('positionScriptModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'positionScriptModal';
+    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;';
+    modal.innerHTML = `
+      <div style="position:relative; width:80%; max-width:900px; height:80%; background:#1e1e1e; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:linear-gradient(135deg,#1e293b 0%,#334155 100%); color:white;">
+          <h3 style="margin:0; font-family:'Montserrat',sans-serif; font-size:1.1rem;"><i class="fas fa-calculator"></i> POSITION SIZING - Pine Script</h3>
+          <div style="display:flex; gap:10px;">
+            <button onclick="copyPositionScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; gap:5px; transition:all 0.3s;"><i class="fas fa-copy"></i> Copy</button>
+            <button onclick="closePositionScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all 0.3s;"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div style="flex:1; overflow:auto; padding:20px;">
+          <pre id="positionScriptCode" style="margin:0; padding:20px; background:#2d2d2d; border-radius:8px; color:#d4d4d4; font-family:'Consolas','Monaco',monospace; font-size:13px; line-height:1.6; white-space:pre-wrap; word-wrap:break-word;"></pre>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closePositionScript();
+    });
+  }
+  const scriptCode = `//@version=5
+indicator("Position Sizing & R:R", overlay=true)
+
+//====================
+// Inline Inputs
+//====================
+
+// Trader Type
+traderType = input.string(     "Moderate Risk",     title="Trader Type",     options=["Low Risk", "Moderate Risk", "High Risk"],     inline="A")
+
+// Direction
+direction = input.string(     "Buy",     title="Direction",     options=["Buy", "Sell"],     inline="A")
+
+// Trading Amount
+tradeAmount = input.float(     100,     title="Trading Amount",     inline="B")
+
+// Entry Price
+entryPrice = input.float(     1.0,     title="Entry Price",     inline="B")
+
+// Risk Type
+riskType = input.string(     "Percentage",     title="Risk Type",     options=["Amount", "Percentage"],     inline="C")
+
+// Risk Value
+riskValue = input.float(     5,     title="Risk Value",     inline="C")
+
+//====================
+// Calculations
+//====================
+riskAmount = riskType == "Percentage"
+     ? tradeAmount * riskValue / 100
+     : riskValue
+
+rawQty = tradeAmount / entryPrice
+quantity = math.floor(rawQty)
+
+riskPerQty = quantity > 0 ? riskAmount / quantity : 0
+
+slPrice = direction == "Buy"
+     ? entryPrice - riskPerQty
+     : entryPrice + riskPerQty
+
+riskGap = math.abs(entryPrice - slPrice)
+
+//====================
+// Targets
+//====================
+t1Multiplier = traderType == "Low Risk" ? 1 : 2
+t2Multiplier = traderType == "Low Risk" ? 2 : traderType == "Moderate Risk" ? 3 : 4
+t3Multiplier = traderType == "High Risk" ? 8 : na
+
+t1 = direction == "Buy"
+     ? entryPrice + (t1Multiplier * riskGap)
+     : entryPrice - (t1Multiplier * riskGap)
+
+t2 = direction == "Buy"
+     ? entryPrice + (t2Multiplier * riskGap)
+     : entryPrice - (t2Multiplier * riskGap)
+
+t3 = traderType == "High Risk"
+     ? direction == "Buy"
+         ? entryPrice + (t3Multiplier * riskGap)
+         : entryPrice - (t3Multiplier * riskGap)
+     : na
+
+//====================
+// High Risk Amount Split
+//====================
+t1Amount = tradeAmount * 20 / 100
+t2Amount = tradeAmount * 40 / 100
+t3Amount = tradeAmount * 60 / 100
+
+//====================
+// UI Colors
+//====================
+headerBg = color.rgb(20, 25, 35)
+labelBg  = color.rgb(35, 42, 55)
+valueBg  = color.rgb(15, 18, 25)
+
+textCol  = color.white
+mutedCol = color.rgb(210, 210, 210)
+
+buyCol   = color.rgb(0, 180, 90)
+sellCol  = color.rgb(220, 70, 70)
+
+lowCol   = color.rgb(0, 150, 255)
+modCol   = color.rgb(255, 170, 0)
+highCol  = color.rgb(255, 70, 70)
+
+targetCol = color.rgb(30, 120, 80)
+slCol     = color.rgb(160, 40, 40)
+
+riskColor = traderType == "Low Risk" ? lowCol : traderType == "Moderate Risk" ? modCol : highCol
+dirColor  = direction == "Buy" ? buyCol : sellCol
+
+//====================
+// Table
+//====================
+var table t = table.new(     position.top_right,     2,     13,     border_width=1,     frame_width=2,     frame_color=color.rgb(90, 90, 90))
+
+//====================
+// Helper Function
+//====================
+f_row(_row, _label, _value, _valueColor) =>
+    table.cell(
+         t, 0, _row,
+         _label,
+         text_color=mutedCol,
+         bgcolor=labelBg,
+         text_size=size.normal
+     )
+
+    table.cell(
+         t, 1, _row,
+         _value,
+         text_color=textCol,
+         bgcolor=_valueColor,
+         text_size=size.normal
+     )
+
+//====================
+// Draw Table
+//====================
+if barstate.islast
+
+    table.cell(
+         t, 0, 0,
+         "⚡ TRADE PLAN",
+         text_color=color.white,
+         bgcolor=headerBg,
+         text_size=size.large
+     )
+
+    table.cell(
+         t, 1, 0,
+         traderType,
+         text_color=color.white,
+         bgcolor=riskColor,
+         text_size=size.large
+     )
+
+    f_row(1, "Trader Type", traderType, riskColor)
+    f_row(2, "Direction", direction, dirColor)
+    f_row(3, "Trading Amount", "₹" + str.tostring(tradeAmount), valueBg)
+    f_row(4, "Entry Price", "₹" + str.tostring(entryPrice), valueBg)
+
+    f_row(
+         5,
+         "Risk Input",
+         riskType == "Percentage"
+         ? str.tostring(riskValue) + "%"
+         : "₹" + str.tostring(riskValue),
+         valueBg
+     )
+
+    f_row(6, "Risk Amount", "₹" + str.tostring(riskAmount), slCol)
+    f_row(7, "Quantity", str.tostring(quantity) + " Nos", valueBg)
+    f_row(8, "SL Price", "₹" + str.tostring(slPrice), slCol)
+
+    f_row(
+         9,
+         "Target 1",
+         traderType == "High Risk"
+         ? "₹" + str.tostring(t1) + " | 20% ₹" + str.tostring(t1Amount)
+         : "₹" + str.tostring(t1),
+         targetCol
+     )
+
+    f_row(
+         10,
+         "Target 2",
+         traderType == "High Risk"
+         ? "₹" + str.tostring(t2) + " | 40% ₹" + str.tostring(t2Amount)
+         : "₹" + str.tostring(t2),
+         targetCol
+     )
+
+    f_row(
+         11,
+         "Target 3",
+         traderType == "High Risk"
+         ? "₹" + str.tostring(t3) + " | 60% ₹" + str.tostring(t3Amount)
+         : "—",
+         traderType == "High Risk" ? targetCol : valueBg
+     )`;
+  document.getElementById('positionScriptCode').textContent = scriptCode;
+  modal.style.display = 'flex';
+}
+
+function closePositionScript() {
+  const modal = document.getElementById('positionScriptModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function copyPositionScript() {
+  const code = document.getElementById('positionScriptCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    alert('Pine Script copied to clipboard!');
+  }).catch(() => {
+    alert('Failed to copy. Please select and copy manually.');
+  });
 }
 
 function showOptionsTradeScript() {
