@@ -1,5 +1,6 @@
 #!/bin/bash
 # trigger_workflow.sh - Triggers the GitHub Actions workflow every 10 minutes
+# Usage: export WORKFLOW_PAT=your_pat_token && ./trigger_workflow.sh
 
 REPO="sushilade/marketcapdetails"
 WORKFLOW_ID="343063003"
@@ -31,14 +32,13 @@ while true; do
         --data "{\"ref\":\"${BRANCH}\"}")
 
     http_code=$(echo "$response" | tail -n1)
-    body=$(echo "$response" | sed '$d')
 
     if [ "$http_code" = "204" ]; then
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] Workflow triggered successfully"
     else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Error (HTTP $http_code): $body"
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Error (HTTP $http_code)"
     fi
 
-    # Wait 10 minutes
+    # Wait 10 minutes (600 seconds)
     sleep 600
 done
