@@ -1703,12 +1703,75 @@ function toggleIndicatorMenu(event) {{
 }}
 
 function showIndicatorOption(option) {{
-  const messages = {{
-    'candle': 'CANDLE COMBINATION indicator selected',
-    'intraday': 'INTRADAY indicator selected',
-    'options': 'OPTIONS TRADE indicator selected'
-  }};
-  alert(messages[option]);
+  if (option === 'candle') {{
+    showCandleCombinationScript();
+  }} else {{
+    const messages = {{
+      'intraday': 'INTRADAY indicator selected',
+      'options': 'OPTIONS TRADE indicator selected'
+    }};
+    alert(messages[option]);
+  }}
+}}
+
+function showCandleCombinationScript() {{
+  let modal = document.getElementById('candleScriptModal');
+  if (!modal) {{
+    modal = document.createElement('div');
+    modal.id = 'candleScriptModal';
+    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;';
+    modal.innerHTML = `
+      <div style="position:relative; width:80%; max-width:900px; height:80%; background:#1e1e1e; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:linear-gradient(135deg,#1e293b 0%,#334155 100%); color:white;">
+          <h3 style="margin:0; font-family:'Montserrat',sans-serif; font-size:1.1rem;"><i class="fas fa-chart-bar"></i> CANDLE COMBINATION - Pine Script</h3>
+          <div style="display:flex; gap:10px;">
+            <button onclick="copyCandleScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; gap:5px; transition:all 0.3s;"><i class="fas fa-copy"></i> Copy</button>
+            <button onclick="closeCandleScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all 0.3s;"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div style="flex:1; overflow:auto; padding:20px;">
+          <pre id="candleScriptCode" style="margin:0; padding:20px; background:#2d2d2d; border-radius:8px; color:#d4d4d4; font-family:'Consolas','Monaco',monospace; font-size:13px; line-height:1.6; white-space:pre-wrap; word-wrap:break-word;"></pre>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) {{
+      if (e.target === modal) closeCandleScript();
+    }});
+  }}
+  const scriptCode = `//@version=5
+indicator("Trending Candle", overlay=false)
+HTF = timeframe.period
+symbolu = input.string(defval = "", title = "Symbol", tooltip = "If you leave the Symbol empty then current symbol is used")
+//timeframe = input(defval = '1D' )
+size = input.int(2 , title="Select Bars",  minval=2, maxval=5, tooltip = "Combination of given previous candle with O H L C price")
+var symbol = symbolu == "" ? syminfo.tickerid : symbolu
+prev_open = request.security(symbol, HTF, open[size])
+highest_high = ta.highest(high[1], size)
+simplehigh = request.security(symbol, HTF, highest_high)
+min_low = ta.lowest(low[1], size )
+simplelow = request.security(symbol, HTF, min_low)
+prev_close = request.security(symbol, HTF, close[1])
+plotcandle( open=prev_open,  high=simplehigh, low=simplelow, close=prev_close, color=close > open ? color.rgb(62, 146, 65) : color.rgb(250, 8, 8), editable = false)
+
+//printTable(txt) => var table t = table.new(position.bottom_right, 1, 1, frame_color  =color.blue, frame_width  = 5), table.cell(t, 0, 0, txt, text_size = size.normal, text_color = #ffee00, bgcolor = color.rgb(0, 0, 4))
+//printTable("ROJ TRADE")`;
+  document.getElementById('candleScriptCode').textContent = scriptCode;
+  modal.style.display = 'flex';
+}}
+
+function closeCandleScript() {{
+  const modal = document.getElementById('candleScriptModal');
+  if (modal) modal.style.display = 'none';
+}}
+
+function copyCandleScript() {{
+  const code = document.getElementById('candleScriptCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {{
+    alert('Pine Script copied to clipboard!');
+  }}).catch(() => {{
+    alert('Failed to copy. Please select and copy manually.');
+  }});
 }}
 
 function updateMarketCapExtremes(stock, dates, marketCapData) {{
