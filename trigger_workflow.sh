@@ -1,16 +1,17 @@
 #!/bin/bash
-# trigger_workflow.sh - Triggers the GitHub Actions workflow at 6:00 PM IST each weekday
+# trigger_workflow.sh - Triggers the GitHub Actions "Update Stock Data" workflow
+# at 6:00 PM IST each weekday via the repository_dispatch API (bypasses the
+# codespace GITHUB_TOKEN's lack of workflow_dispatch scope). Falls back to a
+# provided WORKFLOW_PAT if set. Supports IMMEDIATE=1 for a single on-demand run.
 
 REPO="sushilade/marketcapdetails"
-WORKFLOW_ID="343063003"
 BRANCH="main"
+EVENT_TYPE="update-stock-data"
 
-# Get PAT from environment variable
-PAT="${WORKFLOW_PAT}"
-
+# PAT (preferred) or the ambient codespace GITHUB_TOKEN
+PAT="${WORKFLOW_PAT:-${GITHUB_TOKEN}}"
 if [ -z "$PAT" ]; then
-    echo "Error: WORKFLOW_PAT environment variable not set"
-    echo "Set it with: export WORKFLOW_PAT=your_token_here"
+    echo "Error: No token available (set WORKFLOW_PAT, or ensure GITHUB_TOKEN is present)"
     exit 1
 fi
 
@@ -19,15 +20,15 @@ echo "Will trigger workflow at 6:00 PM IST (12:30 PM UTC) Monday-Friday"
 echo "Press Ctrl+C to stop"
 
 trigger_workflow() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Triggering workflow..."
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Triggering workflow via repository_dispatch..."
 
     response=$(curl -s -w "\n%{http_code}" \
         --request POST \
-        --url "https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches" \
+        --url "https://api.github.com/repos/${REPO}/dispatches" \
         --header "Accept: application/vnd.github+json" \
         --header "Authorization: Bearer ${PAT}" \
         --header "X-GitHub-Api-Version: 2022-11-28" \
-        --data "{\"ref\":\"${BRANCH}\"}")
+        --data "{\"event_type\":\"${EVENT_TYPE}\",\"client_payload\":{\"ref\":\"${BRANCH}\"}}")
 
     http_code=$(echo "$response" | tail -n1)
 
@@ -42,6 +43,13 @@ trigger_workflow() {
 # 6:00 PM IST = 12:30 PM UTC = 750 minutes since midnight UTC
 TARGET_HOUR=12
 TARGET_MINUTE=30
+
+# Immediate (one-shot) mode: trigger once and exit
+if [ "${IMMEDIATE:-0}" = "1" ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Triggering workflow immediately (run-once mode)..."
+    trigger_workflow
+    exit 0
+fi
 
 while true; do
     now_hour=$(date -u +%-H)
