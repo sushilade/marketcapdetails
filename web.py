@@ -2462,26 +2462,23 @@ function buildMarketCandleChart() {{
   const headers = Array.from(table.querySelectorAll('th'));
   const rows = Array.from(table.querySelectorAll('tbody tr'));
 
-  // Find market cap columns (all columns containing 'market')
-  const marketCapCols = [];
+  // All columns from index 1 onwards are date columns with market cap values
+  const dataCols = [];
   for (let i = 1; i < headers.length; i++) {{
-    const h = headers[i].textContent.trim().toLowerCase();
-    if (h.includes('market')) {{
-      marketCapCols.push({{ index: i, name: headers[i].textContent.trim() }});
-    }}
+    dataCols.push({{ index: i, name: headers[i].textContent.trim() }});
   }}
 
-  if (marketCapCols.length === 0) {{ alert('No market cap column found'); return; }}
+  if (dataCols.length === 0) {{ alert('No data columns found'); return; }}
 
-  // Collect per-stock data across all market cap columns
+  // Collect per-stock data across all date columns
   const stockDataMap = new Map();
   rows.forEach(row => {{
     const stockName = row.cells[0].textContent.trim();
     if (!stockDataMap.has(stockName)) {{
       stockDataMap.set(stockName, []);
     }}
-    marketCapCols.forEach(col => {{
-      const valStr = row.cells[col.index].textContent.trim().replace(/,/g, '');
+    dataCols.forEach(col => {{
+      const valStr = row.cells[col.index].textContent.trim().replace(/,/g, '').replace(/[^0-9.\-]/g, '');
       const val = parseFloat(valStr);
       if (!isNaN(val)) {{
         stockDataMap.get(stockName).push({{ date: col.name, value: val }});
@@ -2511,6 +2508,12 @@ function buildMarketCandleChart() {{
     filteredData = stockDataMap.get(selectedStock) || [];
   }} else {{
     stockDataMap.forEach(arr => {{ filteredData = filteredData.concat(arr); }});
+  }}
+
+  if (filteredData.length === 0) {{
+    const chartDiv = document.getElementById('marketCandleChart');
+    chartDiv.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:18px;">No data available for this stock</div>';
+    return;
   }}
 
   // Group by week
@@ -2559,6 +2562,9 @@ function groupDataIntoWeeklyCandles(dataPoints) {{
 
   if (parsedPoints.length === 0) return [];
 
+  // Sort by date ascending
+  parsedPoints.sort((a, b) => a.date - b.date);
+
   // Group by week (Monday to Friday)
   const weeks = new Map();
   parsedPoints.forEach(dp => {{
@@ -2566,18 +2572,26 @@ function groupDataIntoWeeklyCandles(dataPoints) {{
     if (!weeks.has(weekStart.getTime())) {{
       weeks.set(weekStart.getTime(), []);
     }}
-    weeks.get(weekStart.getTime()).push(dp.value);
+    weeks.get(weekStart.getTime()).push(dp);
   }});
 
   const candles = [];
-  weeks.forEach((values, weekKey) => {{
-    values.sort((a, b) => a - b);
+  weeks.forEach((points, weekKey) => {{
+    // Sort points by date within the week
+    points.sort((a, b) => a.date - b.date);
+
+    const open = points[0].value;
+    const close = points[points.length - 1].value;
+    const values = points.map(p => p.value);
+    const high = Math.max(...values);
+    const low = Math.min(...values);
+
     candles.push({{
       weekStart: new Date(weekKey),
-      open: values[0],
-      high: values[values.length - 1],
-      low: values[0],
-      close: values[values.length - 1]
+      open: open,
+      high: high,
+      low: low,
+      close: close
     }});
   }});
 
