@@ -2462,15 +2462,18 @@ function buildMarketCandleChart() {{
   const headers = Array.from(table.querySelectorAll('th'));
   const rows = Array.from(table.querySelectorAll('tbody tr'));
 
-  // All columns from index 1 onwards are date columns with market cap values
+  // Market cap columns are at positions 2, 5, 8, 11... (index 1, 4, 7, 10...)
+  // Pattern: index % 3 == 1 (since col 0 = stock name, then groups of 3: marketcap, delivery, rank)
   const dataCols = [];
   for (let i = 1; i < headers.length; i++) {{
-    dataCols.push({{ index: i, name: headers[i].textContent.trim() }});
+    if (i % 3 === 1) {{
+      dataCols.push({{ index: i, name: headers[i].textContent.trim() }});
+    }}
   }}
 
-  if (dataCols.length === 0) {{ alert('No data columns found'); return; }}
+  if (dataCols.length === 0) {{ alert('No market cap columns found'); return; }}
 
-  // Collect per-stock data across all date columns
+  // Collect per-stock data across all market cap columns
   const stockDataMap = new Map();
   rows.forEach(row => {{
     const stockName = row.cells[0].textContent.trim();
