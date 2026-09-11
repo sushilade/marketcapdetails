@@ -881,6 +881,10 @@ html_content = f"""<!DOCTYPE html>
           <i class="fas fa-calculator"></i> POSITION SIZING
         </button>
       </div>
+      <div style="height: 1px; background: #e2e8f0; margin: 15px 0;"></div>
+      <button class="sidebar-link" onclick="showIndicatorOption('marketCandle')" style="margin-top: 10px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);">
+        <i class="fas fa-chart-candle"></i> MARKET CANDLE
+      </button>
     </div>
   </div>
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMenuOnOverlay()"></div>
@@ -1714,6 +1718,8 @@ function showIndicatorOption(option) {{
     showOptionsTradeScript();
   }} else if (option === 'position') {{
     showPositionSizingScript();
+  }} else if (option === 'marketCandle') {{
+    showMarketCandleScript();
   }}
 }}
 
@@ -2406,6 +2412,66 @@ function closeCandleScript() {{
 
 function copyCandleScript() {{
   const code = document.getElementById('candleScriptCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {{
+    alert('Pine Script copied to clipboard!');
+  }}).catch(() => {{
+    alert('Failed to copy. Please select and copy manually.');
+  }});
+}}
+
+function showMarketCandleScript() {{
+  let modal = document.getElementById('marketCandleScriptModal');
+  if (!modal) {{
+    modal = document.createElement('div');
+    modal.id = 'marketCandleScriptModal';
+    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;';
+    modal.innerHTML = `
+      <div style="position:relative; width:80%; max-width:900px; height:80%; background:#1e1e1e; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:linear-gradient(135deg,#1e293b 0%,#334155 100%); color:white;">
+          <h3 style="margin:0; font-family:'Montserrat',sans-serif; font-size:1.1rem;"><i class="fas fa-chart-candle"></i> MARKET CANDLE - Pine Script</h3>
+          <div style="display:flex; gap:10px;">
+            <button onclick="copyMarketCandleScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; gap:5px; transition:all 0.3s;"><i class="fas fa-copy"></i> Copy</button>
+            <button onclick="closeMarketCandleScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all 0.3s;"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div style="flex:1; overflow:auto; padding:20px;">
+          <pre id="marketCandleScriptCode" style="margin:0; padding:20px; background:#2d2d2d; border-radius:8px; color:#d4d4d4; font-family:'Consolas','Monaco',monospace; font-size:13px; line-height:1.6; white-space:pre-wrap; word-wrap:break-word;"></pre>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) {{
+      if (e.target === modal) closeMarketCandleScript();
+    }});
+  }}
+  const scriptCode = `//@version=5
+indicator("Market Candle", overlay=true)
+
+HTF = input.timeframe("1D", "Higher Timeframe")
+size = input.int(2, "Select Bars", minval=2, maxval=5)
+symbolu = input.string("", "Symbol", tooltip="If empty, current symbol is used")
+var symbol = symbolu == "" ? syminfo.tickerid : symbolu
+
+prev_open = request.security(symbol, HTF, open[size])
+highest_high = ta.highest(high[1], size)
+simplehigh = request.security(symbol, HTF, highest_high)
+min_low = ta.lowest(low[1], size)
+simplelow = request.security(symbol, HTF, min_low)
+prev_close = request.security(symbol, HTF, close[1])
+
+plotcandle(open=prev_open, high=simplehigh, low=simplelow, close=prev_close,
+           color=close > open ? color.rgb(62, 146, 65) : color.rgb(250, 8, 8), editable=false)`;
+  document.getElementById('marketCandleScriptCode').textContent = scriptCode;
+  modal.style.display = 'flex';
+}}
+
+function closeMarketCandleScript() {{
+  const modal = document.getElementById('marketCandleScriptModal');
+  if (modal) modal.style.display = 'none';
+}}
+
+function copyMarketCandleScript() {{
+  const code = document.getElementById('marketCandleScriptCode').textContent;
   navigator.clipboard.writeText(code).then(() => {{
     alert('Pine Script copied to clipboard!');
   }}).catch(() => {{
