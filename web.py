@@ -1546,11 +1546,11 @@ function showMarketcapCandleChart() {{
              <strong>Close:</strong> ${{candle.close.toLocaleString(undefined, {{minimumFractionDigits: 2, maximumFractionDigits: 2}})}} Cr
            </div>
          </div>
-       `;
-     }}
-   }};
+        `;
+      }}
+    }});
 
-   marketcapCandleChart = chart;
+    marketcapCandleChart = chart;
 }}
 
 function applyFilters() {{
