@@ -407012,6 +407012,15 @@ function openTab(evt, tabName) {
     tablinks[i].classList.remove("active");
   }
   document.getElementById(tabName).style.display = "block";
+  if (tabName === 'dataView') {
+    marketcapCandleMode = false;
+    const downloadBtn = document.querySelector('.download-btn');
+    if (downloadBtn) downloadBtn.style.display = '';
+    const controlsDiv = document.querySelector('.controls');
+    if (controlsDiv) controlsDiv.style.display = '';
+    const candleSection = document.getElementById('marketcapCandleSection');
+    if (candleSection) candleSection.style.display = 'none';
+  }
   if (evt && evt.currentTarget) {
     evt.currentTarget.classList.add("active");
   }
@@ -407031,11 +407040,14 @@ function openTabFromMenu(evt, tabName) {
     tablinks[i].classList.remove("active");
   }
   document.getElementById(tabName).style.display = "block";
-  if (tabName === 'dataView' && !marketcapCandleMode) {
+  if (tabName === 'dataView') {
+    marketcapCandleMode = false;
     const downloadBtn = document.querySelector('.download-btn');
     if (downloadBtn) downloadBtn.style.display = '';
     const controlsDiv = document.querySelector('.controls');
     if (controlsDiv) controlsDiv.style.display = '';
+    const candleSection = document.getElementById('marketcapCandleSection');
+    if (candleSection) candleSection.style.display = 'none';
   }
   if (evt && evt.currentTarget) {
     evt.currentTarget.classList.add("active");
@@ -407188,8 +407200,8 @@ function showAll() {
 }
 
 function showMarketcapCandle() {
-   marketcapCandleMode = true;
    openTabFromMenu(null, 'dataView');
+   marketcapCandleMode = true;
    const downloadBtn = document.querySelector('.download-btn');
    if (downloadBtn) downloadBtn.style.display = 'none';
    const controlsDiv = document.querySelector('.controls');
