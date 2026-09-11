@@ -1186,6 +1186,8 @@ function openTab(evt, tabName) {{
     if (downloadBtn) downloadBtn.style.display = '';
     const controlsDiv = document.querySelector('.controls');
     if (controlsDiv) controlsDiv.style.display = '';
+    const tableContainer = document.querySelector('.table-container');
+    if (tableContainer) tableContainer.style.display = '';
     const candleSection = document.getElementById('marketcapCandleSection');
     if (candleSection) candleSection.style.display = 'none';
   }}
@@ -1214,6 +1216,8 @@ function openTabFromMenu(evt, tabName) {{
     if (downloadBtn) downloadBtn.style.display = '';
     const controlsDiv = document.querySelector('.controls');
     if (controlsDiv) controlsDiv.style.display = '';
+    const tableContainer = document.querySelector('.table-container');
+    if (tableContainer) tableContainer.style.display = '';
     const candleSection = document.getElementById('marketcapCandleSection');
     if (candleSection) candleSection.style.display = 'none';
   }}
@@ -1352,9 +1356,11 @@ function showAll() {{
    marketcapCandleMode = false;
    const downloadBtn = document.querySelector('.download-btn');
    if (downloadBtn) downloadBtn.style.display = '';
-   const controlsDiv = document.querySelector('.controls');
-   if (controlsDiv) controlsDiv.style.display = '';
-   const candleSection = document.getElementById('marketcapCandleSection');
+const controlsDiv = document.querySelector('.controls');
+    if (controlsDiv) controlsDiv.style.display = '';
+    const tableContainer = document.querySelector('.table-container');
+    if (tableContainer) tableContainer.style.display = '';
+    const candleSection = document.getElementById('marketcapCandleSection');
    if (candleSection) candleSection.style.display = 'none';
    activeFilters.clear();
   document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
@@ -1372,9 +1378,11 @@ function showMarketcapCandle() {{
    marketcapCandleMode = true;
    const downloadBtn = document.querySelector('.download-btn');
    if (downloadBtn) downloadBtn.style.display = 'none';
-   const controlsDiv = document.querySelector('.controls');
-   if (controlsDiv) controlsDiv.style.display = 'none';
-   activeFilters.clear();
+const controlsDiv = document.querySelector('.controls');
+    if (controlsDiv) controlsDiv.style.display = 'none';
+    const tableContainer = document.querySelector('.table-container');
+    if (tableContainer) tableContainer.style.display = 'none';
+    activeFilters.clear();
    document.querySelectorAll('.filter-buttons button').forEach(btn => {{
      const label = btn.textContent.trim();
      if (label.includes('Market Cap')) btn.classList.add('active');
