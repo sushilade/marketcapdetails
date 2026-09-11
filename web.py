@@ -1533,24 +1533,41 @@ const candleData = Object.keys(weeklyMap).sort().map(key => {{
      return;
    }}
 
-   const chart = LightweightCharts.createChart(chartContainer, {{
-     width: chartContainer.clientWidth,
-     height: 500,
-     layout: {{ backgroundColor: '#ffffff', textColor: '#333' }},
-     grid: {{ vertLines: {{ color: '#e1ecf2' }}, horzLines: {{ color: '#e1ecf2' }} }},
-     timeScale: {{ timeVisible: true, secondsVisible: false }}
-   }});
+const chart = LightweightCharts.createChart(chartContainer, {{
+      width: chartContainer.clientWidth || chartContainer.offsetWidth || 800,
+      height: 500,
+      layout: {{ backgroundColor: '#ffffff', textColor: '#333' }},
+      grid: {{ vertLines: {{ color: '#e1ecf2' }}, horzLines: {{ color: '#e1ecf2' }} }},
+      timeScale: {{ timeVisible: true, secondsVisible: false }}
+    }});
 
-   const candleSeries = chart.addCandlestickSeries({{
-     upColor: '#10b981',
-     downColor: '#ef4444',
-     borderDownColor: '#ef4444',
-     borderUpColor: '#10b981',
-     wickDownColor: '#ef4444',
-     wickUpColor: '#10b981'
-   }});
+    const candleSeries = chart.addCandlestickSeries({{
+      upColor: '#10b981',
+      downColor: '#ef4444',
+      borderDownColor: '#ef4444',
+      borderUpColor: '#10b981',
+      wickDownColor: '#ef4444',
+      wickUpColor: '#10b981'
+    }});
 
-   candleSeries.setData(candleData);
+    candleSeries.setData(candleData);
+
+    // Ensure chart resizes properly
+    if (typeof ResizeObserver !== 'undefined') {{
+      const resizeObserver = new ResizeObserver(entries => {{
+        for (let entry of entries) {{
+          if (entry.target === chartContainer) {{
+            chart.applyOptions({{ width: chartContainer.clientWidth }});
+          }}
+        }}
+      }});
+      resizeObserver.observe(chartContainer);
+    }}
+
+    // Force initial resize after a short delay to ensure layout is complete
+    setTimeout(() => {{
+      chart.applyOptions({{ width: chartContainer.clientWidth || chartContainer.offsetWidth || 800 }});
+    }}, 100);
 
 chart.subscribeClick(e => {{
       if (!e.time) return;
