@@ -1181,6 +1181,12 @@ function openTabFromMenu(evt, tabName) {{
     tablinks[i].classList.remove("active");
   }}
   document.getElementById(tabName).style.display = "block";
+  if (tabName === 'dataView' && !marketcapCandleMode) {{
+    const downloadBtn = document.querySelector('.download-btn');
+    if (downloadBtn) downloadBtn.style.display = '';
+    const controlsDiv = document.querySelector('.controls');
+    if (controlsDiv) controlsDiv.style.display = '';
+  }}
   if (evt && evt.currentTarget) {{
     evt.currentTarget.classList.add("active");
   }}
@@ -1298,6 +1304,7 @@ function updateDashboardStats() {{
 // ---- TABLE FILTERS ----
 const originalTable = document.getElementById('marketTable').cloneNode(true);
 let activeFilters = new Set();
+let marketcapCandleMode = false;
 
 function toggleFilter(type) {{
   const btn = document.getElementById(type + 'Btn');
@@ -1312,7 +1319,12 @@ function toggleFilter(type) {{
 }}
 
 function showAll() {{
-  activeFilters.clear();
+   marketcapCandleMode = false;
+   const downloadBtn = document.querySelector('.download-btn');
+   if (downloadBtn) downloadBtn.style.display = '';
+   const controlsDiv = document.querySelector('.controls');
+   if (controlsDiv) controlsDiv.style.display = '';
+   activeFilters.clear();
   document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
   document.getElementById('showAllBtn').classList.add('active');
   const parent = document.getElementById('marketTable').parentNode;
@@ -1324,7 +1336,12 @@ function showAll() {{
 }}
 
 function showMarketcapCandle() {{
+   marketcapCandleMode = true;
    openTabFromMenu(null, 'dataView');
+   const downloadBtn = document.querySelector('.download-btn');
+   if (downloadBtn) downloadBtn.style.display = 'none';
+   const controlsDiv = document.querySelector('.controls');
+   if (controlsDiv) controlsDiv.style.display = 'none';
    activeFilters.clear();
    document.querySelectorAll('.filter-buttons button').forEach(btn => {{
      const label = btn.textContent.trim();
