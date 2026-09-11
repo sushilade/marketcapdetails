@@ -987,7 +987,25 @@ html_content = f"""<!DOCTYPE html>
           <i class="fas fa-chevron-down"></i>
         </button>
       </div>
-    </div>
+       <!-- MARKETCAP CANDLE Chart Section -->
+       <div id="marketcapCandleSection" style="display: none;">
+         <div class="controls" style="margin-top: 20px;">
+           <h3 style="margin-bottom: 16px;"><i class="fas fa-chart-candle"></i> Stock Candlestick Chart</h3>
+           <div class="search-container">
+             <label for="marketcapStockSelect" style="font-weight: 700; color: var(--primary); margin-right: 12px; font-size: 0.95rem;">Select Stock:</label>
+             <select id="marketcapStockSelect" onchange="showMarketcapCandleChart()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 200px;">
+               <option value="">-- Select Stock --</option>
+             </select>
+           </div>
+         </div>
+         <div class="chart-container">
+           <div id="marketcapCandleChart" style="width: 100%; height: 500px;"></div>
+         </div>
+         <div class="info-panel" id="marketcapCandleInfo">
+           <p>Select a stock to view its weekly market cap candlestick chart.</p>
+         </div>
+       </div>
+      </div>
 
     <!-- Stock Analysis Tab -->
     <div id="stockAnalysis" class="tabcontent">
@@ -1324,6 +1342,8 @@ function showAll() {{
    if (downloadBtn) downloadBtn.style.display = '';
    const controlsDiv = document.querySelector('.controls');
    if (controlsDiv) controlsDiv.style.display = '';
+   const candleSection = document.getElementById('marketcapCandleSection');
+   if (candleSection) candleSection.style.display = 'none';
    activeFilters.clear();
   document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
   document.getElementById('showAllBtn').classList.add('active');
@@ -1378,7 +1398,147 @@ function showMarketcapCandle() {{
      row.style.display = idx < 10 ? '' : 'none';
    }});
 
-   applyColorFormatting();
+       applyColorFormatting();
+
+    const candleSection = document.getElementById('marketcapCandleSection');
+    if (candleSection) candleSection.style.display = 'block';
+    populateMarketcapCandleStocks();
+}}
+
+function populateMarketcapCandleStocks() {{
+   const table = document.getElementById('marketTable');
+   const rows = Array.from(table.querySelectorAll('tbody tr'));
+   const select = document.getElementById('marketcapStockSelect');
+   if (!select) return;
+   select.innerHTML = '';
+   const defaultOption = document.createElement('option');
+   defaultOption.value = '';
+   defaultOption.textContent = '-- Select Stock --';
+   select.appendChild(defaultOption);
+   rows.forEach(row => {{
+     const stock = row.cells[0].textContent.trim();
+     if (stock) {{
+       const option = document.createElement('option');
+       option.value = stock;
+       option.textContent = stock;
+       select.appendChild(option);
+     }}
+   }});
+}}
+
+let marketcapCandleChart = null;
+
+function showMarketcapCandleChart() {{
+   const stockSelect = document.getElementById('marketcapStockSelect');
+   const selectedStock = stockSelect ? stockSelect.value : '';
+   const infoPanel = document.getElementById('marketcapCandleInfo');
+   if (infoPanel) infoPanel.innerHTML = '<p>Select a candle on the chart to see OHLC market cap values.</p>';
+   if (!selectedStock) return;
+
+   const table = document.getElementById('marketTable');
+   const headers = Array.from(table.querySelectorAll('th'));
+   const rows = Array.from(table.querySelectorAll('tbody tr'));
+   const datePattern = /^(\\d{{4}}-\\d{{2}}-\\d{{2}})/;
+
+   let row;
+   rows.forEach(r => {{
+     if (r.cells[0].textContent.trim() === selectedStock) row = r;
+   }});
+   if (!row) return;
+
+   const dailyData = [];
+   for (let i = 1; i < headers.length; i++) {{
+     const headerText = headers[i].textContent.trim();
+     const match = headerText.match(datePattern);
+     if (!match) continue;
+     const lower = headerText.toLowerCase();
+     if (!lower.includes('market')) continue;
+     const dateStr = match[1];
+     const cellText = row.cells[i] ? row.cells[i].textContent.trim().replace(/,/g, '') : '';
+     const value = parseFloat(cellText);
+     if (!isNaN(value)) {{
+       dailyData.push({{ date: dateStr, value: value }});
+     }}
+   }}
+
+   dailyData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+   const weeklyMap = {{}};
+   dailyData.forEach(item => {{
+     const date = new Date(item.date);
+     const day = date.getDay();
+     const monday = new Date(date.getFullYear(), date.getMonth(), date.getDate() - (day === 0 ? 6 : day - 1));
+     const mondayStr = monday.toISOString().split('T')[0];
+     if (!weeklyMap[mondayStr]) {{
+       weeklyMap[mondayStr] = {{ open: item.value, high: item.value, low: item.value, close: item.value, lastDate: item.date }};
+     }} else {{
+       const w = weeklyMap[mondayStr];
+       w.high = Math.max(w.high, item.value);
+       w.low = Math.min(w.low, item.value);
+       w.close = item.value;
+       w.lastDate = item.date;
+     }}
+   }});
+
+   const candleData = Object.keys(weeklyMap).sort().map(key => {{
+     const w = weeklyMap[key];
+     return {{ time: key, open: w.open, high: w.high, low: w.low, close: w.close }};
+   }});
+
+   const chartContainer = document.getElementById('marketcapCandleChart');
+   if (marketcapCandleChart) marketcapCandleChart.remove();
+   chartContainer.innerHTML = '';
+
+   if (candleData.length === 0) {{
+     chartContainer.innerHTML = '<p style="padding: 20px; color: #64748b;">No market cap data available for this stock.</p>';
+     return;
+   }}
+
+   const chart = LightweightCharts.createChart(chartContainer, {{
+     width: chartContainer.clientWidth,
+     height: 500,
+     layout: {{ backgroundColor: '#ffffff', textColor: '#333' }},
+     grid: {{ vertLines: {{ color: '#e1ecf2' }}, horzLines: {{ color: '#e1ecf2' }} }},
+     timeScale: {{ timeVisible: true, secondsVisible: false }}
+   }});
+
+   const candleSeries = chart.addCandlestickSeries({{
+     upColor: '#10b981',
+     downColor: '#ef4444',
+     borderDownColor: '#ef4444',
+     borderUpColor: '#10b981',
+     wickDownColor: '#ef4444',
+     wickUpColor: '#10b981'
+   }});
+
+   candleSeries.setData(candleData);
+
+   chart.subscribeClick(e => {{
+     if (!e.time) return;
+     const candle = candleData.find(c => c.time === e.time);
+     if (candle) {{
+       const infoPanel = document.getElementById('marketcapCandleInfo');
+       infoPanel.innerHTML = `
+         <h4 style="margin-bottom: 16px;">${{selectedStock}} - Week of ${{candle.time}}</h4>
+         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+           <div style="padding: 12px 20px; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-radius: 8px; border-left: 4px solid #28a745;">
+             <strong>Open:</strong> ${{candle.open.toLocaleString(undefined, {{minimumFractionDigits: 2, maximumFractionDigits: 2}})}} Cr
+           </div>
+           <div style="padding: 12px 20px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+             <strong>High:</strong> ${{candle.high.toLocaleString(undefined, {{minimumFractionDigits: 2, maximumFractionDigits: 2}})}} Cr
+           </div>
+           <div style="padding: 12px 20px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+             <strong>Low:</strong> ${{candle.low.toLocaleString(undefined, {{minimumFractionDigits: 2, maximumFractionDigits: 2}})}} Cr
+           </div>
+           <div style="padding: 12px 20px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 8px; border-left: 4px solid #dc3545;">
+             <strong>Close:</strong> ${{candle.close.toLocaleString(undefined, {{minimumFractionDigits: 2, maximumFractionDigits: 2}})}} Cr
+           </div>
+         </div>
+       `;
+     }}
+   }};
+
+   marketcapCandleChart = chart;
 }}
 
 function applyFilters() {{
