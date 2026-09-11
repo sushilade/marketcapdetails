@@ -407332,12 +407332,31 @@ function showMarketcapCandleChart() {
      }
    });
 
-   const candleData = Object.keys(weeklyMap).sort().map(key => {
-     const w = weeklyMap[key];
-     return { time: key, open: w.open, high: w.high, low: w.low, close: w.close };
-   });
+const candleData = Object.keys(weeklyMap).sort().map(key => {
+      const w = weeklyMap[key];
+      return { time: key, open: w.open, high: w.high, low: w.low, close: w.close };
+    });
 
-   const chartContainer = document.getElementById('marketcapCandleChart');
+    // Show summary of all weeks with short O/H/L/C format
+    const infoPanel = document.getElementById('marketcapCandleInfo');
+    if (infoPanel && candleData.length > 0) {
+      const summaryHtml = candleData.map(c => `
+        <div style="display: inline-block; margin: 4px 8px 4px 0; padding: 8px 12px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 0.85rem;">
+          <strong>${c.time}:</strong> O:${c.open.toLocaleString(undefined, {maximumFractionDigits: 0})} H:${c.high.toLocaleString(undefined, {maximumFractionDigits: 0})} L:${c.low.toLocaleString(undefined, {maximumFractionDigits: 0})} C:${c.close.toLocaleString(undefined, {maximumFractionDigits: 0})}
+        </div>
+      `).join('');
+      infoPanel.innerHTML = `
+        <div style="margin-bottom: 12px;">
+          <strong>${selectedStock} - Weekly Market Cap Summary (${candleData.length} weeks):</strong>
+        </div>
+        <div style="max-height: 200px; overflow-y: auto;">
+          ${summaryHtml}
+        </div>
+        <p style="margin-top: 12px; color: #64748b; font-size: 0.85rem;">Click a candle on the chart to see detailed OHLC values.</p>
+      `;
+    }
+
+    const chartContainer = document.getElementById('marketcapCandleChart');
    if (marketcapCandleChart) marketcapCandleChart.remove();
    chartContainer.innerHTML = '';
 
