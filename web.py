@@ -1378,11 +1378,9 @@ function showMarketcapCandle() {{
    marketcapCandleMode = true;
    const downloadBtn = document.querySelector('.download-btn');
    if (downloadBtn) downloadBtn.style.display = 'none';
-const controlsDiv = document.querySelector('.controls');
-    if (controlsDiv) controlsDiv.style.display = 'none';
-    const tableContainer = document.querySelector('.table-container');
-    if (tableContainer) tableContainer.style.display = 'none';
-    activeFilters.clear();
+   const controlsDiv = document.querySelector('.controls');
+   if (controlsDiv) controlsDiv.style.display = 'none';
+   activeFilters.clear();
    document.querySelectorAll('.filter-buttons button').forEach(btn => {{
      const label = btn.textContent.trim();
      if (label.includes('Market Cap')) btn.classList.add('active');
