@@ -407338,7 +407338,7 @@ const candleData = Object.keys(weeklyMap).sort().map(key => {
     });
 
     // Show summary of all weeks with short O/H/L/C format
-    const infoPanel = document.getElementById('marketcapCandleInfo');
+    infoPanel = document.getElementById('marketcapCandleInfo');
     if (infoPanel && candleData.length > 0) {
       const summaryHtml = candleData.map(c => `
         <div style="display: inline-block; margin: 4px 8px 4px 0; padding: 8px 12px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 0.85rem;">
@@ -407384,12 +407384,12 @@ const candleData = Object.keys(weeklyMap).sort().map(key => {
 
    candleSeries.setData(candleData);
 
-   chart.subscribeClick(e => {
-     if (!e.time) return;
-     const candle = candleData.find(c => c.time === e.time);
-     if (candle) {
-       const infoPanel = document.getElementById('marketcapCandleInfo');
-       infoPanel.innerHTML = `
+chart.subscribeClick(e => {
+      if (!e.time) return;
+      const candle = candleData.find(c => c.time === e.time);
+      if (candle) {
+        infoPanel = document.getElementById('marketcapCandleInfo');
+        infoPanel.innerHTML = `
          <h4 style="margin-bottom: 16px;">${selectedStock} - Week of ${candle.time}</h4>
          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
            <div style="padding: 12px 20px; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-radius: 8px; border-left: 4px solid #28a745;">
