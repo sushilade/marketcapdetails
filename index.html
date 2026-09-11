@@ -407285,6 +407285,12 @@ function showMarketcapCandleChart() {
    if (infoPanel) infoPanel.innerHTML = '<p>Select a candle on the chart to see OHLC market cap values.</p>';
    if (!selectedStock) return;
 
+   // Ensure the chart section is visible before creating chart
+   const candleSection = document.getElementById('marketcapCandleSection');
+   if (candleSection && candleSection.style.display === 'none') {
+     candleSection.style.display = 'block';
+   }
+
    const table = document.getElementById('marketTable');
    const headers = Array.from(table.querySelectorAll('th'));
    const rows = Array.from(table.querySelectorAll('tbody tr'));
@@ -407354,7 +407360,7 @@ const candleData = Object.keys(weeklyMap).sort().map(key => {
       `;
     }
 
-const chartContainer = document.getElementById('marketcapCandleChart');
+    const chartContainer = document.getElementById('marketcapCandleChart');
     if (marketcapCandleChart) {
       marketcapCandleChart = null;
     }
@@ -407365,8 +407371,25 @@ const chartContainer = document.getElementById('marketcapCandleChart');
       return;
     }
 
-    // Ensure container has proper width before creating chart
-    const containerWidth = chartContainer.clientWidth || chartContainer.offsetWidth || chartContainer.parentElement?.clientWidth || 800;
+    // Wait for section to be fully visible before creating chart
+    const waitForVisible = () => {
+      return new Promise(resolve => {
+        const check = () => {
+          const section = document.getElementById('marketcapCandleSection');
+          const container = document.getElementById('marketcapCandleChart');
+          if (section && section.style.display !== 'none' && container && (container.clientWidth > 0 || container.offsetWidth > 0)) {
+            resolve();
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+        check();
+      });
+    };
+
+    waitForVisible().then(() => {
+      // Ensure container has proper width before creating chart
+      const containerWidth = chartContainer.clientWidth || chartContainer.offsetWidth || chartContainer.parentElement?.clientWidth || 800;
 
     const chart = LightweightCharts.createChart(chartContainer, {
       width: containerWidth,
@@ -407402,13 +407425,14 @@ const chartContainer = document.getElementById('marketcapCandleChart');
           }
         }
       });
-      resizeObserver.observe(chartContainer);
+resizeObserver.observe(chartContainer);
     }
 
     // Force initial resize after a short delay to ensure layout is complete
     setTimeout(() => {
       chart.applyOptions({ width: chartContainer.clientWidth || chartContainer.offsetWidth || 800 });
     }, 100);
+  });
 
 chart.subscribeClick(e => {
       if (!e.time) return;
