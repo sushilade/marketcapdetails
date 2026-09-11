@@ -2478,7 +2478,7 @@ function buildMarketCandleChart() {{
       stockDataMap.set(stockName, []);
     }}
     dataCols.forEach(col => {{
-      const valStr = row.cells[col.index].textContent.trim().replace(/,/g, '').replace(/[^0-9.\-]/g, '');
+      const valStr = row.cells[col.index].textContent.trim().replace(/,/g, '').replace(/[^0-9.\\-]/g, '');
       const val = parseFloat(valStr);
       if (!isNaN(val)) {{
         stockDataMap.get(stockName).push({{ date: col.name, value: val }});
@@ -2600,7 +2600,7 @@ function groupDataIntoWeeklyCandles(dataPoints) {{
 }}
 
 function parseDateFromHeader(header) {{
-  const match = header.match(/(\d{{4}})-(\d{{2}})-(\d{{2}})/);
+  const match = header.match(/(\\d{{4}})-(\\d{{2}})-(\\d{{2}})/);
   if (match) {{
     return new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]));
   }}
