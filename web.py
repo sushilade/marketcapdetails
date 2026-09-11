@@ -2538,7 +2538,49 @@ function buildMarketCandleChart() {{
     }}
   }});
 
-  const candleSeries = chart.addCandlestickSeries();
+  const candleSeries = chart.addCandlestickSeries({{
+    tooltip: {{
+      enabled: true,
+      style: {{
+        background: 'rgba(15, 23, 42, 0.95)',
+        color: '#e2e8f0',
+        border: '1px solid #475569',
+        borderRadius: '8px',
+        fontSize: '13px',
+        padding: '12px 14px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
+      }}
+    }}
+  }});
+
+  // Store week data map for tooltip lookup
+  const weekDataMap = new Map();
+  weeklyCandles.forEach(w => {{
+    weekDataMap.set(w.weekStart.getTime(), w);
+  }});
+
+  // Attach tooltip handler
+  chart.subscribeOnTooltip('data', function(params) {{
+    const data = params && params.data;
+    if (!data || data.length === 0) return null;
+    const dp = data[0];
+    const ts = dp.time * 1000;
+    const w = weekDataMap.get(ts);
+    if (!w) return null;
+    const fmt = (v) => v.toLocaleString('en-IN', {{ maximumFractionDigits: 2 }});
+    const color = w.close >= w.open ? '#10b981' : '#ef4444';
+    const direction = w.close >= w.open ? 'BULLISH' : 'BEARISH';
+    return {{
+      body: [
+        '<b style="color:' + color + '">[' + direction + ']</b> Week: ' + w.weekLabel,
+        'Open: <b>' + fmt(w.open) + '</b>',
+        'High: <b>' + fmt(w.high) + '</b>',
+        'Low: <b>' + fmt(w.low) + '</b>',
+        'Close: <b>' + fmt(w.close) + '</b>',
+        'Duration: ' + w.durationLabel
+      ].join('\\n')
+    }};
+  }});
 
   const candleData = weeklyCandles.map(w => {{
     const ts = new Date(w.weekStart).getTime() / 1000;
@@ -2594,12 +2636,20 @@ function groupDataIntoWeeklyCandles(dataPoints) {{
       open: open,
       high: high,
       low: low,
-      close: close
+      close: close,
+      weekLabel: formatDateLabel(new Date(weekKey)),
+      durationLabel: points.length + ' trading day' + (points.length === 1 ? '' : 's')
     }});
   }});
 
   candles.sort((a, b) => a.weekStart - b.weekStart);
   return candles;
+}}
+
+function formatDateLabel(date) {{
+  const d = new Date(date);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
 }}
 
 function parseDateFromHeader(header) {{
