@@ -1524,9 +1524,11 @@ const candleData = Object.keys(weeklyMap).sort().map(key => {{
       `;
     }}
 
-    const chartContainer = document.getElementById('marketcapCandleChart');
-   if (marketcapCandleChart) marketcapCandleChart.remove();
-   chartContainer.innerHTML = '';
+const chartContainer = document.getElementById('marketcapCandleChart');
+    if (marketcapCandleChart) {{
+      marketcapCandleChart = null;
+    }}
+    chartContainer.innerHTML = '';
 
    if (candleData.length === 0) {{
      chartContainer.innerHTML = '<p style="padding: 20px; color: #64748b;">No market cap data available for this stock.</p>';
