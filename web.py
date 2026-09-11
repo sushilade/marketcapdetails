@@ -1528,13 +1528,16 @@ const chartContainer = document.getElementById('marketcapCandleChart');
     }}
     chartContainer.innerHTML = '';
 
-   if (candleData.length === 0) {{
-     chartContainer.innerHTML = '<p style="padding: 20px; color: #64748b;">No market cap data available for this stock.</p>';
-     return;
-   }}
+    if (candleData.length === 0) {{
+      chartContainer.innerHTML = '<p style="padding: 20px; color: #64748b;">No market cap data available for this stock.</p>';
+      return;
+    }}
 
-const chart = LightweightCharts.createChart(chartContainer, {{
-      width: chartContainer.clientWidth || chartContainer.offsetWidth || 800,
+    // Ensure container has proper width before creating chart
+    const containerWidth = chartContainer.clientWidth || chartContainer.offsetWidth || chartContainer.parentElement?.clientWidth || 800;
+
+    const chart = LightweightCharts.createChart(chartContainer, {{
+      width: containerWidth,
       height: 500,
       layout: {{ backgroundColor: '#ffffff', textColor: '#333' }},
       grid: {{ vertLines: {{ color: '#e1ecf2' }}, horzLines: {{ color: '#e1ecf2' }} }},
@@ -1552,7 +1555,13 @@ const chart = LightweightCharts.createChart(chartContainer, {{
 
     candleSeries.setData(candleData);
 
-    // Ensure chart resizes properly
+    // Force resize after a short delay to ensure layout is complete
+    setTimeout(() => {{
+      const w = chartContainer.clientWidth || chartContainer.offsetWidth || chartContainer.parentElement?.clientWidth || 800;
+      chart.applyOptions({{ width: w }});
+    }}, 50);
+
+    // Ensure chart resizes properly on container resize
     if (typeof ResizeObserver !== 'undefined') {{
       const resizeObserver = new ResizeObserver(entries => {{
         for (let entry of entries) {{
