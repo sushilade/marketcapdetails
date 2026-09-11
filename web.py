@@ -1424,7 +1424,7 @@ function showMarketcapCandle() {{
 }}
 
 function populateMarketcapCandleStocks() {{
-   const table = document.getElementById('marketTable');
+   const table = originalTable;
    const rows = Array.from(table.querySelectorAll('tbody tr'));
    const select = document.getElementById('marketcapStockSelect');
    if (!select) return;
