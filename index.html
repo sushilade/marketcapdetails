@@ -406764,16 +406764,15 @@ function showMarketCandleScript() {
     modal.id = 'marketCandleScriptModal';
     modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;';
     modal.innerHTML = `
-      <div style="position:relative; width:80%; max-width:900px; height:80%; background:#1e1e1e; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); display:flex; flex-direction:column;">
+      <div style="position:relative; width:90%; max-width:1100px; height:90%; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); display:flex; flex-direction:column;">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:linear-gradient(135deg,#1e293b 0%,#334155 100%); color:white;">
-          <h3 style="margin:0; font-family:'Montserrat',sans-serif; font-size:1.1rem;"><i class="fas fa-chart-candle"></i> MARKET CANDLE - Pine Script</h3>
+          <h3 style="margin:0; font-family:'Montserrat',sans-serif; font-size:1.1rem;"><i class="fas fa-chart-candle"></i> MARKET CANDLE - Weekly Market Cap</h3>
           <div style="display:flex; gap:10px;">
-            <button onclick="copyMarketCandleScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; gap:5px; transition:all 0.3s;"><i class="fas fa-copy"></i> Copy</button>
             <button onclick="closeMarketCandleScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all 0.3s;"><i class="fas fa-times"></i></button>
           </div>
         </div>
-        <div style="flex:1; overflow:auto; padding:20px;">
-          <pre id="marketCandleScriptCode" style="margin:0; padding:20px; background:#2d2d2d; border-radius:8px; color:#d4d4d4; font-family:'Consolas','Monaco',monospace; font-size:13px; line-height:1.6; white-space:pre-wrap; word-wrap:break-word;"></pre>
+        <div style="flex:1; padding:10px;">
+          <div id="marketCandleChart" style="width:100%; height:100%;"></div>
         </div>
       </div>
     `;
@@ -406782,25 +406781,10 @@ function showMarketCandleScript() {
       if (e.target === modal) closeMarketCandleScript();
     });
   }
-  const scriptCode = `//@version=5
-indicator("Market Candle", overlay=true)
-
-HTF = input.timeframe("1D", "Higher Timeframe")
-size = input.int(2, "Select Bars", minval=2, maxval=5)
-symbolu = input.string("", "Symbol", tooltip="If empty, current symbol is used")
-var symbol = symbolu == "" ? syminfo.tickerid : symbolu
-
-prev_open = request.security(symbol, HTF, open[size])
-highest_high = ta.highest(high[1], size)
-simplehigh = request.security(symbol, HTF, highest_high)
-min_low = ta.lowest(low[1], size)
-simplelow = request.security(symbol, HTF, min_low)
-prev_close = request.security(symbol, HTF, close[1])
-
-plotcandle(open=prev_open, high=simplehigh, low=simplelow, close=prev_close,
-           color=close > open ? color.rgb(62, 146, 65) : color.rgb(250, 8, 8), editable=false)`;
-  document.getElementById('marketCandleScriptCode').textContent = scriptCode;
   modal.style.display = 'flex';
+  setTimeout(function() {
+    buildMarketCandleChart();
+  }, 100);
 }
 
 function closeMarketCandleScript() {
@@ -406808,13 +406792,130 @@ function closeMarketCandleScript() {
   if (modal) modal.style.display = 'none';
 }
 
-function copyMarketCandleScript() {
-  const code = document.getElementById('marketCandleScriptCode').textContent;
-  navigator.clipboard.writeText(code).then(() => {
-    alert('Pine Script copied to clipboard!');
-  }).catch(() => {
-    alert('Failed to copy. Please select and copy manually.');
+function buildMarketCandleChart() {
+  const table = document.getElementById('marketTable');
+  if (!table) { alert('Market table not found'); return; }
+
+  const headers = Array.from(table.querySelectorAll('th'));
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+  // Find market cap column (latest date column containing 'market')
+  let marketCapColIndex = -1;
+  let marketCapColName = '';
+  for (let i = headers.length - 1; i >= 1; i--) {
+    const h = headers[i].textContent.trim().toLowerCase();
+    if (h.includes('market')) {
+      marketCapColIndex = i;
+      marketCapColName = headers[i].textContent.trim();
+      break;
+    }
+  }
+
+  if (marketCapColIndex === -1) { alert('No market cap column found'); return; }
+
+  // Collect date -> market cap pairs
+  const dataPoints = [];
+  rows.forEach(row => {
+    const stockName = row.cells[0].textContent.trim();
+    const dateStr = marketCapColName;
+    const valStr = row.cells[marketCapColIndex].textContent.trim().replace(/,/g, '');
+    const val = parseFloat(valStr);
+    if (!isNaN(val)) {
+      dataPoints.push({ date: dateStr, value: val, stock: stockName });
+    }
   });
+
+  // Group by week (Monday to Friday)
+  const weeklyCandles = groupDataIntoWeeklyCandles(dataPoints);
+
+  // Render with lightweight-charts
+  const chartDiv = document.getElementById('marketCandleChart');
+  chartDiv.innerHTML = '';
+  const chart = LightweightCharts.createChart(chartDiv, {
+    width: chartDiv.clientWidth,
+    height: chartDiv.clientHeight,
+    layout: {
+      textColor: '#d1d5dc',
+      background: { color: '#1e293b' }
+    },
+    grid: {
+      vertLines: { color: '#334155' },
+      horzLines: { color: '#334155' }
+    }
+  });
+
+  const candleSeries = chart.addCandlestickSeries();
+
+  // Build candle data
+  const candleData = weeklyCandles.map(w => {
+    const ts = new Date(w.weekStart).getTime() / 1000;
+    return {
+      time: ts,
+      open: w.open,
+      high: w.high,
+      low: w.low,
+      close: w.close
+    };
+  });
+
+  candleSeries.setData(candleData);
+}
+
+function groupDataIntoWeeklyCandles(dataPoints) {
+  if (dataPoints.length === 0) return [];
+
+  // Parse the date from the column header
+  const dateStr = dataPoints[0].date;
+  const parsedDate = parseDateFromHeader(dateStr);
+  if (!parsedDate) return [];
+
+  // Group by week (Monday to Friday)
+  const weeks = new Map();
+
+  dataPoints.forEach(dp => {
+    const weekStart = getWeekStart(parsedDate);
+    if (!weeks.has(weekStart)) {
+      weeks.set(weekStart, []);
+    }
+    weeks.get(weekStart).push(dp.value);
+  });
+
+  const candles = [];
+  weeks.forEach((values, weekStart) => {
+    values.sort((a, b) => a - b);
+    const mondayVal = values.length > 0 ? values[0] : 0;
+    const fridayVal = values.length > 0 ? values[values.length - 1] : 0;
+    const highVal = values.length > 0 ? values[values.length - 1] : 0;
+    const lowVal = values.length > 0 ? values[0] : 0;
+
+    candles.push({
+      weekStart: weekStart,
+      open: mondayVal,
+      high: highVal,
+      low: lowVal,
+      close: fridayVal
+    });
+  });
+
+  candles.sort((a, b) => a.weekStart - b.weekStart);
+  return candles;
+}
+
+function parseDateFromHeader(header) {
+  const match = header.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    return new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]));
+  }
+  return null;
+}
+
+function getWeekStart(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1) - day; // Monday
+  const monday = new Date(d);
+  monday.setDate(d.getDate() + diff);
+  return new Date(monday.getFullYear(), monday.getMonth(), monday.getDate());
 }
 
 function updateMarketCapExtremes(stock, dates, marketCapData) {
