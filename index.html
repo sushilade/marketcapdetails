@@ -407408,7 +407408,7 @@ const candleData = Object.keys(weeklyMap).sort().map(key => {
       wickUpColor: '#10b981'
     });
 
-    candleSeries.setData(candleData);
+candleSeries.setData(candleData);
 
     // Force resize after a short delay to ensure layout is complete
     setTimeout(() => {
@@ -407425,41 +407425,41 @@ const candleData = Object.keys(weeklyMap).sort().map(key => {
           }
         }
       });
-resizeObserver.observe(chartContainer);
+      resizeObserver.observe(chartContainer);
     }
 
     // Force initial resize after a short delay to ensure layout is complete
     setTimeout(() => {
       chart.applyOptions({ width: chartContainer.clientWidth || chartContainer.offsetWidth || 800 });
     }, 100);
-  });
 
-chart.subscribeClick(e => {
+    chart.subscribeClick(e => {
       if (!e.time) return;
       const candle = candleData.find(c => c.time === e.time);
       if (candle) {
         infoPanel = document.getElementById('marketcapCandleInfo');
         infoPanel.innerHTML = `
-         <h4 style="margin-bottom: 16px;">${selectedStock} - Week of ${candle.time}</h4>
-         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-           <div style="padding: 12px 20px; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-radius: 8px; border-left: 4px solid #28a745;">
-             <strong>Open:</strong> ${candle.open.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} Cr
-           </div>
-           <div style="padding: 12px 20px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
-             <strong>High:</strong> ${candle.high.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} Cr
-           </div>
-           <div style="padding: 12px 20px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
-             <strong>Low:</strong> ${candle.low.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} Cr
-           </div>
-           <div style="padding: 12px 20px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 8px; border-left: 4px solid #dc3545;">
-             <strong>Close:</strong> ${candle.close.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} Cr
-           </div>
-         </div>
+          <h4 style="margin-bottom: 16px;">${selectedStock} - Week of ${candle.time}</h4>
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div style="padding: 12px 20px; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-radius: 8px; border-left: 4px solid #28a745;">
+              <strong>Open:</strong> ${candle.open.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} Cr
+            </div>
+            <div style="padding: 12px 20px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+              <strong>High:</strong> ${candle.high.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} Cr
+            </div>
+            <div style="padding: 12px 20px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 8px; border-left: 4px solid #ffc107;">
+              <strong>Low:</strong> ${candle.low.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} Cr
+            </div>
+            <div style="padding: 12px 20px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 8px; border-left: 4px solid #dc3545;">
+              <strong>Close:</strong> ${candle.close.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} Cr
+            </div>
+          </div>
         `;
       }
     });
 
     marketcapCandleChart = chart;
+  });
 }
 
 function applyFilters() {
