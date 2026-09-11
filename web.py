@@ -863,6 +863,9 @@ html_content = f"""<!DOCTYPE html>
       <button class="sidebar-link" onclick="openTabFromMenu(event, 'historyRank')">
         <i class="fas fa-history"></i> History Rank
       </button>
+      <button class="sidebar-link" onclick="showMarketcapCandle()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);">
+        <i class="fas fa-chart-candle"></i> MARKETCAP CANDLE
+      </button>
       <button class="sidebar-link" onclick="toggleIndicatorMenu(event)" id="indicatorBtn">
         <i class="fas fa-lightbulb"></i> Indicator
         <i class="fas fa-chevron-down" id="indicatorArrow" style="margin-left: auto; font-size: 12px; transition: transform 0.3s;"></i>
@@ -1313,11 +1316,52 @@ function showAll() {{
   document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
   document.getElementById('showAllBtn').classList.add('active');
   const parent = document.getElementById('marketTable').parentNode;
-  parent.removeChild(document.getElementById('marketTable'));
-  const clone = originalTable.cloneNode(true);
-  parent.appendChild(clone);
-  applyColorFormatting();
-  updateDashboardStats();
+   parent.removeChild(document.getElementById('marketTable'));
+   const clone = originalTable.cloneNode(true);
+   parent.appendChild(clone);
+   applyColorFormatting();
+   updateDashboardStats();
+}}
+
+function showMarketcapCandle() {{
+   openTabFromMenu(null, 'dataView');
+   activeFilters.clear();
+   document.querySelectorAll('.filter-buttons button').forEach(btn => {{
+     const label = btn.textContent.trim();
+     if (label.includes('Market Cap')) btn.classList.add('active');
+     else btn.classList.remove('active');
+   }});
+   const parent = document.getElementById('marketTable').parentNode;
+   parent.removeChild(document.getElementById('marketTable'));
+   const clone = originalTable.cloneNode(true);
+   parent.appendChild(clone);
+
+   const table = document.getElementById('marketTable');
+   const headers = Array.from(table.querySelectorAll('th'));
+   const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+   const columnsToShow = new Set();
+   columnsToShow.add(0);
+   for (let i = 1; i < headers.length; i++) {{
+     const h = headers[i].textContent.trim().toLowerCase();
+     if (h.includes('market')) columnsToShow.add(i);
+   }}
+
+   headers.forEach((h, idx) => {{
+     h.style.display = columnsToShow.has(idx) ? '' : 'none';
+   }});
+   rows.forEach(row => {{
+     const cells = Array.from(row.querySelectorAll('td'));
+     cells.forEach((cell, idx) => {{
+       cell.style.display = columnsToShow.has(idx) ? '' : 'none';
+     }});
+   }});
+
+   rows.forEach((row, idx) => {{
+     row.style.display = idx < 10 ? '' : 'none';
+   }});
+
+   applyColorFormatting();
 }}
 
 function applyFilters() {{
