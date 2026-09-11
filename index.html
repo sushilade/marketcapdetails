@@ -406767,7 +406767,8 @@ function showMarketCandleScript() {
       <div style="position:relative; width:90%; max-width:1100px; height:90%; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); display:flex; flex-direction:column;">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:linear-gradient(135deg,#1e293b 0%,#334155 100%); color:white;">
           <h3 style="margin:0; font-family:'Montserrat',sans-serif; font-size:1.1rem;"><i class="fas fa-chart-candle"></i> MARKET CANDLE - Weekly Market Cap</h3>
-          <div style="display:flex; gap:10px;">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <select id="marketCandleStockSelect" onchange="buildMarketCandleChart()" style="padding:8px 12px; border:2px solid #e2e8f0; border-radius:8px; font-size:14px; background:#f8fafc; max-width:300px;"></select>
             <button onclick="closeMarketCandleScript()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all 0.3s;"><i class="fas fa-times"></i></button>
           </div>
         </div>
@@ -406799,34 +406800,59 @@ function buildMarketCandleChart() {
   const headers = Array.from(table.querySelectorAll('th'));
   const rows = Array.from(table.querySelectorAll('tbody tr'));
 
-  // Find market cap column (latest date column containing 'market')
-  let marketCapColIndex = -1;
-  let marketCapColName = '';
-  for (let i = headers.length - 1; i >= 1; i--) {
+  // Find market cap columns (all columns containing 'market')
+  const marketCapCols = [];
+  for (let i = 1; i < headers.length; i++) {
     const h = headers[i].textContent.trim().toLowerCase();
     if (h.includes('market')) {
-      marketCapColIndex = i;
-      marketCapColName = headers[i].textContent.trim();
-      break;
+      marketCapCols.push({ index: i, name: headers[i].textContent.trim() });
     }
   }
 
-  if (marketCapColIndex === -1) { alert('No market cap column found'); return; }
+  if (marketCapCols.length === 0) { alert('No market cap column found'); return; }
 
-  // Collect date -> market cap pairs
-  const dataPoints = [];
+  // Collect per-stock data across all market cap columns
+  const stockDataMap = new Map();
   rows.forEach(row => {
     const stockName = row.cells[0].textContent.trim();
-    const dateStr = marketCapColName;
-    const valStr = row.cells[marketCapColIndex].textContent.trim().replace(/,/g, '');
-    const val = parseFloat(valStr);
-    if (!isNaN(val)) {
-      dataPoints.push({ date: dateStr, value: val, stock: stockName });
+    if (!stockDataMap.has(stockName)) {
+      stockDataMap.set(stockName, []);
     }
+    marketCapCols.forEach(col => {
+      const valStr = row.cells[col.index].textContent.trim().replace(/,/g, '');
+      const val = parseFloat(valStr);
+      if (!isNaN(val)) {
+        stockDataMap.get(stockName).push({ date: col.name, value: val });
+      }
+    });
   });
 
-  // Group by week (Monday to Friday)
-  const weeklyCandles = groupDataIntoWeeklyCandles(dataPoints);
+  // Populate stock selector
+  const select = document.getElementById('marketCandleStockSelect');
+  if (select) {
+    select.innerHTML = '';
+    const allOption = document.createElement('option');
+    allOption.value = '';
+    allOption.textContent = 'All Stocks (Aggregated)';
+    select.appendChild(allOption);
+    Array.from(stockDataMap.keys()).sort().forEach(stock => {
+      const opt = document.createElement('option');
+      opt.value = stock;
+      opt.textContent = stock;
+      select.appendChild(opt);
+    });
+  }
+
+  const selectedStock = select ? select.value : '';
+  let filteredData = [];
+  if (selectedStock) {
+    filteredData = stockDataMap.get(selectedStock) || [];
+  } else {
+    stockDataMap.forEach(arr => { filteredData = filteredData.concat(arr); });
+  }
+
+  // Group by week
+  const weeklyCandles = groupDataIntoWeeklyCandles(filteredData);
 
   // Render with lightweight-charts
   const chartDiv = document.getElementById('marketCandleChart');
@@ -406846,7 +406872,6 @@ function buildMarketCandleChart() {
 
   const candleSeries = chart.addCandlestickSeries();
 
-  // Build candle data
   const candleData = weeklyCandles.map(w => {
     const ts = new Date(w.weekStart).getTime() / 1000;
     return {
@@ -406864,36 +406889,33 @@ function buildMarketCandleChart() {
 function groupDataIntoWeeklyCandles(dataPoints) {
   if (dataPoints.length === 0) return [];
 
-  // Parse the date from the column header
-  const dateStr = dataPoints[0].date;
-  const parsedDate = parseDateFromHeader(dateStr);
-  if (!parsedDate) return [];
+  // Parse dates from all data points
+  const parsedPoints = dataPoints.map(dp => {
+    const d = parseDateFromHeader(dp.date);
+    return d ? { date: d, value: dp.value } : null;
+  }).filter(p => p !== null);
+
+  if (parsedPoints.length === 0) return [];
 
   // Group by week (Monday to Friday)
   const weeks = new Map();
-
-  dataPoints.forEach(dp => {
-    const weekStart = getWeekStart(parsedDate);
-    if (!weeks.has(weekStart)) {
-      weeks.set(weekStart, []);
+  parsedPoints.forEach(dp => {
+    const weekStart = getWeekStart(dp.date);
+    if (!weeks.has(weekStart.getTime())) {
+      weeks.set(weekStart.getTime(), []);
     }
-    weeks.get(weekStart).push(dp.value);
+    weeks.get(weekStart.getTime()).push(dp.value);
   });
 
   const candles = [];
-  weeks.forEach((values, weekStart) => {
+  weeks.forEach((values, weekKey) => {
     values.sort((a, b) => a - b);
-    const mondayVal = values.length > 0 ? values[0] : 0;
-    const fridayVal = values.length > 0 ? values[values.length - 1] : 0;
-    const highVal = values.length > 0 ? values[values.length - 1] : 0;
-    const lowVal = values.length > 0 ? values[0] : 0;
-
     candles.push({
-      weekStart: weekStart,
-      open: mondayVal,
-      high: highVal,
-      low: lowVal,
-      close: fridayVal
+      weekStart: new Date(weekKey),
+      open: values[0],
+      high: values[values.length - 1],
+      low: values[0],
+      close: values[values.length - 1]
     });
   });
 
@@ -406912,7 +406934,7 @@ function parseDateFromHeader(header) {
 function getWeekStart(date) {
   const d = new Date(date);
   const day = d.getDay();
-  const diff = (day === 0 ? -6 : 1) - day; // Monday
+  const diff = (day === 0 ? -6 : 1) - day;
   const monday = new Date(d);
   monday.setDate(d.getDate() + diff);
   return new Date(monday.getFullYear(), monday.getMonth(), monday.getDate());
