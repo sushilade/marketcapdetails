@@ -1930,7 +1930,7 @@ function updateMarketcapCandleActionButtons() {{
   const hasStock = select && select.value;
 
   if (viewButton) viewButton.style.display = hasStock ? 'inline-flex' : 'none';
-  if (moreButton) moreButton.style.display = 'none';
+  if (moreButton) moreButton.style.display = hasStock ? 'inline-flex' : 'none';
 }}
 
 function hideMarketcapMoreInfo() {{
