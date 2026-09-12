@@ -1169,6 +1169,25 @@ function openTab(evt, tabName) {{
   toggleMenu(false);
   const dashboardStats = document.querySelector('.dashboard-stats');
   if (dashboardStats) dashboardStats.style.display = 'none';
+
+  // Restore hidden controls when entering dataView normally
+  if (tabName === 'dataView') {{
+    const downloadBtn = document.querySelector('.download-btn');
+    if (downloadBtn) downloadBtn.style.display = '';
+    const controls = document.querySelector('.controls');
+    if (controls) controls.style.display = '';
+    const searchContainer = document.querySelector('.search-container');
+    if (searchContainer) searchContainer.style.display = '';
+    const scrollUp = document.querySelector('.scroll-up');
+    const scrollDown = document.querySelector('.scroll-down');
+    if (scrollUp) scrollUp.style.display = '';
+    if (scrollDown) scrollDown.style.display = '';
+    const scrollArea = document.getElementById('tableScrollArea');
+    if (scrollArea) {{
+      scrollArea.style.maxHeight = '';
+      scrollArea.style.overflowY = '';
+    }}
+  }}
 }}
 
 function openTabFromMenu(evt, tabName) {{
@@ -1188,6 +1207,25 @@ function openTabFromMenu(evt, tabName) {{
   toggleMenu(false);
   const dashboardStats = document.querySelector('.dashboard-stats');
   if (dashboardStats) dashboardStats.style.display = 'none';
+
+  // Restore hidden controls when entering dataView normally
+  if (tabName === 'dataView') {{
+    const downloadBtn = document.querySelector('.download-btn');
+    if (downloadBtn) downloadBtn.style.display = '';
+    const controls = document.querySelector('.controls');
+    if (controls) controls.style.display = '';
+    const searchContainer = document.querySelector('.search-container');
+    if (searchContainer) searchContainer.style.display = '';
+    const scrollUp = document.querySelector('.scroll-up');
+    const scrollDown = document.querySelector('.scroll-down');
+    if (scrollUp) scrollUp.style.display = '';
+    if (scrollDown) scrollDown.style.display = '';
+    const scrollArea = document.getElementById('tableScrollArea');
+    if (scrollArea) {{
+      scrollArea.style.maxHeight = '';
+      scrollArea.style.overflowY = '';
+    }}
+  }}
 }}
 
 function updateSidebarActive(tabName) {{
@@ -1694,6 +1732,14 @@ function showMarketcapCandle() {{
   document.getElementById('dataView').style.display = "block";
   updateSidebarActive('dataView');
   toggleMenu(false);
+
+  // Hide download button, controls, and search container
+  const downloadBtn = document.querySelector('.download-btn');
+  if (downloadBtn) downloadBtn.style.display = 'none';
+  const controls = document.querySelector('.controls');
+  if (controls) controls.style.display = 'none';
+  const searchContainer = document.querySelector('.search-container');
+  if (searchContainer) searchContainer.style.display = 'none';
 
   const table = document.getElementById('marketTable');
   if (!table) return;
