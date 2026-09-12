@@ -1963,12 +1963,10 @@ function drawMarketcapCandle() {{
       horzLines: {{ color: '#e2e8f0' }},
     }},
     crosshair: {{
-      mode: LightweightCharts.CrosshairMode.Normal,
-      visible: true,
+      mode: LightweightCharts.CrosshairMode.None,
     }},
     tooltip: {{
       enabled: true,
-      followMode: LightweightCharts.TooltipFollowMode.Char,
     }},
     priceScale: {{
       borderVisible: false,
@@ -1977,17 +1975,9 @@ function drawMarketcapCandle() {{
       borderVisible: false,
       timeVisible: true,
       tickMarkFormatter: (time) => {{
-        // time can be a string date "2025-06-18" or a unix timestamp (seconds)
-        let date;
-        if (typeof time === 'string') {{
-          date = new Date(time + 'T00:00:00');
-        }} else {{
-          date = new Date(time * 1000);
-        }}
-        if (isNaN(date.getTime())) return '';
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        // Show year-month label like TradingView (e.g. "2025 Jan", "2025 Jun")
-        return date.getFullYear() + ' ' + months[date.getMonth()];
+        // Show as YYYY-MM-DD (Monday date)
+        const d = new Date(time);
+        return d.toISOString().slice(0, 10);
       }},
     }},
   }});
