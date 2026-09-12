@@ -976,7 +976,7 @@ html_content = f"""<!DOCTYPE html>
         </div>
       </div>
 
-      <div class="table-container" id="marketTableContainer">
+      <div class="table-container" id="marketTableContainer" style="display: none;">
         <div class="table-scroll-area" id="tableScrollArea">
         {html_table}
         </div>
@@ -1230,9 +1230,8 @@ function openTab(evt, tabName) {{
     }}
     const candleContainer = document.getElementById('marketcapCandleChartContainer');
     if (candleContainer) candleContainer.style.display = 'none';
-    // Show the market cap table
     const tableContainer = document.getElementById('marketTableContainer');
-    if (tableContainer) tableContainer.style.display = '';
+    if (tableContainer) tableContainer.style.display = 'none';
   }}
 }}
 
@@ -1273,9 +1272,8 @@ function openTabFromMenu(evt, tabName) {{
     }}
     const candleContainer = document.getElementById('marketcapCandleChartContainer');
     if (candleContainer) candleContainer.style.display = 'none';
-    // Show the market cap table
     const tableContainer = document.getElementById('marketTableContainer');
-    if (tableContainer) tableContainer.style.display = '';
+    if (tableContainer) tableContainer.style.display = 'none';
   }}
 }}
 
@@ -1404,6 +1402,9 @@ function showAll() {{
   activeFilters.clear();
   document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
   document.getElementById('showAllBtn').classList.add('active');
+  document.getElementById('searchInput').value = '';
+  const tableContainer = document.getElementById('marketTableContainer');
+  if (tableContainer) tableContainer.style.display = '';
   const parent = document.getElementById('marketTable').parentNode;
   parent.removeChild(document.getElementById('marketTable'));
   const clone = originalTable.cloneNode(true);
@@ -1563,15 +1564,29 @@ function populateStockSuggestions() {{
 function searchStock() {{
   const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
   const table = document.getElementById('marketTable');
+  const tableContainer = document.getElementById('marketTableContainer');
+  const headers = Array.from(table.querySelectorAll('th'));
   const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+  if (!searchTerm) {{
+    rows.forEach(row => row.style.display = 'none');
+    if (tableContainer) tableContainer.style.display = 'none';
+    return;
+  }}
+
+  headers.forEach(header => {{
+    header.style.display = '';
+  }});
+  if (tableContainer) tableContainer.style.display = '';
+
   rows.forEach(row => {{
     const stockName = row.cells[0].textContent.trim().toLowerCase();
-    if (stockName.includes(searchTerm)) {{
-      row.style.display = '';
-    }} else {{
-      row.style.display = 'none';
-    }}
+    row.style.display = stockName.includes(searchTerm) ? '' : 'none';
+    Array.from(row.querySelectorAll('td')).forEach(cell => {{
+      cell.style.display = '';
+    }});
   }});
+
   applyColorFormatting();
   updateDashboardStats();
 }}
@@ -1579,8 +1594,10 @@ function searchStock() {{
 function clearSearch() {{
   document.getElementById('searchInput').value = '';
   const table = document.getElementById('marketTable');
+  const tableContainer = document.getElementById('marketTableContainer');
   const rows = Array.from(table.querySelectorAll('tbody tr'));
-  rows.forEach(row => row.style.display = '');
+  rows.forEach(row => row.style.display = 'none');
+  if (tableContainer) tableContainer.style.display = 'none';
   applyColorFormatting();
   updateDashboardStats();
 }}
