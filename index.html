@@ -407797,9 +407797,6 @@ function drawMarketcapCandle() {
     crosshair: {
       mode: LightweightCharts.CrosshairMode.Normal,
     },
-    tooltip: {
-      enabled: true,
-    },
     priceScale: {
       borderVisible: false,
     },
@@ -407825,9 +407822,9 @@ function drawMarketcapCandle() {
 
   candleSeries.setData(candles);
 
-  // Custom tooltip showing OHLC
+  // Custom tooltip showing OHLC - use series-level crosshair
   const tooltip = document.getElementById('marketcapCandleTooltip');
-  chart.subscribeCrosshair(param => {
+  candleSeries.subscribeCrosshairMove(param => {
     if (!param.point || !param.seriesData) {
       if (tooltip) tooltip.style.display = 'none';
       return;
