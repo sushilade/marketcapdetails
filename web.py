@@ -976,7 +976,7 @@ html_content = f"""<!DOCTYPE html>
         </div>
       </div>
 
-      <div class="table-container">
+      <div class="table-container" id="marketTableContainer">
         <div class="table-scroll-area" id="tableScrollArea">
         {html_table}
         </div>
@@ -997,6 +997,35 @@ html_content = f"""<!DOCTYPE html>
         <div id="marketcapCandleTooltip" class="rank-tooltip" style="display: none;"></div>
         <div style="position: relative; height: 480px;">
           <div id="marketcapCandleChart" style="width: 100%; height: 100%;"></div>
+        </div>
+        <div id="marketcapCandleOHLC" style="margin-top: 16px; padding: 16px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 12px; border: 1px solid #e2e8f0; display: none;">
+          <h5 style="margin: 0 0 12px 0; color: var(--primary); font-family: 'Montserrat', sans-serif; font-size: 0.95rem;"><i class="fas fa-info-circle"></i> Selected Candle Details</h5>
+          <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+            <div style="min-width: 140px;">
+              <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Date</span>
+              <div id="ohlcDate" style="font-weight: 700; font-size: 1.1rem; color: var(--primary);">-</div>
+            </div>
+            <div style="min-width: 140px;">
+              <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Open</span>
+              <div id="ohlcOpen" style="font-weight: 700; font-size: 1.1rem; color: #667eea;">-</div>
+            </div>
+            <div style="min-width: 140px;">
+              <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">High</span>
+              <div id="ohlcHigh" style="font-weight: 700; font-size: 1.1rem; color: #10b981;">-</div>
+            </div>
+            <div style="min-width: 140px;">
+              <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Low</span>
+              <div id="ohlcLow" style="font-weight: 700; font-size: 1.1rem; color: #ef4444;">-</div>
+            </div>
+            <div style="min-width: 140px;">
+              <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Close</span>
+              <div id="ohlcClose" style="font-weight: 700; font-size: 1.1rem; color: var(--primary);">-</div>
+            </div>
+            <div style="min-width: 140px;">
+              <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Change</span>
+              <div id="ohlcChange" style="font-weight: 700; font-size: 1.1rem;">-</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1201,6 +1230,9 @@ function openTab(evt, tabName) {{
     }}
     const candleContainer = document.getElementById('marketcapCandleChartContainer');
     if (candleContainer) candleContainer.style.display = 'none';
+    // Show the market cap table
+    const tableContainer = document.getElementById('marketTableContainer');
+    if (tableContainer) tableContainer.style.display = '';
   }}
 }}
 
@@ -1241,6 +1273,9 @@ function openTabFromMenu(evt, tabName) {{
     }}
     const candleContainer = document.getElementById('marketcapCandleChartContainer');
     if (candleContainer) candleContainer.style.display = 'none';
+    // Show the market cap table
+    const tableContainer = document.getElementById('marketTableContainer');
+    if (tableContainer) tableContainer.style.display = '';
   }}
 }}
 
@@ -1749,6 +1784,9 @@ function showMarketcapCandle() {{
   updateSidebarActive('dataView');
   toggleMenu(false);
 
+  const dashboardStats = document.querySelector('.dashboard-stats');
+  if (dashboardStats) dashboardStats.style.display = 'none';
+
   // Hide download button, controls, and search container
   const downloadBtn = document.querySelector('.download-btn');
   if (downloadBtn) downloadBtn.style.display = 'none';
@@ -1799,6 +1837,10 @@ function showMarketcapCandle() {{
   // Show candlestick chart container
   const candleContainer = document.getElementById('marketcapCandleChartContainer');
   if (candleContainer) candleContainer.style.display = 'block';
+
+  // Hide the market cap table
+  const tableContainer = document.getElementById('marketTableContainer');
+  if (tableContainer) tableContainer.style.display = 'none';
 
   // Populate stock dropdown
   populateMarketcapCandleDropdown();
@@ -1963,10 +2005,7 @@ function drawMarketcapCandle() {{
       horzLines: {{ color: '#e2e8f0' }},
     }},
     crosshair: {{
-      mode: LightweightCharts.CrosshairMode.None,
-    }},
-    tooltip: {{
-      enabled: true,
+      mode: LightweightCharts.CrosshairMode.Normal,
     }},
     priceScale: {{
       borderVisible: false,
@@ -1993,16 +2032,25 @@ function drawMarketcapCandle() {{
 
   candleSeries.setData(candles);
 
-  // Custom tooltip showing OHLC
+  // Custom tooltip showing OHLC - use series-level crosshair
   const tooltip = document.getElementById('marketcapCandleTooltip');
-  chart.subscribeCrosshair(param => {{
+  const ohlcDisplay = document.getElementById('marketcapCandleOHLC');
+  const ohlcDate = document.getElementById('ohlcDate');
+  const ohlcOpen = document.getElementById('ohlcOpen');
+  const ohlcHigh = document.getElementById('ohlcHigh');
+  const ohlcLow = document.getElementById('ohlcLow');
+  const ohlcClose = document.getElementById('ohlcClose');
+  const ohlcChange = document.getElementById('ohlcChange');
+  candleSeries.subscribeCrosshairMove(param => {{
     if (!param.point || !param.seriesData) {{
       if (tooltip) tooltip.style.display = 'none';
+      if (ohlcDisplay) ohlcDisplay.style.display = 'none';
       return;
     }}
     const candle = param.seriesData.get(candleSeries);
     if (!candle) {{
       if (tooltip) tooltip.style.display = 'none';
+      if (ohlcDisplay) ohlcDisplay.style.display = 'none';
       return;
     }}
     const dateStr = candle.time instanceof Date
@@ -2014,6 +2062,9 @@ function drawMarketcapCandle() {{
     const close = candle.close;
     const isUp = close >= open;
     const color = isUp ? '#10b981' : '#ef4444';
+    const change = ((close - open) / open * 100).toFixed(2);
+    const changeColor = change >= 0 ? '#10b981' : '#ef4444';
+    const changeSign = change >= 0 ? '+' : '';
     if (tooltip) {{
       tooltip.style.display = 'block';
       tooltip.innerHTML =
@@ -2027,6 +2078,17 @@ function drawMarketcapCandle() {{
       const containerPos = chartDiv.parentElement.getBoundingClientRect();
       tooltip.style.left = (px + 15) + 'px';
       tooltip.style.top = (py + 15) + 'px';
+    }}
+    // Update OHLC display below chart
+    if (ohlcDisplay && ohlcDate && ohlcOpen && ohlcHigh && ohlcLow && ohlcClose && ohlcChange) {{
+      ohlcDisplay.style.display = 'block';
+      ohlcDate.textContent = dateStr;
+      ohlcOpen.textContent = open.toLocaleString();
+      ohlcHigh.textContent = high.toLocaleString();
+      ohlcLow.textContent = low.toLocaleString();
+      ohlcClose.textContent = close.toLocaleString();
+      ohlcChange.textContent = changeSign + change + '%';
+      ohlcChange.style.color = changeColor;
     }}
   }});
 

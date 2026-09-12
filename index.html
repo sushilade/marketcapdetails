@@ -407616,6 +407616,9 @@ function showMarketcapCandle() {
   updateSidebarActive('dataView');
   toggleMenu(false);
 
+  const dashboardStats = document.querySelector('.dashboard-stats');
+  if (dashboardStats) dashboardStats.style.display = 'none';
+
   // Hide download button, controls, and search container
   const downloadBtn = document.querySelector('.download-btn');
   if (downloadBtn) downloadBtn.style.display = 'none';
