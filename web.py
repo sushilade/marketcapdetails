@@ -1238,6 +1238,8 @@ function openTab(evt, tabName) {{
     const tableContainer = document.getElementById('marketTableContainer');
     if (tableContainer) tableContainer.style.display = 'none';
   }}
+  const backBtn = document.getElementById('stockAnalysisBackBtn');
+  if (backBtn) backBtn.style.display = 'none';
 }}
 
 function openTabFromMenu(evt, tabName) {{
@@ -1279,6 +1281,8 @@ function openTabFromMenu(evt, tabName) {{
     const tableContainer = document.getElementById('marketTableContainer');
     if (tableContainer) tableContainer.style.display = 'none';
   }}
+  const backBtn = document.getElementById('stockAnalysisBackBtn');
+  if (backBtn) backBtn.style.display = 'none';
 }}
 
 function updateSidebarActive(tabName) {{
