@@ -987,6 +987,18 @@ html_content = f"""<!DOCTYPE html>
           <i class="fas fa-chevron-down"></i>
         </button>
       </div>
+
+      <div class="chart-container" id="marketcapCandleChartContainer" style="margin-top: 24px; display: none;">
+        <h4 style="margin-bottom: 16px; color: var(--secondary); font-family: 'Montserrat', sans-serif;"><i class="fas fa-chart-candle"></i> Market Cap Candlestick</h4>
+        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <label for="marketcapCandleStockSelect" style="font-weight: 700; color: var(--primary); font-size: 0.95rem;">Select Stock:</label>
+          <select id="marketcapCandleStockSelect" onchange="drawMarketcapCandle()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 220px;"></select>
+        </div>
+        <div id="marketcapCandleTooltip" class="rank-tooltip" style="display: none;"></div>
+        <div style="position: relative; height: 480px;">
+          <div id="marketcapCandleChart"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Stock Analysis Tab -->
@@ -1187,6 +1199,8 @@ function openTab(evt, tabName) {{
       scrollArea.style.maxHeight = '';
       scrollArea.style.overflowY = '';
     }}
+    const candleContainer = document.getElementById('marketcapCandleChartContainer');
+    if (candleContainer) candleContainer.style.display = 'none';
   }}
 }}
 
@@ -1225,6 +1239,8 @@ function openTabFromMenu(evt, tabName) {{
       scrollArea.style.maxHeight = '';
       scrollArea.style.overflowY = '';
     }}
+    const candleContainer = document.getElementById('marketcapCandleChartContainer');
+    if (candleContainer) candleContainer.style.display = 'none';
   }}
 }}
 
@@ -1779,6 +1795,219 @@ function showMarketcapCandle() {{
   if (scrollDown) scrollDown.style.display = 'flex';
 
   applyColorFormatting();
+
+  // Show candlestick chart container
+  const candleContainer = document.getElementById('marketcapCandleChartContainer');
+  if (candleContainer) candleContainer.style.display = 'block';
+
+  // Populate stock dropdown
+  populateMarketcapCandleDropdown();
+
+  // Draw candlestick for first stock
+  setTimeout(drawMarketcapCandle, 200);
+}}
+
+function populateMarketcapCandleDropdown() {{
+  const table = document.getElementById('marketTable');
+  if (!table) return;
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  const select = document.getElementById('marketcapCandleStockSelect');
+  if (!select) return;
+  select.innerHTML = '';
+  rows.forEach(row => {{
+    const nameCell = row.cells[0];
+    if (nameCell) {{
+      const opt = document.createElement('option');
+      opt.value = nameCell.textContent.trim();
+      opt.textContent = nameCell.textContent.trim();
+      select.appendChild(opt);
+    }}
+  }});
+}}
+
+function getMarketcapCandleData(stockName) {{
+  const table = document.getElementById('marketTable');
+  if (!table) return {{ dates: [], data: [] }};
+  const headers = Array.from(table.querySelectorAll('th'));
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  const lcHeaders = headers.map(h => h.textContent.trim().toLowerCase());
+
+  // Find market cap column indices and their dates
+  const mcCols = [];
+  lcHeaders.forEach((h, i) => {{
+    if (i > 0 && h.includes('market')) {{
+      mcCols.push({{ idx: i, date: h }});
+    }}
+  }});
+
+  // Find the row for the selected stock
+  let stockRow = null;
+  rows.forEach(row => {{
+    const nameCell = row.cells[0];
+    if (nameCell && nameCell.textContent.trim() === stockName) {{
+      stockRow = row;
+    }}
+  }});
+
+  const result = [];
+  if (stockRow) {{
+    mcCols.forEach(col => {{
+      const cell = stockRow.cells[col.idx];
+      if (cell) {{
+        const val = parseFloat(cell.textContent.trim().replace(/,/g, ''));
+        if (!isNaN(val)) {{
+          result.push({{ date: col.date, value: val }});
+        }}
+      }}
+    }});
+  }}
+  return result;
+}}
+
+function groupByWeek(data) {{
+  // Group consecutive dates into Monday-Friday weeks
+  // Monday = open, Friday = close, max = high, min = low
+  const weeks = [];
+  if (data.length === 0) return weeks;
+
+  let currentWeek = [];
+  data.forEach((d, i) => {{
+    const date = new Date(d.date);
+    const day = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const isWeekend = (day === 0 || day === 6);
+
+    if (isWeekend) {{
+      // Weekend - flush current week if it has data
+      if (currentWeek.length > 0) {{
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }}
+    }} else {{
+      currentWeek.push(d);
+      // If this is Friday (day===5), flush the week
+      if (day === 5) {{
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }}
+    }}
+  }});
+
+  // Flush any remaining week
+  if (currentWeek.length > 0) {{
+    weeks.push(currentWeek);
+  }}
+
+  return weeks;
+}}
+
+function drawMarketcapCandle() {{
+  const select = document.getElementById('marketcapCandleStockSelect');
+  if (!select || !select.value) return;
+  const stockName = select.value;
+
+  const data = getMarketcapCandleData(stockName);
+  const weeks = groupByWeek(data);
+
+  // Build OHLC candlesticks
+  const candles = [];
+  weeks.forEach(week => {{
+    if (week.length === 0) return;
+    const open = week[0].value; // Monday market cap
+    const close = week[week.length - 1].value; // Friday market cap
+    let high = week[0].value;
+    let low = week[0].value;
+    week.forEach(d => {{
+      if (d.value > high) high = d.value;
+      if (d.value < low) low = d.value;
+    }});
+    candles.push({{
+      time: week[0].date,
+      open: open,
+      high: high,
+      low: low,
+      close: close
+    }});
+  }});
+
+  // Render with lightweight-charts
+  const chartDiv = document.getElementById('marketcapCandleChart');
+  if (!chartDiv) return;
+  chartDiv.innerHTML = '';
+
+  const chart = LightweightCharts.createChart(chartDiv, {{
+    width: chartDiv.clientWidth,
+    height: 480,
+    layout: {{
+      textColor: '#d1d5dc',
+      background: {{ color: '#ffffff' }},
+    }},
+    grid: {{
+      vertLines: {{ color: '#e2e8f0' }},
+      horzLines: {{ color: '#e2e8f0' }},
+    }},
+    crosshair: {{
+      mode: LightweightCharts.CrosshairMode.None,
+    }},
+    tooltip: {{
+      enabled: true,
+    }},
+  }});
+
+  const candleSeries = chart.addCandlestickSeries({{
+    upColor: '#10b981',
+    downColor: '#ef4444',
+    borderUpColor: '#10b981',
+    borderDownColor: '#ef4444',
+    wickUpColor: '#10b981',
+    wickDownColor: '#ef4444',
+  }});
+
+  candleSeries.setData(candles);
+
+  // Custom tooltip showing OHLC
+  const tooltip = document.getElementById('marketcapCandleTooltip');
+  chart.subscribeCrosshair(param => {{
+    if (!param.point || !param.seriesData) {{
+      if (tooltip) tooltip.style.display = 'none';
+      return;
+    }}
+    const candle = param.seriesData.get(candleSeries);
+    if (!candle) {{
+      if (tooltip) tooltip.style.display = 'none';
+      return;
+    }}
+    const dateStr = candle.time instanceof Date
+      ? candle.time.toISOString().slice(0, 10)
+      : String(candle.time);
+    const open = candle.open;
+    const high = candle.high;
+    const low = candle.low;
+    const close = candle.close;
+    const isUp = close >= open;
+    const color = isUp ? '#10b981' : '#ef4444';
+    if (tooltip) {{
+      tooltip.style.display = 'block';
+      tooltip.innerHTML = `
+        <b style="color: " + color + ";">Date: " + dateStr + "</b><br/>
+        Open: " + open.toLocaleString() + "<br/>
+        High: " + high.toLocaleString() + "<br/>
+        Low: " + low.toLocaleString() + "<br/>
+        Close: " + close.toLocaleString()
+      `;
+      // Position tooltip
+      const rect = chartDiv.getBoundingClientRect();
+      const px = param.point.x;
+      const py = param.point.y;
+      tooltip.style.left = (px + 15) + 'px';
+      tooltip.style.top = (py + 15) + 'px';
+    }}
+  }});
+
+  // Resize handler
+  const resizeObserver = new ResizeObserver(() => {{
+    chart.resize(chartDiv.clientWidth, 480);
+  }});
+  resizeObserver.observe(chartDiv);
 }}
 
 function openTradingView() {{
