@@ -2017,7 +2017,7 @@ function drawMarketcapCandle() {{
     }}
     const dateStr = candle.time instanceof Date
       ? candle.time.toISOString().slice(0, 10)
-      : (typeof candle.time === 'string' ? candle.time : String(candle.time));
+      : String(candle.time);
     const open = candle.open;
     const high = candle.high;
     const low = candle.low;
