@@ -988,14 +988,16 @@ html_content = f"""<!DOCTYPE html>
       <div class="chart-container" id="marketcapCandleChartContainer" style="margin-top: 24px; display: none;">
         <h4 style="margin-bottom: 16px; color: var(--secondary); font-family: 'Montserrat', sans-serif;"><i class="fas fa-chart-candle"></i> Market Cap Candlestick</h4>
         <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
-          <label for="marketcapCandleStockSelect" style="font-weight: 700; color: var(--primary); font-size: 0.95rem;">Select Stock:</label>
-          <select id="marketcapCandleStockSelect" onchange="drawMarketcapCandle(); updateMarketcapCandleActionButtons()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 220px;"></select>
           <button id="marketcapViewTradingViewBtn" onclick="openTradingViewFromCandle()" style="padding: 12px 20px; background: linear-gradient(135deg, #2962FF 0%, #1E53E5 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(41, 98, 255, 0.3); transition: all 0.3s;">
             <i class="fas fa-external-link-alt"></i> VIEW ON TRADINGVIEW
           </button>
-          <button id="marketcapMoreInfoBtn" onclick="openCandleStockAnalysis()" style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35); transition: all 0.3s;">
+          <button id="marketcapMoreInfoBtn" onclick="openCandleStockAnalysis()" style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(102, 126, 241, 0.35); transition: all 0.3s;">
             <i class="fas fa-info-circle"></i> MORE INFORMATION
           </button>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+          <label for="marketcapCandleStockSelect" style="font-weight: 700; color: var(--primary); font-size: 0.95rem;">Select Stock:</label>
+          <select id="marketcapCandleStockSelect" onchange="drawMarketcapCandle(); updateMarketcapCandleActionButtons()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 220px;"></select>
         </div>
         <div id="marketcapCandleTooltip" class="rank-tooltip" style="display: none;"></div>
         <div style="position: relative; height: 480px;">
