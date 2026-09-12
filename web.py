@@ -948,10 +948,10 @@ html_content = f"""<!DOCTYPE html>
           <button onclick="toggleFilter('rank')" id="rankBtn">
             <i class="fas fa-trophy"></i> Rank
           </button>
-          <button onclick="arrangeRank()" id="rankArrangeBtn">
+          <button onclick="arrangeRank()" id="rankArrangeBtn" style="display: none;">
             <i class="fas fa-sort-amount-down"></i> Rank Arrange
           </button>
-          <button onclick="filterIntradayPicks()" id="intradayBtn">
+          <button onclick="filterIntradayPicks()" id="intradayBtn" style="display: none;">
             <i class="fas fa-bolt"></i> Intraday Stocks
           </button>
           <button onclick="showAll()" id="showAllBtn">
@@ -1234,9 +1234,10 @@ function openTab(evt, tabName) {{
     }}
     const candleContainer = document.getElementById('marketcapCandleChartContainer');
     if (candleContainer) candleContainer.style.display = 'none';
-    const tableContainer = document.getElementById('marketTableContainer');
-    if (tableContainer) tableContainer.style.display = 'none';
-  }}
+     const tableContainer = document.getElementById('marketTableContainer');
+     if (tableContainer) tableContainer.style.display = 'none';
+     hideSecondaryButtons();
+   }}
 }}
 
 function openTabFromMenu(evt, tabName) {{
@@ -1274,9 +1275,10 @@ function openTabFromMenu(evt, tabName) {{
     }}
     const candleContainer = document.getElementById('marketcapCandleChartContainer');
     if (candleContainer) candleContainer.style.display = 'none';
-    const tableContainer = document.getElementById('marketTableContainer');
-    if (tableContainer) tableContainer.style.display = 'none';
-  }}
+     const tableContainer = document.getElementById('marketTableContainer');
+     if (tableContainer) tableContainer.style.display = 'none';
+     hideSecondaryButtons();
+   }}
 }}
 
 function updateSidebarActive(tabName) {{
@@ -1397,7 +1399,22 @@ function toggleFilter(type) {{
     activeFilters.add(type);
     btn.classList.add('active');
   }}
+  hideSecondaryButtons();
   applyFilters();
+}}
+
+function hideSecondaryButtons() {{
+  const rankBtn = document.getElementById('rankArrangeBtn');
+  const intradayBtn = document.getElementById('intradayBtn');
+  if (rankBtn) rankBtn.style.display = 'none';
+  if (intradayBtn) intradayBtn.style.display = 'none';
+}}
+
+function showSecondaryButtons() {{
+  const rankBtn = document.getElementById('rankArrangeBtn');
+  const intradayBtn = document.getElementById('intradayBtn');
+  if (rankBtn) rankBtn.style.display = '';
+  if (intradayBtn) intradayBtn.style.display = '';
 }}
 
 function showAll() {{
@@ -1413,6 +1430,7 @@ function showAll() {{
   parent.appendChild(clone);
   applyColorFormatting();
   updateDashboardStats();
+  showSecondaryButtons();
 
   // Show only first, last, 2nd last, and 3rd last columns
   const table = document.getElementById('marketTable');
@@ -1609,6 +1627,7 @@ function searchStock() {{
 
   applyColorFormatting();
   updateDashboardStats();
+  hideSecondaryButtons();
 }}
 
 function clearSearch() {{
@@ -1620,6 +1639,7 @@ function clearSearch() {{
   if (tableContainer) tableContainer.style.display = 'none';
   applyColorFormatting();
   updateDashboardStats();
+  hideSecondaryButtons();
 }}
 
 function setDatePickerRanges() {{
@@ -1735,6 +1755,7 @@ function filterByDateRange() {{
 
   applyColorFormatting();
   updateDashboardStats();
+  hideSecondaryButtons();
 }}
 
 function arrangeRank() {{
@@ -1794,6 +1815,7 @@ function arrangeRank() {{
   if (scrollDown) scrollDown.style.display = 'flex';
 
   applyColorFormatting();
+  hideSecondaryButtons();
 }}
 
 function filterIntradayPicks() {{
@@ -1848,6 +1870,7 @@ function filterIntradayPicks() {{
   if (scrollDown) scrollDown.style.display = 'flex';
 
   applyColorFormatting();
+  hideSecondaryButtons();
 }}
 
 function downloadExcel() {{
