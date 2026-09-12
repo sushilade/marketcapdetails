@@ -863,6 +863,9 @@ html_content = f"""<!DOCTYPE html>
       <button class="sidebar-link" onclick="openTabFromMenu(event, 'historyRank')">
         <i class="fas fa-history"></i> History Rank
       </button>
+      <button class="sidebar-link" onclick="showMarketcapCandle()">
+        <i class="fas fa-chart-candle"></i> MARKETCAP CANDLE
+      </button>
       <button class="sidebar-link" onclick="toggleIndicatorMenu(event)" id="indicatorBtn">
         <i class="fas fa-lightbulb"></i> Indicator
         <i class="fas fa-chevron-down" id="indicatorArrow" style="margin-left: auto; font-size: 12px; transition: transform 0.3s;"></i>
@@ -1680,6 +1683,56 @@ function scrollTable(direction) {{
   if (!area) return;
   const rowHeight = 45;
   area.scrollBy({{ top: direction * rowHeight, behavior: 'smooth' }});
+}}
+
+function showMarketcapCandle() {{
+  // Switch to dataView tab
+  const tabcontent = document.getElementsByClassName("tabcontent");
+  for (let i = 0; i < tabcontent.length; i++) {{
+    tabcontent[i].style.display = "none";
+  }}
+  document.getElementById('dataView').style.display = "block";
+  updateSidebarActive('dataView');
+  toggleMenu(false);
+
+  const table = document.getElementById('marketTable');
+  if (!table) return;
+  const headers = Array.from(table.querySelectorAll('th'));
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  const lcHeaders = headers.map(h => h.textContent.trim().toLowerCase());
+
+  // Find stock name column (first column) and market cap columns (date-wise)
+  const stockColIdx = 0;
+  const marketCapCols = [];
+  lcHeaders.forEach((h, i) => {{
+    if (i > 0 && h.includes('market')) marketCapCols.push(i);
+  }});
+
+  // Show only stock name + market cap columns
+  headers.forEach((h, idx) => {{
+    h.style.display = (idx === stockColIdx || marketCapCols.includes(idx)) ? '' : 'none';
+  }});
+  rows.forEach(row => {{
+    const cells = row.querySelectorAll('td');
+    cells.forEach((cell, idx) => {{
+      cell.style.display = (idx === stockColIdx || marketCapCols.includes(idx)) ? '' : 'none';
+    }});
+  }});
+
+  // Limit to max 10 rows, show scroll buttons for the rest
+  const scrollArea = document.getElementById('tableScrollArea');
+  if (scrollArea) {{
+    scrollArea.style.maxHeight = '450px';
+    scrollArea.style.overflowY = 'auto';
+  }}
+
+  // Show scroll up/down buttons
+  const scrollUp = document.querySelector('.scroll-up');
+  const scrollDown = document.querySelector('.scroll-down');
+  if (scrollUp) scrollUp.style.display = 'flex';
+  if (scrollDown) scrollDown.style.display = 'flex';
+
+  applyColorFormatting();
 }}
 
 function openTradingView() {{
