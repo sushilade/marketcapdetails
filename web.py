@@ -1199,7 +1199,6 @@ html_content = f"""<!DOCTYPE html>
 <script>
 // ---- TAB SWITCHING ----
 function openTab(evt, tabName) {{
-  if (tabName === 'stockAnalysis') lastStockSource = 'menu';
   restoreMarketcapCandleTableDisplayState();
   const tabcontent = document.getElementsByClassName("tabcontent");
   for (let i = 0; i < tabcontent.length; i++) {{
@@ -1238,12 +1237,9 @@ function openTab(evt, tabName) {{
     const tableContainer = document.getElementById('marketTableContainer');
     if (tableContainer) tableContainer.style.display = 'none';
   }}
-  const backBtn = document.getElementById('stockAnalysisBackBtn');
-  if (backBtn) backBtn.style.display = 'none';
 }}
 
 function openTabFromMenu(evt, tabName) {{
-  if (tabName === 'stockAnalysis') lastStockSource = 'menu';
   const tabcontent = document.getElementsByClassName("tabcontent");
   for (let i = 0; i < tabcontent.length; i++) {{
     tabcontent[i].style.display = "none";
@@ -1281,8 +1277,6 @@ function openTabFromMenu(evt, tabName) {{
     const tableContainer = document.getElementById('marketTableContainer');
     if (tableContainer) tableContainer.style.display = 'none';
   }}
-  const backBtn = document.getElementById('stockAnalysisBackBtn');
-  if (backBtn) backBtn.style.display = 'none';
 }}
 
 function updateSidebarActive(tabName) {{
@@ -3016,7 +3010,7 @@ function showStockDetails(stockName, sourceTab) {{
   }}
   document.getElementById('stockAnalysis').style.display = "block";
   const backBtn = document.getElementById('stockAnalysisBackBtn');
-  if (backBtn) backBtn.style.display = lastStockSource === 'marketcapCandle' ? 'inline-flex' : 'none';
+  if (backBtn) backBtn.style.display = 'inline-flex';
   updateSidebarActive('stockAnalysis');
   toggleMenu(false);
   const dashboardStats = document.querySelector('.dashboard-stats');
