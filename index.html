@@ -933,7 +933,7 @@
         </div>
       </div>
 
-      <div class="table-container">
+      <div class="table-container" id="marketTableContainer">
         <div class="table-scroll-area" id="tableScrollArea">
         <table class="dataframe dataframe" id="marketTable">
   <thead>
@@ -407062,6 +407062,9 @@ function openTab(evt, tabName) {
     }
     const candleContainer = document.getElementById('marketcapCandleChartContainer');
     if (candleContainer) candleContainer.style.display = 'none';
+    // Show the market cap table
+    const tableContainer = document.getElementById('marketTableContainer');
+    if (tableContainer) tableContainer.style.display = '';
   }
 }
 
@@ -407102,6 +407105,9 @@ function openTabFromMenu(evt, tabName) {
     }
     const candleContainer = document.getElementById('marketcapCandleChartContainer');
     if (candleContainer) candleContainer.style.display = 'none';
+    // Show the market cap table
+    const tableContainer = document.getElementById('marketTableContainer');
+    if (tableContainer) tableContainer.style.display = '';
   }
 }
 
@@ -407660,6 +407666,10 @@ function showMarketcapCandle() {
   // Show candlestick chart container
   const candleContainer = document.getElementById('marketcapCandleChartContainer');
   if (candleContainer) candleContainer.style.display = 'block';
+
+  // Hide the market cap table
+  const tableContainer = document.getElementById('marketTableContainer');
+  if (tableContainer) tableContainer.style.display = 'none';
 
   // Populate stock dropdown
   populateMarketcapCandleDropdown();
