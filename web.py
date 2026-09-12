@@ -1038,7 +1038,7 @@ html_content = f"""<!DOCTYPE html>
     <!-- Stock Analysis Tab -->
     <div id="stockAnalysis" class="tabcontent">
       <h3><i class="fas fa-chart-line"></i> Individual Stock Analysis</h3>
-      <button onclick="openCandleChartFromAnalysis()" style="margin-bottom: 18px; padding: 10px 20px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35); transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
+      <button id="stockAnalysisBackBtn" onclick="openCandleChartFromAnalysis()" style="margin-bottom: 18px; padding: 10px 20px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35); transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
         <i class="fas fa-arrow-left"></i> Back
       </button>
       
@@ -1199,6 +1199,7 @@ html_content = f"""<!DOCTYPE html>
 <script>
 // ---- TAB SWITCHING ----
 function openTab(evt, tabName) {{
+  if (tabName === 'stockAnalysis') lastStockSource = 'menu';
   restoreMarketcapCandleTableDisplayState();
   const tabcontent = document.getElementsByClassName("tabcontent");
   for (let i = 0; i < tabcontent.length; i++) {{
@@ -1240,6 +1241,7 @@ function openTab(evt, tabName) {{
 }}
 
 function openTabFromMenu(evt, tabName) {{
+  if (tabName === 'stockAnalysis') lastStockSource = 'menu';
   const tabcontent = document.getElementsByClassName("tabcontent");
   for (let i = 0; i < tabcontent.length; i++) {{
     tabcontent[i].style.display = "none";
@@ -3009,6 +3011,8 @@ function showStockDetails(stockName, sourceTab) {{
     tablinks[i].classList.remove("active");
   }}
   document.getElementById('stockAnalysis').style.display = "block";
+  const backBtn = document.getElementById('stockAnalysisBackBtn');
+  if (backBtn) backBtn.style.display = lastStockSource === 'marketcapCandle' ? 'inline-flex' : 'none';
   updateSidebarActive('stockAnalysis');
   toggleMenu(false);
   const dashboardStats = document.querySelector('.dashboard-stats');
