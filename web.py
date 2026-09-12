@@ -996,7 +996,7 @@ html_content = f"""<!DOCTYPE html>
         </div>
         <div id="marketcapCandleTooltip" class="rank-tooltip" style="display: none;"></div>
         <div style="position: relative; height: 480px;">
-          <div id="marketcapCandleChart"></div>
+          <div id="marketcapCandleChart" style="width: 100%; height: 100%;"></div>
         </div>
       </div>
     </div>
@@ -1856,7 +1856,9 @@ function getMarketcapCandleData(stockName) {{
       if (cell) {{
         const val = parseFloat(cell.textContent.trim().replace(/,/g, ''));
         if (!isNaN(val)) {{
-          result.push({{ date: col.date, value: val }});
+          // Clean date string: "2025-06-18 Market Cap" -> "2025-06-18"
+          const cleanDate = (col.date || '').split(' ')[0];
+          result.push({{ date: cleanDate, value: val }});
         }}
       }}
     }});
@@ -1872,7 +1874,10 @@ function groupByWeek(data) {{
 
   let currentWeek = [];
   data.forEach((d, i) => {{
-    const date = new Date(d.date);
+    // Extract just the date part (e.g. "2025-06-18 Market Cap" -> "2025-06-18")
+    const dateStr = (d.date || '').split(' ')[0];
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return;
     const day = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
     const isWeekend = (day === 0 || day === 6);
 
@@ -1920,8 +1925,10 @@ function drawMarketcapCandle() {{
       if (d.value > high) high = d.value;
       if (d.value < low) low = d.value;
     }});
+    // Use Monday date string as time
+    const mondayDate = week[0].date;
     candles.push({{
-      time: week[0].date,
+      time: mondayDate,
       open: open,
       high: high,
       low: low,
@@ -1929,16 +1936,26 @@ function drawMarketcapCandle() {{
     }});
   }});
 
+  if (candles.length === 0) {{
+    const chartDiv = document.getElementById('marketcapCandleChart');
+    if (chartDiv) chartDiv.innerHTML = '<p style="padding:20px;color:#64748b;">No market cap data available for this stock.</p>';
+    return;
+  }}
+
   // Render with lightweight-charts
   const chartDiv = document.getElementById('marketcapCandleChart');
   if (!chartDiv) return;
   chartDiv.innerHTML = '';
 
+  const containerRect = chartDiv.parentElement.getBoundingClientRect();
+  const width = containerRect.width > 0 ? containerRect.width : 800;
+  const height = 480;
+
   const chart = LightweightCharts.createChart(chartDiv, {{
-    width: chartDiv.clientWidth,
-    height: 480,
+    width: width,
+    height: height,
     layout: {{
-      textColor: '#d1d5dc',
+      textColor: '#334155',
       background: {{ color: '#ffffff' }},
     }},
     grid: {{
@@ -1950,6 +1967,18 @@ function drawMarketcapCandle() {{
     }},
     tooltip: {{
       enabled: true,
+    }},
+    priceScale: {{
+      borderVisible: false,
+    }},
+    timeScale: {{
+      borderVisible: false,
+      timeVisible: true,
+      tickMarkFormatter: (time) => {{
+        // Show as YYYY-MM-DD (Monday date)
+        const d = new Date(time);
+        return d.toISOString().slice(0, 10);
+      }},
     }},
   }});
 
@@ -1987,17 +2016,15 @@ function drawMarketcapCandle() {{
     const color = isUp ? '#10b981' : '#ef4444';
     if (tooltip) {{
       tooltip.style.display = 'block';
-      tooltip.innerHTML = `
-        <b style="color: " + color + ";">Date: " + dateStr + "</b><br/>
-        Open: " + open.toLocaleString() + "<br/>
-        High: " + high.toLocaleString() + "<br/>
-        Low: " + low.toLocaleString() + "<br/>
-        Close: " + close.toLocaleString()
-      `;
-      // Position tooltip
-      const rect = chartDiv.getBoundingClientRect();
+      tooltip.innerHTML =
+        '<b style="color: ' + color + ';">Date: ' + dateStr + '</b><br/>' +
+        'Open: ' + open.toLocaleString() + '<br/>' +
+        'High: ' + high.toLocaleString() + '<br/>' +
+        'Low: ' + low.toLocaleString() + '<br/>' +
+        'Close: ' + close.toLocaleString();
       const px = param.point.x;
       const py = param.point.y;
+      const containerPos = chartDiv.parentElement.getBoundingClientRect();
       tooltip.style.left = (px + 15) + 'px';
       tooltip.style.top = (py + 15) + 'px';
     }}
@@ -2005,9 +2032,10 @@ function drawMarketcapCandle() {{
 
   // Resize handler
   const resizeObserver = new ResizeObserver(() => {{
-    chart.resize(chartDiv.clientWidth, 480);
+    const r = chartDiv.parentElement.getBoundingClientRect();
+    chart.resize(r.width > 0 ? r.width : 800, 480);
   }});
-  resizeObserver.observe(chartDiv);
+  resizeObserver.observe(chartDiv.parentElement);
 }}
 
 function openTradingView() {{
