@@ -935,9 +935,6 @@ html_content = f"""<!DOCTYPE html>
 
     <!-- Data View Tab -->
     <div id="dataView" class="tabcontent">
-      <button class="download-btn" onclick="downloadExcel()">
-        <i class="fas fa-download"></i> Download Market Cap Data
-      </button>
 
       <div class="controls">
         <h3><i class="fas fa-sliders-h"></i> Details of Stocks</h3>
@@ -1213,8 +1210,6 @@ function openTab(evt, tabName) {{
 
   // Restore hidden controls when entering dataView normally
   if (tabName === 'dataView') {{
-    const downloadBtn = document.querySelector('.download-btn');
-    if (downloadBtn) downloadBtn.style.display = '';
     const controls = document.querySelector('.controls');
     if (controls) controls.style.display = '';
     const searchContainer = document.querySelector('.search-container');
@@ -1255,8 +1250,6 @@ function openTabFromMenu(evt, tabName) {{
 
   // Restore hidden controls when entering dataView normally
   if (tabName === 'dataView') {{
-    const downloadBtn = document.querySelector('.download-btn');
-    if (downloadBtn) downloadBtn.style.display = '';
     const controls = document.querySelector('.controls');
     if (controls) controls.style.display = '';
     const searchContainer = document.querySelector('.search-container');
