@@ -407245,6 +407245,24 @@ function showAll() {
   parent.appendChild(clone);
   applyColorFormatting();
   updateDashboardStats();
+
+  // Show only first, last, 2nd last, and 3rd last columns
+  const table = document.getElementById('marketTable');
+  const headers = Array.from(table.querySelectorAll('th'));
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  const firstCol = 0;
+  const lastCol = headers.length - 1;
+  const secondLastCol = headers.length - 2;
+  const thirdLastCol = headers.length - 3;
+  headers.forEach((h, idx) => {
+    h.style.display = (idx === firstCol || idx === lastCol || idx === secondLastCol || idx === thirdLastCol) ? '' : 'none';
+  });
+  rows.forEach(row => {
+    const cells = Array.from(row.querySelectorAll('td'));
+    cells.forEach((cell, idx) => {
+      cell.style.display = (idx === firstCol || idx === lastCol || idx === secondLastCol || idx === thirdLastCol) ? '' : 'none';
+    });
+  });
 }
 
 function applyFilters() {
