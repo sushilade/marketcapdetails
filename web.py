@@ -987,9 +987,15 @@ html_content = f"""<!DOCTYPE html>
 
       <div class="chart-container" id="marketcapCandleChartContainer" style="margin-top: 24px; display: none;">
         <h4 style="margin-bottom: 16px; color: var(--secondary); font-family: 'Montserrat', sans-serif;"><i class="fas fa-chart-candle"></i> Market Cap Candlestick</h4>
-        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
           <label for="marketcapCandleStockSelect" style="font-weight: 700; color: var(--primary); font-size: 0.95rem;">Select Stock:</label>
-          <select id="marketcapCandleStockSelect" onchange="drawMarketcapCandle()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 220px;"></select>
+          <select id="marketcapCandleStockSelect" onchange="drawMarketcapCandle(); updateMarketcapCandleActionButtons()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 220px;"></select>
+          <button id="marketcapViewTradingViewBtn" onclick="openTradingViewFromCandle()" style="padding: 12px 20px; background: linear-gradient(135deg, #2962FF 0%, #1E53E5 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(41, 98, 255, 0.3); transition: all 0.3s;">
+            <i class="fas fa-external-link-alt"></i> VIEW ON TRADINGVIEW
+          </button>
+          <button id="marketcapMoreInfoBtn" onclick="openCandleStockAnalysis()" style="padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35); transition: all 0.3s;">
+            <i class="fas fa-info-circle"></i> MORE INFORMATION
+          </button>
         </div>
         <div id="marketcapCandleTooltip" class="rank-tooltip" style="display: none;"></div>
         <div style="position: relative; height: 480px;">
@@ -1030,7 +1036,7 @@ html_content = f"""<!DOCTYPE html>
     <!-- Stock Analysis Tab -->
     <div id="stockAnalysis" class="tabcontent">
       <h3><i class="fas fa-chart-line"></i> Individual Stock Analysis</h3>
-      <button onclick="openTab(null, lastStockSource || 'historyRank')" style="margin-bottom: 18px; padding: 10px 20px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35); transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
+      <button onclick="openCandleChartFromAnalysis()" style="margin-bottom: 18px; padding: 10px 20px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35); transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
         <i class="fas fa-arrow-left"></i> Back
       </button>
       
@@ -1191,6 +1197,7 @@ html_content = f"""<!DOCTYPE html>
 <script>
 // ---- TAB SWITCHING ----
 function openTab(evt, tabName) {{
+  restoreMarketcapCandleTableDisplayState();
   const tabcontent = document.getElementsByClassName("tabcontent");
   for (let i = 0; i < tabcontent.length; i++) {{
     tabcontent[i].style.display = "none";
@@ -1784,7 +1791,39 @@ function scrollTable(direction) {{
   area.scrollBy({{ top: direction * rowHeight, behavior: 'smooth' }});
 }}
 
-function showMarketcapCandle() {{
+let marketcapCandleReturnStock = '';
+let marketcapCandleTableDisplayState = null;
+
+function saveMarketcapCandleTableDisplayState() {{
+  if (marketcapCandleTableDisplayState) return;
+  const table = document.getElementById('marketTable');
+  if (!table) return;
+  marketcapCandleTableDisplayState = {{
+    headers: Array.from(table.querySelectorAll('th')).map(header => header.style.display),
+    rows: Array.from(table.querySelectorAll('tbody tr')).map(row =>
+      Array.from(row.querySelectorAll('td')).map(cell => cell.style.display)
+    )
+  }};
+}}
+
+function restoreMarketcapCandleTableDisplayState() {{
+  if (!marketcapCandleTableDisplayState) return;
+  const state = marketcapCandleTableDisplayState;
+  const table = document.getElementById('marketTable');
+  if (table) {{
+    Array.from(table.querySelectorAll('th')).forEach((header, index) => {{
+      header.style.display = state.headers[index] || '';
+    }});
+    Array.from(table.querySelectorAll('tbody tr')).forEach((row, rowIndex) => {{
+      Array.from(row.querySelectorAll('td')).forEach((cell, cellIndex) => {{
+        cell.style.display = (state.rows[rowIndex] || [])[cellIndex] || '';
+      }});
+    }});
+  }}
+  marketcapCandleTableDisplayState = null;
+}}
+
+function showMarketcapCandle(stockName) {{
   // Switch to dataView tab
   const tabcontent = document.getElementsByClassName("tabcontent");
   for (let i = 0; i < tabcontent.length; i++) {{
@@ -1797,9 +1836,7 @@ function showMarketcapCandle() {{
   const dashboardStats = document.querySelector('.dashboard-stats');
   if (dashboardStats) dashboardStats.style.display = 'none';
 
-  // Hide download button, controls, and search container
-  const downloadBtn = document.querySelector('.download-btn');
-  if (downloadBtn) downloadBtn.style.display = 'none';
+  // Hide controls and search container
   const controls = document.querySelector('.controls');
   if (controls) controls.style.display = 'none';
   const searchContainer = document.querySelector('.search-container');
@@ -1807,6 +1844,8 @@ function showMarketcapCandle() {{
 
   const table = document.getElementById('marketTable');
   if (!table) return;
+  restoreMarketcapCandleTableDisplayState();
+  saveMarketcapCandleTableDisplayState();
   const headers = Array.from(table.querySelectorAll('th'));
   const rows = Array.from(table.querySelectorAll('tbody tr'));
   const lcHeaders = headers.map(h => h.textContent.trim().toLowerCase());
@@ -1853,18 +1892,19 @@ function showMarketcapCandle() {{
   if (tableContainer) tableContainer.style.display = 'none';
 
   // Populate stock dropdown
-  populateMarketcapCandleDropdown();
+  populateMarketcapCandleDropdown(stockName);
 
   // Draw candlestick for first stock
   setTimeout(drawMarketcapCandle, 200);
 }}
 
-function populateMarketcapCandleDropdown() {{
+function populateMarketcapCandleDropdown(selectedStock) {{
   const table = document.getElementById('marketTable');
   if (!table) return;
   const rows = Array.from(table.querySelectorAll('tbody tr'));
   const select = document.getElementById('marketcapCandleStockSelect');
   if (!select) return;
+  const currentStock = selectedStock || select.value;
   select.innerHTML = '';
   rows.forEach(row => {{
     const nameCell = row.cells[0];
@@ -1875,6 +1915,60 @@ function populateMarketcapCandleDropdown() {{
       select.appendChild(opt);
     }}
   }});
+  if (currentStock && Array.from(select.options).some(option => option.value === currentStock)) {{
+    select.value = currentStock;
+  }}
+  updateMarketcapCandleActionButtons();
+}}
+
+function updateMarketcapCandleActionButtons() {{
+  const select = document.getElementById('marketcapCandleStockSelect');
+  const viewButton = document.getElementById('marketcapViewTradingViewBtn');
+  const moreButton = document.getElementById('marketcapMoreInfoBtn');
+  const hasStock = select && select.value;
+
+  if (viewButton) viewButton.style.display = hasStock ? 'inline-flex' : 'none';
+  if (moreButton) moreButton.style.display = 'none';
+}}
+
+function hideMarketcapMoreInfo() {{
+  const moreButton = document.getElementById('marketcapMoreInfoBtn');
+  if (moreButton) moreButton.style.display = 'none';
+}}
+
+function openTradingViewFromCandle() {{
+  const select = document.getElementById('marketcapCandleStockSelect');
+  const stock = select ? select.value : '';
+  if (!stock) {{
+    alert('Please select a stock first.');
+    return;
+  }}
+
+  const tradingViewUrl = 'https://www.tradingview.com/chart/?symbol=NSE:' + encodeURIComponent(stock);
+  window.open(tradingViewUrl, '_blank');
+
+  const moreButton = document.getElementById('marketcapMoreInfoBtn');
+  if (moreButton) moreButton.style.display = 'inline-flex';
+}}
+
+function openCandleStockAnalysis() {{
+  const select = document.getElementById('marketcapCandleStockSelect');
+  const stock = select ? select.value : '';
+  if (!stock) {{
+    alert('Please select a stock first.');
+    return;
+  }}
+
+  marketcapCandleReturnStock = stock;
+  showStockDetails(stock, 'marketcapCandle');
+}}
+
+function openCandleChartFromAnalysis() {{
+  if (lastStockSource === 'marketcapCandle') {{
+    showMarketcapCandle(marketcapCandleReturnStock || (document.getElementById('stockSelect') || {{}}).value);
+  }} else {{
+    openTab(null, lastStockSource || 'historyRank');
+  }}
 }}
 
 function getMarketcapCandleData(stockName) {{
