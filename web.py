@@ -1748,6 +1748,33 @@ function arrangeRank() {{
   }});
   while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
   rows.forEach(r => tbody.appendChild(r));
+
+  // Show only first column (Stock) and last column (latest Rank)
+  const firstCol = 0;
+  const lastCol = headers.length - 1;
+  headers.forEach((h, idx) => {{
+    h.style.display = (idx === firstCol || idx === lastCol) ? '' : 'none';
+  }});
+  rows.forEach(row => {{
+    const cells = Array.from(row.querySelectorAll('td'));
+    cells.forEach((cell, idx) => {{
+      cell.style.display = (idx === firstCol || idx === lastCol) ? '' : 'none';
+    }});
+  }});
+
+  // Show table container
+  const tableContainer = document.getElementById('marketTableContainer');
+  if (tableContainer) tableContainer.style.display = 'block';
+  const scrollArea = document.getElementById('tableScrollArea');
+  if (scrollArea) {{
+    scrollArea.style.maxHeight = '450px';
+    scrollArea.style.overflowY = 'auto';
+  }}
+  const scrollUp = document.querySelector('.scroll-up');
+  const scrollDown = document.querySelector('.scroll-down');
+  if (scrollUp) scrollUp.style.display = 'flex';
+  if (scrollDown) scrollDown.style.display = 'flex';
+
   applyColorFormatting();
 }}
 
