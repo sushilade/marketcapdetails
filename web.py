@@ -1038,9 +1038,12 @@ html_content = f"""<!DOCTYPE html>
     <!-- Stock Analysis Tab -->
     <div id="stockAnalysis" class="tabcontent">
       <h3><i class="fas fa-chart-line"></i> Individual Stock Analysis</h3>
-      <button id="stockAnalysisBackBtn" onclick="openCandleChartFromAnalysis()" style="margin-bottom: 18px; padding: 10px 20px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35); transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
-        <i class="fas fa-arrow-left"></i> Back
-      </button>
+       <button id="stockAnalysisBackBtn" onclick="openCandleChartFromAnalysis()" style="margin-bottom: 18px; padding: 10px 20px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35); transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
+         <i class="fas fa-arrow-left"></i> Back
+       </button>
+       <button id="marketcapGraphBtn" onclick="openMarketcapGraph()" style="margin-bottom: 18px; margin-left: 12px; padding: 10px 20px; border: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35); transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
+         <i class="fas fa-chart-candle"></i> Marketcap Graph
+       </button>
       
       <div class="controls" style="margin-bottom: 20px; padding: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);">
         <label for="stockSelect" style="font-weight: 700; color: var(--primary); margin-right: 12px; font-size: 0.95rem;">Select Stock:</label>
@@ -2063,9 +2066,22 @@ function openCandleStockAnalysis() {{
 function openCandleChartFromAnalysis() {{
   if (lastStockSource === 'marketcapCandle') {{
     showMarketcapCandle(marketcapCandleReturnStock || (document.getElementById('stockSelect') || {{}}).value);
+  }} else if (lastStockSource === 'stockAnalysis') {{
+    showMarketcapCandle((document.getElementById('stockSelect') || {{}}).value);
   }} else {{
     openTab(null, lastStockSource || 'historyRank');
   }}
+}}
+
+function openMarketcapGraph() {{
+  const select = document.getElementById('stockSelect');
+  const stockName = select ? select.value : '';
+  if (!stockName) {{
+    alert('Please select a stock first.');
+    return;
+  }}
+  lastStockSource = 'stockAnalysis';
+  showMarketcapCandle(stockName);
 }}
 
 function getMarketcapCandleData(stockName) {{
