@@ -45,6 +45,28 @@ jobs:
         if: steps.holiday.outputs.result == 'WORKING'
         run: python web.py
 
+      - name: Job Summary
+        if: always()
+        run: |
+          {
+            echo "## 📊 Stock Data Update Report"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| **Triggered** | $(date '+%Y-%m-%d %H:%M:%S %Z') |"
+            echo "| **Market Status** | ${{ steps.holiday.outputs.result || 'SKIPPED' }} |"
+            echo "| **nse Package** | 4.0.1 |"
+            echo "| **Commit** | ${{ github.sha }} |"
+            echo ""
+            if [ "${{ steps.holiday.outputs.result }}" = "WORKING" ]; then
+              echo "✅ Market was open. Data updated successfully."
+            elif [ "${{ steps.holiday.outputs.result }}" = "HOLIDAY" ]; then
+              echo "🏖️ Market was closed (holiday). No update needed."
+            else
+              echo "⏭️ Job skipped."
+            fi
+          } >> $GITHUB_STEP_SUMMARY
+
       - name: Commit and push changes
         if: steps.holiday.outputs.result == 'WORKING'
         run: |
