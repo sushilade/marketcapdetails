@@ -1290,7 +1290,8 @@ function updateSidebarActive(tabName) {{
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
   sidebarLinks.forEach(link => {{
     link.classList.remove('active');
-    if (link.getAttribute('onclick').includes("'" + tabName + "'")) {{
+    const onclickAttr = link.getAttribute('onclick');
+    if (onclickAttr && onclickAttr.includes("'" + tabName + "'")) {{
       link.classList.add('active');
     }}
   }});
@@ -4026,7 +4027,7 @@ function showHistoryRank() {{
   // Sort rank columns by date
   rankColumns.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // Pre-compute top 10 improvers for each date transition
+// Pre-compute top 10 improvers for each date transition
   const dailyTop10Map = {{}};
   const dailyTop10Stocks = {{}};
   for (let i = 1; i < rankColumns.length; i++) {{
@@ -4040,7 +4041,7 @@ function showHistoryRank() {{
       const prevRank = parseInt(prevRankText, 10);
       const currRank = parseInt(currRankText, 10);
 
-if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0 && prevRank < 500) {{
+      if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0 && prevRank < 500) {{
         const improvement = prevRank - currRank;
         if (improvement > 0) {{
           const pctImprovement = (improvement / prevRank) * 100;
@@ -4053,9 +4054,10 @@ if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0 && prev
           }});
         }}
       }}
+    }});
 
-      stockData.sort((a, b) => b.pctImprovement - a.pctImprovement);
-      const top10 = stockData.slice(0, 10);
+    stockData.sort((a, b) => b.pctImprovement - a.pctImprovement);
+    const top10 = stockData.slice(0, 10);
     dailyTop10Map[currCol.date] = top10;
     top10.forEach(s => {{
       if (!dailyTop10Stocks[s.name]) dailyTop10Stocks[s.name] = [];
