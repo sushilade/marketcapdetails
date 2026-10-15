@@ -997,8 +997,7 @@ html_content = f"""<!DOCTYPE html>
         </div>
         <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
           <label for="marketcapCandleStockSelect" style="font-weight: 700; color: var(--primary); font-size: 0.95rem;">Select Stock:</label>
-          <input type="text" id="marketcapCandleStockSelect" list="marketcapCandleStockOptions" onchange="drawMarketcapCandle(); updateMarketcapCandleActionButtons()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 220px;">
-          <datalist id="marketcapCandleStockOptions"></datalist>
+          <select id="marketcapCandleStockSelect" onchange="drawMarketcapCandle(); updateMarketcapCandleActionButtons()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 220px;"></select>
         </div>
         <div id="marketcapCandleTooltip" class="rank-tooltip" style="display: none;"></div>
         <div style="position: relative; height: 480px;">
@@ -1046,10 +1045,9 @@ html_content = f"""<!DOCTYPE html>
          <i class="fas fa-chart-candle"></i> Marketcap Graph
        </button>
       
-<div class="controls" style="margin-bottom: 20px; padding: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);">
-         <label for="stockSelect" style="font-weight: 700; color: var(--primary); margin-right: 12px; font-size: 0.95rem;">Select Stock:</label>
-         <input type="text" id="stockSelect" list="stockSelectOptions" onchange="const d=getStockAnalysisDuration();updateChart(d?d.start:'',d?d.end:'');" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s; min-width: 200px;">
-         <datalist id="stockSelectOptions"></datalist>
+      <div class="controls" style="margin-bottom: 20px; padding: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);">
+        <label for="stockSelect" style="font-weight: 700; color: var(--primary); margin-right: 12px; font-size: 0.95rem;">Select Stock:</label>
+        <select id="stockSelect" onchange="const d=getStockAnalysisDuration();updateChart(d?d.start:'',d?d.end:'');" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s; min-width: 200px;"></select>
         <button onclick="openTradingView()" style="margin-left: 15px; padding: 12px 20px; background: linear-gradient(135deg, #2962FF 0%, #1E53E5 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(41, 98, 255, 0.3); transition: all 0.3s;">
           <i class="fas fa-chart-line"></i> View on TradingView
         </button>
@@ -1114,7 +1112,7 @@ html_content = f"""<!DOCTYPE html>
         <div style="padding: 20px;">
           <div id="topPerformersRegularControl">
             <div class="info-panel" id="topPerformersList">
-              <p>Click "Show Top Performers" to display the list of top 10 stocks by delivery percentage (rank less than 500, names only).</p>
+              <p>Click "Show Top Performers" to display the list of top 10 stocks by delivery percentage.</p>
             </div>
 
             <button onclick="showTopPerformers()" id="showTopPerformersBtn" style="margin-top: 15px;">
@@ -1134,8 +1132,8 @@ html_content = f"""<!DOCTYPE html>
         </div>
       </div>
 
-<div class="chart-container" id="topPerformersChartContainer" style="margin-top: 24px; display: none;">
-        <h4 style="margin-bottom: 16px; color: var(--secondary); font-family: 'Montserrat', sans-serif;">🏆 Top 10 by Delivery Qty > 70, Dates Count (Rank < 500)</h4>
+      <div class="chart-container" id="topPerformersChartContainer" style="margin-top: 24px; display: none;">
+        <h4 style="margin-bottom: 16px; color: var(--secondary); font-family: 'Montserrat', sans-serif;">🏆 Top 10 by Delivery Qty &gt; 70, Dates Count</h4>
         <div style="position: relative; height: 350px;">
           <canvas id="topPerformersChart"></canvas>
         </div>
@@ -1147,7 +1145,7 @@ html_content = f"""<!DOCTYPE html>
       <h3><i class="fas fa-arrow-up"></i> Top 10 Rank Improvers</h3>
 
       <div class="info-panel" id="rankChangesList">
-        <p>Click "Show Rank Changes" to display stocks with the biggest rank improvements (yesterday vs today), only stocks with Yesterday Rank less than 500.</p>
+        <p>Click "Show Rank Changes" to display stocks with the biggest rank improvements (yesterday vs today).</p>
       </div>
 
       <button onclick="showRankChanges()" id="showRankChangesBtn">
@@ -1191,7 +1189,7 @@ html_content = f"""<!DOCTYPE html>
       </div>
 
       <div class="info-panel" id="historyRankList">
-        <p>Click "Show History Rank" to display top 10 rank improvers for each date transition, only stocks with Yesterday Rank less than 500.</p>
+        <p>Click "Show History Rank" to display top 10 rank improvers for each date transition.</p>
       </div>
 
       <button onclick="showHistoryRank()" id="showHistoryRankBtn" style="padding: 14px 28px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px;">
@@ -1290,8 +1288,7 @@ function updateSidebarActive(tabName) {{
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
   sidebarLinks.forEach(link => {{
     link.classList.remove('active');
-    const onclickAttr = link.getAttribute('onclick');
-    if (onclickAttr && onclickAttr.includes("'" + tabName + "'")) {{
+    if (link.getAttribute('onclick').includes("'" + tabName + "'")) {{
       link.classList.add('active');
     }}
   }});
@@ -1361,7 +1358,7 @@ function updateDashboardStats() {{
     }}
   }}
   
-  // Find top performer (highest delivery %) - only rank < 500
+  // Find top performer (highest delivery %)
   let deliveryColIndex = -1;
   for (let i = headers.length - 1; i >= 1; i--) {{
     const headerText = headers[i].textContent.trim().toLowerCase();
@@ -1370,31 +1367,12 @@ function updateDashboardStats() {{
       break;
     }}
   }}
-
-  // Find the latest rank column for filtering
-  let rankColIndex = -1;
-  for (let i = headers.length - 1; i >= 1; i--) {{
-    const headerText = headers[i].textContent.trim().toLowerCase();
-    if (headerText.includes('rank')) {{
-      rankColIndex = i;
-      break;
-    }}
-  }}
-
+  
   if (deliveryColIndex !== -1) {{
     let topPerformer = '';
     let topValue = 0;
-
+    
     rows.forEach(row => {{
-      // Filter: only consider stocks with rank < 500
-      if (rankColIndex !== -1) {{
-        const rankCell = row.cells[rankColIndex];
-        if (rankCell) {{
-          const rankText = rankCell.textContent.trim().replace(/,/g, '') || '';
-          const rank = parseInt(rankText);
-          if (isNaN(rank) || rank >= 500) return;
-        }}
-      }}
       const cell = row.cells[deliveryColIndex];
       if (cell) {{
         const value = parseFloat(cell.textContent.trim().replace(/,/g, '').replace('%', ''));
@@ -1404,7 +1382,7 @@ function updateDashboardStats() {{
         }}
       }}
     }});
-
+    
     if (topPerformer) {{
       document.getElementById('topPerformer').textContent = topPerformer;
     }}
@@ -2024,21 +2002,21 @@ function populateMarketcapCandleDropdown(selectedStock) {{
   const table = document.getElementById('marketTable');
   if (!table) return;
   const rows = Array.from(table.querySelectorAll('tbody tr'));
-  const input = document.getElementById('marketcapCandleStockSelect');
-  const datalist = document.getElementById('marketcapCandleStockOptions');
-  if (!input || !datalist) return;
-  const currentStock = selectedStock || input.value;
-  datalist.innerHTML = '';
+  const select = document.getElementById('marketcapCandleStockSelect');
+  if (!select) return;
+  const currentStock = selectedStock || select.value;
+  select.innerHTML = '';
   rows.forEach(row => {{
     const nameCell = row.cells[0];
     if (nameCell) {{
       const opt = document.createElement('option');
       opt.value = nameCell.textContent.trim();
-      datalist.appendChild(opt);
+      opt.textContent = nameCell.textContent.trim();
+      select.appendChild(opt);
     }}
   }});
-  if (currentStock) {{
-    input.value = currentStock;
+  if (currentStock && Array.from(select.options).some(option => option.value === currentStock)) {{
+    select.value = currentStock;
   }}
   updateMarketcapCandleActionButtons();
 }}
@@ -3108,14 +3086,15 @@ let stockChart;
 function loadStockList() {{
   const table = document.getElementById('marketTable');
   const rows = Array.from(table.querySelectorAll('tbody tr'));
-  const datalist = document.getElementById('stockSelectOptions');
-  datalist.innerHTML = "";
+  const select = document.getElementById('stockSelect');
+  select.innerHTML = "";
   rows.forEach(row => {{
     const stock = row.cells[0].textContent.trim();
     if (stock) {{
       const option = document.createElement('option');
       option.value = stock;
-      datalist.appendChild(option);
+      option.textContent = stock;
+      select.appendChild(option);
     }}
   }});
 }}
@@ -3657,30 +3636,15 @@ function showTopPerformers() {{
     }}
   }}
 
-  // Find the latest rank column
-  let rankColIndex = -1;
-  for (let i = headers.length - 1; i >= 1; i--) {{
-    const headerText = headers[i].textContent.trim().toLowerCase();
-    if (headerText.includes('rank')) {{
-      rankColIndex = i;
-      break;
-    }}
-  }}
-
   if (deliveryColIndex === -1) {{
     alert('No delivery columns found!');
     return;
   }}
 
-  // Collect stock data with delivery values (only rank < 500)
+  // Collect stock data with delivery values
   const stockData = [];
   rows.forEach(row => {{
     const stockName = row.cells[0].textContent.trim();
-    if (rankColIndex !== -1) {{
-      const rankText = row.cells[rankColIndex]?.textContent.trim().replace(/,/g, '') || '';
-      const rank = parseInt(rankText);
-      if (isNaN(rank) || rank >= 500) return;
-    }}
     const deliveryText = row.cells[deliveryColIndex]?.textContent.trim().replace(/,/g, '').replace('%', '') || '';
     const delivery = parseFloat(deliveryText);
     if (!isNaN(delivery) && delivery > 0) {{
@@ -3692,9 +3656,9 @@ function showTopPerformers() {{
   stockData.sort((a, b) => b.delivery - a.delivery);
   const top10 = stockData.slice(0, 10);
 
-  // Display in info panel (names only)
+  // Display in info panel
   const infoPanel = document.getElementById('topPerformersList');
-  infoPanel.innerHTML = '<h4>Top 10 Stocks by Delivery Percentage (Rank &lt; 500)</h4>';
+  infoPanel.innerHTML = '<h4>Top 10 Stocks by Delivery Percentage</h4>';
   const list = document.createElement('ol');
   top10.forEach((stock, index) => {{
     const item = document.createElement('li');
@@ -3705,7 +3669,9 @@ function showTopPerformers() {{
     nameSpan.style.cursor = 'pointer';
     nameSpan.style.textDecoration = 'underline';
     nameSpan.onclick = function() {{ showStockDetails(stock.name, 'topPerformers'); }};
+    const deliveryText = document.createTextNode(' - ' + stock.delivery.toFixed(2) + '%');
     item.appendChild(nameSpan);
+    item.appendChild(deliveryText);
     list.appendChild(item);
   }});
   infoPanel.appendChild(list);
@@ -3729,51 +3695,9 @@ function showTopPerformersDuration(startDate, endDate) {{
     }}
   }});
 
-  // Find rank columns with dates to match selected date range
-  const rankColumns = [];
-  headers.forEach((header, index) => {{
-    if (index > 0 && header.textContent.trim().toLowerCase().includes('rank')) {{
-      const headerText = header.textContent.trim();
-      const dateMatch = headerText.match(/(\\d{{4}}-\\d{{2}}-\\d{{2}})/);
-      if (dateMatch) {{
-        rankColumns.push({{ index: index, date: dateMatch[1] }});
-      }}
-    }}
-  }});
-
   const stockDeliveryCounts = [];
   rows.forEach(row => {{
     const stockName = row.cells[0].textContent.trim();
-    
-    // Find rank column for the selected end date (or latest if no end date)
-    let rankColIndex = -1;
-    if (rankColumns.length > 0) {{
-      if (endDate) {{
-        // Find rank column on or before endDate
-        const candidates = rankColumns.filter(rc => rc.date <= endDate);
-        if (candidates.length > 0) {{
-          // Use the latest rank column on or before endDate
-          candidates.sort((a, b) => new Date(b.date) - new Date(a.date));
-          rankColIndex = candidates[0].index;
-        }} else {{
-          // No rank column before endDate, use earliest
-          rankColumns.sort((a, b) => new Date(a.date) - new Date(b.date));
-          rankColIndex = rankColumns[0].index;
-        }}
-      }} else {{
-        // No end date, use latest rank column
-        rankColumns.sort((a, b) => new Date(b.date) - new Date(a.date));
-        rankColIndex = rankColumns[0].index;
-      }}
-    }}
-
-    // Check rank < 500
-    if (rankColIndex !== -1) {{
-      const rankText = row.cells[rankColIndex]?.textContent.trim().replace(/,/g, '') || '';
-      const rank = parseInt(rankText);
-      if (isNaN(rank) || rank >= 500) return;
-    }}
-    
     let count = 0;
     allDeliveryIndices.forEach(colIndex => {{
       const colDate = deliveryDateMap[colIndex];
@@ -3851,8 +3775,8 @@ function showTopPerformersDuration(startDate, endDate) {{
           title: {{
             display: true,
             text: startDate && endDate
-              ? '🏆 Top 10 by Delivery Qty > 70, Dates Count (Rank < 500) (' + startDate + ' to ' + endDate + ')'
-              : '🏆 Top 10 by Delivery Qty > 70, Dates Count (Rank < 500)',
+              ? '🏆 Top 10 by Delivery Qty > 70, Dates Count (' + startDate + ' to ' + endDate + ')'
+              : '🏆 Top 10 by Delivery Qty > 70, Dates Count',
             font: {{ size: 16, weight: 'bold' }},
             color: '#1e293b'
           }}
@@ -3975,115 +3899,28 @@ function showRankChanges() {{
     const latestRank = parseInt(latestRankText, 10);
     const previousRank = parseInt(previousRankText, 10);
 
-if (!isNaN(latestRank) && !isNaN(previousRank) && previousRank < 500) {{
-        const change = previousRank - latestRank; // Positive means improvement
-        if (change > 0) {{
-          const pctImprovement = previousRank > 0 ? ((change / previousRank) * 100) : 0;
-          stockData.push({{ name: stockName, previousRank: previousRank, latestRank: latestRank, change: change, pctImprovement: pctImprovement }});
-        }}
+    if (!isNaN(latestRank) && !isNaN(previousRank)) {{
+      const change = previousRank - latestRank; // Positive means improvement
+      if (change >= 10) {{
+        stockData.push({{ name: stockName, previousRank: previousRank, latestRank: latestRank, change: change }});
       }}
-    }});
+    }}
+  }});
 
-    // Sort by largest percentage improvement and take top 10
-    stockData.sort((a, b) => b.pctImprovement - a.pctImprovement);
-    const topImprovers = stockData.slice(0, 10);
+  // Sort by largest improvement (highest change) and take top 10
+  stockData.sort((a, b) => b.change - a.change);
+  const topImprovers = stockData.slice(0, 10);
 
-  // Display in info panel as a styled table
+  // Display in info panel
   const infoPanel = document.getElementById('rankChangesList');
-  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers (Yesterday vs Today, Yesterday Rank &lt; 500)</h4>';
-
-  if (topImprovers.length === 0) {{
-    const noData = document.createElement('p');
-    noData.textContent = 'No rank improvements found for the latest date transition.';
-    noData.style.color = 'var(--text-light)';
-    infoPanel.appendChild(noData);
-    return;
-  }}
-
-  const tableEl = document.createElement('table');
-  tableEl.style.width = '100%';
-  tableEl.style.borderCollapse = 'separate';
-  tableEl.style.borderSpacing = '0';
-  tableEl.style.fontSize = '0.92rem';
-  tableEl.style.borderRadius = '12px';
-  tableEl.style.overflow = 'hidden';
-  tableEl.style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)';
-
-  const thead = document.createElement('thead');
-  const headerRow = document.createElement('tr');
-  ['Rank', 'Stock', 'Yesterday Rank', 'Today Rank', 'Improvement', 'Improvement %'].forEach(text => {{
-    const th = document.createElement('th');
-    th.textContent = text;
-    th.style.padding = '14px 16px';
-    th.style.background = 'linear-gradient(135deg, #1e293b 0%, #334155 100%)';
-    th.style.color = 'white';
-    th.style.textAlign = 'left';
-    th.style.fontFamily = "'Montserrat', sans-serif";
-    th.style.fontWeight = '700';
-    th.style.fontSize = '0.82rem';
-    th.style.textTransform = 'uppercase';
-    th.style.letterSpacing = '0.6px';
-    th.style.borderBottom = '2px solid rgba(255,255,255,0.1)';
-    headerRow.appendChild(th);
+  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers (Yesterday vs Today)</h4>';
+  const list = document.createElement('ol');
+  topImprovers.forEach((stock, index) => {{
+    const item = document.createElement('li');
+    item.innerHTML = `<strong>${{stock.name}}</strong> - Yesterday Rank: ${{Math.floor(stock.previousRank / 10)}}, Today Rank: ${{Math.floor(stock.latestRank / 10)}}`;
+    list.appendChild(item);
   }});
-  thead.appendChild(headerRow);
-  tableEl.appendChild(thead);
-
-  const tbody = document.createElement('tbody');
-  topImprovers.forEach((stock, idx) => {{
-    const tr = document.createElement('tr');
-    tr.style.transition = 'all 0.2s';
-    if (idx % 2 === 1) tr.style.background = '#f8fafc';
-
-    const tdRank = document.createElement('td');
-    tdRank.textContent = idx + 1;
-    tdRank.style.padding = '14px 16px';
-    tdRank.style.fontWeight = '700';
-    tdRank.style.color = 'var(--primary)';
-    tdRank.style.textAlign = 'center';
-
-    const tdName = document.createElement('td');
-    tdName.textContent = stock.name;
-    tdName.style.padding = '14px 16px';
-    tdName.style.fontWeight = '600';
-
-    const tdPrev = document.createElement('td');
-    tdPrev.textContent = stock.previousRank;
-    tdPrev.style.padding = '14px 16px';
-    tdPrev.style.textAlign = 'center';
-
-    const tdCurr = document.createElement('td');
-    tdCurr.textContent = stock.latestRank;
-    tdCurr.style.padding = '14px 16px';
-    tdCurr.style.color = 'var(--success)';
-    tdCurr.style.fontWeight = '700';
-    tdCurr.style.textAlign = 'center';
-
-    const tdImprove = document.createElement('td');
-    tdImprove.textContent = '+' + stock.change;
-    tdImprove.style.padding = '14px 16px';
-    tdImprove.style.color = 'var(--success)';
-    tdImprove.style.fontWeight = '700';
-    tdImprove.style.textAlign = 'center';
-
-    const tdPct = document.createElement('td');
-    tdPct.textContent = '+' + stock.pctImprovement.toFixed(1) + '%';
-    tdPct.style.padding = '14px 16px';
-    tdPct.style.color = '#10b981';
-    tdPct.style.fontWeight = '800';
-    tdPct.style.textAlign = 'center';
-    tdPct.style.background = 'rgba(16, 185, 129, 0.15)';
-
-    tr.appendChild(tdRank);
-    tr.appendChild(tdName);
-    tr.appendChild(tdPrev);
-    tr.appendChild(tdCurr);
-    tr.appendChild(tdImprove);
-    tr.appendChild(tdPct);
-    tbody.appendChild(tr);
-  }});
-  tableEl.appendChild(tbody);
-  infoPanel.appendChild(tableEl);
+  infoPanel.appendChild(list);
 }}
 
 let historyRankData = null;
@@ -4113,7 +3950,7 @@ function showHistoryRank() {{
   // Sort rank columns by date
   rankColumns.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-// Pre-compute top 10 improvers for each date transition
+  // Pre-compute top 10 improvers for each date transition
   const dailyTop10Map = {{}};
   const dailyTop10Stocks = {{}};
   for (let i = 1; i < rankColumns.length; i++) {{
@@ -4127,22 +3964,20 @@ function showHistoryRank() {{
       const prevRank = parseInt(prevRankText, 10);
       const currRank = parseInt(currRankText, 10);
 
-      if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0 && prevRank < 500) {{
+      if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0) {{
         const improvement = prevRank - currRank;
         if (improvement > 0) {{
-          const pctImprovement = (improvement / prevRank) * 100;
           stockData.push({{
             name: stockName,
             prevRank: prevRank,
             currRank: currRank,
-            improvement: improvement,
-            pctImprovement: pctImprovement
+            improvement: improvement
           }});
         }}
       }}
     }});
 
-    stockData.sort((a, b) => b.pctImprovement - a.pctImprovement);
+    stockData.sort((a, b) => b.improvement - a.improvement);
     const top10 = stockData.slice(0, 10);
     dailyTop10Map[currCol.date] = top10;
     top10.forEach(s => {{
@@ -4180,7 +4015,7 @@ function renderHistoryRankAllDates(startDate, endDate) {{
   const {{ dailyTop10Map, dailyTop10Stocks, rankColumns }} = historyRankData;
 
   const infoPanel = document.getElementById('historyRankList');
-  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers by Date Transition (Yesterday Rank &lt; 500)</h4>';
+  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers by Date Transition</h4>';
 
   const counts = historyRankData.dailyTop10Stocks || {{}};
   const top5 = Object.entries(counts)
@@ -4273,7 +4108,7 @@ function renderHistoryRankAllDates(startDate, endDate) {{
 
       const thead = document.createElement('thead');
       const headerRow = document.createElement('tr');
-      ['Rank', 'Stock', 'Also In Top 10 Dates', 'Count of Dates', 'Show Details', 'Previous Rank', 'Current Rank', 'Improvement', 'Improvement %'].forEach(text => {{
+      ['Rank', 'Stock', 'Also In Top 10 Dates', 'Count of Dates', 'Show Details', 'Previous Rank', 'Current Rank', 'Improvement'].forEach(text => {{
         const th = document.createElement('th');
         th.textContent = text;
         th.style.padding = '14px 16px';
@@ -4352,31 +4187,23 @@ function renderHistoryRankAllDates(startDate, endDate) {{
         tdAction.appendChild(showBtn);
 
         const tdPrev = document.createElement('td');
-        tdPrev.textContent = stock.prevRank;
+        tdPrev.textContent = stock.prevRank / 10;
         tdPrev.style.padding = '14px 16px';
         tdPrev.style.textAlign = 'center';
 
         const tdCurr = document.createElement('td');
-        tdCurr.textContent = stock.currRank;
+        tdCurr.textContent = stock.currRank / 10;
         tdCurr.style.padding = '14px 16px';
         tdCurr.style.color = 'var(--success)';
         tdCurr.style.fontWeight = '700';
         tdCurr.style.textAlign = 'center';
 
         const tdImprove = document.createElement('td');
-        tdImprove.textContent = '+' + stock.improvement;
+        tdImprove.textContent = '+' + (stock.improvement / 10);
         tdImprove.style.padding = '14px 16px';
         tdImprove.style.color = 'var(--success)';
         tdImprove.style.fontWeight = '700';
         tdImprove.style.textAlign = 'center';
-
-        const tdImprovePct = document.createElement('td');
-        const improvePct = stock.prevRank > 0 ? ((stock.improvement / stock.prevRank) * 100) : 0;
-        tdImprovePct.textContent = '+' + improvePct.toFixed(1) + '%';
-        tdImprovePct.style.padding = '14px 16px';
-        tdImprovePct.style.color = 'var(--success)';
-        tdImprovePct.style.fontWeight = '700';
-        tdImprovePct.style.textAlign = 'center';
 
         tr.appendChild(tdRank);
         tr.appendChild(tdName);
@@ -4386,7 +4213,6 @@ function renderHistoryRankAllDates(startDate, endDate) {{
         tr.appendChild(tdPrev);
         tr.appendChild(tdCurr);
         tr.appendChild(tdImprove);
-        tr.appendChild(tdImprovePct);
         tbody.appendChild(tr);
       }});
       tableEl.appendChild(tbody);
@@ -4592,7 +4418,7 @@ function renderHistoryRankForDate(selectedDate, startDate, endDate) {{
 
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  ['Rank', 'Stock', 'Also In Top 10 Dates', 'Count of Dates', 'Show Details', 'Previous Rank', 'Current Rank', 'Improvement', 'Improvement %'].forEach(text => {{
+  ['Rank', 'Stock', 'Also In Top 10 Dates', 'Count of Dates', 'Show Details', 'Previous Rank', 'Current Rank', 'Improvement'].forEach(text => {{
     const th = document.createElement('th');
     th.textContent = text;
     th.style.padding = '14px 16px';
@@ -4671,31 +4497,23 @@ function renderHistoryRankForDate(selectedDate, startDate, endDate) {{
     tdAction.appendChild(showBtn);
 
     const tdPrev = document.createElement('td');
-    tdPrev.textContent = stock.prevRank;
+    tdPrev.textContent = stock.prevRank / 10;
     tdPrev.style.padding = '14px 16px';
     tdPrev.style.textAlign = 'center';
 
     const tdCurr = document.createElement('td');
-    tdCurr.textContent = stock.currRank;
+    tdCurr.textContent = stock.currRank / 10;
     tdCurr.style.padding = '14px 16px';
     tdCurr.style.color = 'var(--success)';
     tdCurr.style.fontWeight = '700';
     tdCurr.style.textAlign = 'center';
 
     const tdImprove = document.createElement('td');
-    tdImprove.textContent = '+' + stock.improvement;
+    tdImprove.textContent = '+' + (stock.improvement / 10);
     tdImprove.style.padding = '14px 16px';
     tdImprove.style.color = 'var(--success)';
     tdImprove.style.fontWeight = '700';
     tdImprove.style.textAlign = 'center';
-
-    const tdImprovePct = document.createElement('td');
-    const improvePct = stock.prevRank > 0 ? ((stock.improvement / stock.prevRank) * 100) : 0;
-    tdImprovePct.textContent = '+' + improvePct.toFixed(1) + '%';
-    tdImprovePct.style.padding = '14px 16px';
-    tdImprovePct.style.color = 'var(--success)';
-    tdImprovePct.style.fontWeight = '700';
-    tdImprovePct.style.textAlign = 'center';
 
     tr.appendChild(tdRank);
     tr.appendChild(tdName);
@@ -4705,7 +4523,6 @@ function renderHistoryRankForDate(selectedDate, startDate, endDate) {{
     tr.appendChild(tdPrev);
     tr.appendChild(tdCurr);
     tr.appendChild(tdImprove);
-    tr.appendChild(tdImprovePct);
     tbody.appendChild(tr);
   }});
   tableEl.appendChild(tbody);
