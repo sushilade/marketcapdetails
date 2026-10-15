@@ -442748,19 +442748,19 @@ if (!isNaN(latestRank) && !isNaN(previousRank) && previousRank < 500) {
     tdName.style.fontWeight = '600';
 
     const tdPrev = document.createElement('td');
-    tdPrev.textContent = Math.floor(stock.previousRank / 10);
+    tdPrev.textContent = stock.previousRank;
     tdPrev.style.padding = '14px 16px';
     tdPrev.style.textAlign = 'center';
 
     const tdCurr = document.createElement('td');
-    tdCurr.textContent = Math.floor(stock.latestRank / 10);
+    tdCurr.textContent = stock.latestRank;
     tdCurr.style.padding = '14px 16px';
     tdCurr.style.color = 'var(--success)';
     tdCurr.style.fontWeight = '700';
     tdCurr.style.textAlign = 'center';
 
     const tdImprove = document.createElement('td');
-    tdImprove.textContent = '+' + (stock.change / 10);
+    tdImprove.textContent = '+' + stock.change;
     tdImprove.style.padding = '14px 16px';
     tdImprove.style.color = 'var(--success)';
     tdImprove.style.fontWeight = '700';
@@ -443052,19 +443052,19 @@ function renderHistoryRankAllDates(startDate, endDate) {
         tdAction.appendChild(showBtn);
 
         const tdPrev = document.createElement('td');
-        tdPrev.textContent = stock.prevRank / 10;
+        tdPrev.textContent = stock.prevRank;
         tdPrev.style.padding = '14px 16px';
         tdPrev.style.textAlign = 'center';
 
         const tdCurr = document.createElement('td');
-        tdCurr.textContent = stock.currRank / 10;
+        tdCurr.textContent = stock.currRank;
         tdCurr.style.padding = '14px 16px';
         tdCurr.style.color = 'var(--success)';
         tdCurr.style.fontWeight = '700';
         tdCurr.style.textAlign = 'center';
 
         const tdImprove = document.createElement('td');
-        tdImprove.textContent = '+' + (stock.improvement / 10);
+        tdImprove.textContent = '+' + stock.improvement;
         tdImprove.style.padding = '14px 16px';
         tdImprove.style.color = 'var(--success)';
         tdImprove.style.fontWeight = '700';
@@ -443371,19 +443371,19 @@ function renderHistoryRankForDate(selectedDate, startDate, endDate) {
     tdAction.appendChild(showBtn);
 
     const tdPrev = document.createElement('td');
-    tdPrev.textContent = stock.prevRank / 10;
+    tdPrev.textContent = stock.prevRank;
     tdPrev.style.padding = '14px 16px';
     tdPrev.style.textAlign = 'center';
 
     const tdCurr = document.createElement('td');
-    tdCurr.textContent = stock.currRank / 10;
+    tdCurr.textContent = stock.currRank;
     tdCurr.style.padding = '14px 16px';
     tdCurr.style.color = 'var(--success)';
     tdCurr.style.fontWeight = '700';
     tdCurr.style.textAlign = 'center';
 
     const tdImprove = document.createElement('td');
-    tdImprove.textContent = '+' + (stock.improvement / 10);
+    tdImprove.textContent = '+' + stock.improvement;
     tdImprove.style.padding = '14px 16px';
     tdImprove.style.color = 'var(--success)';
     tdImprove.style.fontWeight = '700';
