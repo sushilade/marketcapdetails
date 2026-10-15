@@ -3977,13 +3977,14 @@ function showRankChanges() {{
     if (!isNaN(latestRank) && !isNaN(previousRank) && previousRank < 500) {{
       const change = previousRank - latestRank; // Positive means improvement
       if (change >= 10) {{
-        stockData.push({{ name: stockName, previousRank: previousRank, latestRank: latestRank, change: change }});
+        const pctImprovement = previousRank > 0 ? ((change / previousRank) * 100) : 0;
+        stockData.push({{ name: stockName, previousRank: previousRank, latestRank: latestRank, change: change, pctImprovement: pctImprovement }});
       }}
     }}
   }});
 
-  // Sort by largest improvement (highest change) and take top 10
-  stockData.sort((a, b) => b.change - a.change);
+  // Sort by largest percentage improvement and take top 10
+  stockData.sort((a, b) => b.pctImprovement - a.pctImprovement);
   const topImprovers = stockData.slice(0, 10);
 
   // Display in info panel
@@ -3992,7 +3993,7 @@ function showRankChanges() {{
   const list = document.createElement('ol');
   topImprovers.forEach((stock, index) => {{
     const item = document.createElement('li');
-    item.innerHTML = `<strong>${{stock.name}}</strong> - Yesterday Rank: ${{Math.floor(stock.previousRank / 10)}}, Today Rank: ${{Math.floor(stock.latestRank / 10)}}`;
+    item.innerHTML = `<strong>${{stock.name}}</strong> - Yesterday Rank: ${{Math.floor(stock.previousRank / 10)}}, Today Rank: ${{Math.floor(stock.latestRank / 10)}}, Improvement: <span style="color:#10b981;font-weight:700;">+${{stock.pctImprovement.toFixed(1)}}%</span>`;
     list.appendChild(item);
   }});
   infoPanel.appendChild(list);
@@ -4039,21 +4040,22 @@ function showHistoryRank() {{
       const prevRank = parseInt(prevRankText, 10);
       const currRank = parseInt(currRankText, 10);
 
-      if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0 && prevRank < 500) {{
+if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0 && prevRank < 500) {{
         const improvement = prevRank - currRank;
         if (improvement > 0) {{
+          const pctImprovement = (improvement / prevRank) * 100;
           stockData.push({{
             name: stockName,
             prevRank: prevRank,
             currRank: currRank,
-            improvement: improvement
+            improvement: improvement,
+            pctImprovement: pctImprovement
           }});
         }}
       }}
-    }});
 
-    stockData.sort((a, b) => b.improvement - a.improvement);
-    const top10 = stockData.slice(0, 10);
+      stockData.sort((a, b) => b.pctImprovement - a.pctImprovement);
+      const top10 = stockData.slice(0, 10);
     dailyTop10Map[currCol.date] = top10;
     top10.forEach(s => {{
       if (!dailyTop10Stocks[s.name]) dailyTop10Stocks[s.name] = [];
@@ -4183,7 +4185,7 @@ function renderHistoryRankAllDates(startDate, endDate) {{
 
       const thead = document.createElement('thead');
       const headerRow = document.createElement('tr');
-      ['Rank', 'Stock', 'Also In Top 10 Dates', 'Count of Dates', 'Show Details', 'Previous Rank', 'Current Rank', 'Improvement'].forEach(text => {{
+      ['Rank', 'Stock', 'Also In Top 10 Dates', 'Count of Dates', 'Show Details', 'Previous Rank', 'Current Rank', 'Improvement', 'Improvement %'].forEach(text => {{
         const th = document.createElement('th');
         th.textContent = text;
         th.style.padding = '14px 16px';
@@ -4280,6 +4282,14 @@ function renderHistoryRankAllDates(startDate, endDate) {{
         tdImprove.style.fontWeight = '700';
         tdImprove.style.textAlign = 'center';
 
+        const tdImprovePct = document.createElement('td');
+        const improvePct = stock.prevRank > 0 ? ((stock.improvement / stock.prevRank) * 100) : 0;
+        tdImprovePct.textContent = '+' + improvePct.toFixed(1) + '%';
+        tdImprovePct.style.padding = '14px 16px';
+        tdImprovePct.style.color = 'var(--success)';
+        tdImprovePct.style.fontWeight = '700';
+        tdImprovePct.style.textAlign = 'center';
+
         tr.appendChild(tdRank);
         tr.appendChild(tdName);
         tr.appendChild(tdDates);
@@ -4288,6 +4298,7 @@ function renderHistoryRankAllDates(startDate, endDate) {{
         tr.appendChild(tdPrev);
         tr.appendChild(tdCurr);
         tr.appendChild(tdImprove);
+        tr.appendChild(tdImprovePct);
         tbody.appendChild(tr);
       }});
       tableEl.appendChild(tbody);
@@ -4493,7 +4504,7 @@ function renderHistoryRankForDate(selectedDate, startDate, endDate) {{
 
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  ['Rank', 'Stock', 'Also In Top 10 Dates', 'Count of Dates', 'Show Details', 'Previous Rank', 'Current Rank', 'Improvement'].forEach(text => {{
+  ['Rank', 'Stock', 'Also In Top 10 Dates', 'Count of Dates', 'Show Details', 'Previous Rank', 'Current Rank', 'Improvement', 'Improvement %'].forEach(text => {{
     const th = document.createElement('th');
     th.textContent = text;
     th.style.padding = '14px 16px';
@@ -4590,6 +4601,14 @@ function renderHistoryRankForDate(selectedDate, startDate, endDate) {{
     tdImprove.style.fontWeight = '700';
     tdImprove.style.textAlign = 'center';
 
+    const tdImprovePct = document.createElement('td');
+    const improvePct = stock.prevRank > 0 ? ((stock.improvement / stock.prevRank) * 100) : 0;
+    tdImprovePct.textContent = '+' + improvePct.toFixed(1) + '%';
+    tdImprovePct.style.padding = '14px 16px';
+    tdImprovePct.style.color = 'var(--success)';
+    tdImprovePct.style.fontWeight = '700';
+    tdImprovePct.style.textAlign = 'center';
+
     tr.appendChild(tdRank);
     tr.appendChild(tdName);
     tr.appendChild(tdDates);
@@ -4598,6 +4617,7 @@ function renderHistoryRankForDate(selectedDate, startDate, endDate) {{
     tr.appendChild(tdPrev);
     tr.appendChild(tdCurr);
     tr.appendChild(tdImprove);
+    tr.appendChild(tdImprovePct);
     tbody.appendChild(tr);
   }});
   tableEl.appendChild(tbody);
