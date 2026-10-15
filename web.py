@@ -3988,16 +3988,102 @@ function showRankChanges() {{
   stockData.sort((a, b) => b.pctImprovement - a.pctImprovement);
   const topImprovers = stockData.slice(0, 10);
 
-  // Display in info panel
+  // Display in info panel as a styled table
   const infoPanel = document.getElementById('rankChangesList');
   infoPanel.innerHTML = '<h4>Top 10 Rank Improvers (Yesterday vs Today, Yesterday Rank &lt; 500)</h4>';
-  const list = document.createElement('ol');
-  topImprovers.forEach((stock, index) => {{
-    const item = document.createElement('li');
-    item.innerHTML = `<strong>${{stock.name}}</strong> - Yesterday Rank: ${{Math.floor(stock.previousRank / 10)}}, Today Rank: ${{Math.floor(stock.latestRank / 10)}}, Improvement: <span style="color:#10b981;font-weight:700;">+${{stock.pctImprovement.toFixed(1)}}%</span>`;
-    list.appendChild(item);
+
+  if (topImprovers.length === 0) {{
+    const noData = document.createElement('p');
+    noData.textContent = 'No rank improvements of 10 or more points found.';
+    noData.style.color = 'var(--text-light)';
+    infoPanel.appendChild(noData);
+    return;
+  }}
+
+  const tableEl = document.createElement('table');
+  tableEl.style.width = '100%';
+  tableEl.style.borderCollapse = 'separate';
+  tableEl.style.borderSpacing = '0';
+  tableEl.style.fontSize = '0.92rem';
+  tableEl.style.borderRadius = '12px';
+  tableEl.style.overflow = 'hidden';
+  tableEl.style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)';
+
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  ['Rank', 'Stock', 'Yesterday Rank', 'Today Rank', 'Improvement', 'Improvement %'].forEach(text => {{
+    const th = document.createElement('th');
+    th.textContent = text;
+    th.style.padding = '14px 16px';
+    th.style.background = 'linear-gradient(135deg, #1e293b 0%, #334155 100%)';
+    th.style.color = 'white';
+    th.style.textAlign = 'left';
+    th.style.fontFamily = "'Montserrat', sans-serif";
+    th.style.fontWeight = '700';
+    th.style.fontSize = '0.82rem';
+    th.style.textTransform = 'uppercase';
+    th.style.letterSpacing = '0.6px';
+    th.style.borderBottom = '2px solid rgba(255,255,255,0.1)';
+    headerRow.appendChild(th);
   }});
-  infoPanel.appendChild(list);
+  thead.appendChild(headerRow);
+  tableEl.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  topImprovers.forEach((stock, idx) => {{
+    const tr = document.createElement('tr');
+    tr.style.transition = 'all 0.2s';
+    if (idx % 2 === 1) tr.style.background = '#f8fafc';
+
+    const tdRank = document.createElement('td');
+    tdRank.textContent = idx + 1;
+    tdRank.style.padding = '14px 16px';
+    tdRank.style.fontWeight = '700';
+    tdRank.style.color = 'var(--primary)';
+    tdRank.style.textAlign = 'center';
+
+    const tdName = document.createElement('td');
+    tdName.textContent = stock.name;
+    tdName.style.padding = '14px 16px';
+    tdName.style.fontWeight = '600';
+
+    const tdPrev = document.createElement('td');
+    tdPrev.textContent = Math.floor(stock.previousRank / 10);
+    tdPrev.style.padding = '14px 16px';
+    tdPrev.style.textAlign = 'center';
+
+    const tdCurr = document.createElement('td');
+    tdCurr.textContent = Math.floor(stock.latestRank / 10);
+    tdCurr.style.padding = '14px 16px';
+    tdCurr.style.color = 'var(--success)';
+    tdCurr.style.fontWeight = '700';
+    tdCurr.style.textAlign = 'center';
+
+    const tdImprove = document.createElement('td');
+    tdImprove.textContent = '+' + (stock.change / 10);
+    tdImprove.style.padding = '14px 16px';
+    tdImprove.style.color = 'var(--success)';
+    tdImprove.style.fontWeight = '700';
+    tdImprove.style.textAlign = 'center';
+
+    const tdPct = document.createElement('td');
+    tdPct.textContent = '+' + stock.pctImprovement.toFixed(1) + '%';
+    tdPct.style.padding = '14px 16px';
+    tdPct.style.color = '#10b981';
+    tdPct.style.fontWeight = '800';
+    tdPct.style.textAlign = 'center';
+    tdPct.style.background = 'rgba(16, 185, 129, 0.15)';
+
+    tr.appendChild(tdRank);
+    tr.appendChild(tdName);
+    tr.appendChild(tdPrev);
+    tr.appendChild(tdCurr);
+    tr.appendChild(tdImprove);
+    tr.appendChild(tdPct);
+    tbody.appendChild(tr);
+  }});
+  tableEl.appendChild(tbody);
+  infoPanel.appendChild(tableEl);
 }}
 
 let historyRankData = null;
