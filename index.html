@@ -439697,7 +439697,8 @@
         </div>
         <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
           <label for="marketcapCandleStockSelect" style="font-weight: 700; color: var(--primary); font-size: 0.95rem;">Select Stock:</label>
-          <select id="marketcapCandleStockSelect" onchange="drawMarketcapCandle(); updateMarketcapCandleActionButtons()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 220px;"></select>
+          <input type="text" id="marketcapCandleStockSelect" list="marketcapCandleStockOptions" onchange="drawMarketcapCandle(); updateMarketcapCandleActionButtons()" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; min-width: 220px;">
+          <datalist id="marketcapCandleStockOptions"></datalist>
         </div>
         <div id="marketcapCandleTooltip" class="rank-tooltip" style="display: none;"></div>
         <div style="position: relative; height: 480px;">
@@ -439745,9 +439746,10 @@
          <i class="fas fa-chart-candle"></i> Marketcap Graph
        </button>
       
-      <div class="controls" style="margin-bottom: 20px; padding: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);">
-        <label for="stockSelect" style="font-weight: 700; color: var(--primary); margin-right: 12px; font-size: 0.95rem;">Select Stock:</label>
-        <select id="stockSelect" onchange="const d=getStockAnalysisDuration();updateChart(d?d.start:'',d?d.end:'');" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s; min-width: 200px;"></select>
+<div class="controls" style="margin-bottom: 20px; padding: 20px; background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);">
+         <label for="stockSelect" style="font-weight: 700; color: var(--primary); margin-right: 12px; font-size: 0.95rem;">Select Stock:</label>
+         <input type="text" id="stockSelect" list="stockSelectOptions" onchange="const d=getStockAnalysisDuration();updateChart(d?d.start:'',d?d.end:'');" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.3s; min-width: 200px;">
+         <datalist id="stockSelectOptions"></datalist>
         <button onclick="openTradingView()" style="margin-left: 15px; padding: 12px 20px; background: linear-gradient(135deg, #2962FF 0%, #1E53E5 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(41, 98, 255, 0.3); transition: all 0.3s;">
           <i class="fas fa-chart-line"></i> View on TradingView
         </button>
@@ -439812,7 +439814,7 @@
         <div style="padding: 20px;">
           <div id="topPerformersRegularControl">
             <div class="info-panel" id="topPerformersList">
-              <p>Click "Show Top Performers" to display the list of top 10 stocks by delivery percentage.</p>
+              <p>Click "Show Top Performers" to display the list of top 10 stocks by delivery percentage (rank less than 500, names only).</p>
             </div>
 
             <button onclick="showTopPerformers()" id="showTopPerformersBtn" style="margin-top: 15px;">
@@ -439832,8 +439834,8 @@
         </div>
       </div>
 
-      <div class="chart-container" id="topPerformersChartContainer" style="margin-top: 24px; display: none;">
-        <h4 style="margin-bottom: 16px; color: var(--secondary); font-family: 'Montserrat', sans-serif;">🏆 Top 10 by Delivery Qty &gt; 70, Dates Count</h4>
+<div class="chart-container" id="topPerformersChartContainer" style="margin-top: 24px; display: none;">
+        <h4 style="margin-bottom: 16px; color: var(--secondary); font-family: 'Montserrat', sans-serif;">🏆 Top 10 by Delivery Qty > 70, Dates Count (Rank < 500)</h4>
         <div style="position: relative; height: 350px;">
           <canvas id="topPerformersChart"></canvas>
         </div>
@@ -439845,7 +439847,7 @@
       <h3><i class="fas fa-arrow-up"></i> Top 10 Rank Improvers</h3>
 
       <div class="info-panel" id="rankChangesList">
-        <p>Click "Show Rank Changes" to display stocks with the biggest rank improvements (yesterday vs today).</p>
+        <p>Click "Show Rank Changes" to display stocks with the biggest rank improvements (yesterday vs today), only stocks with Yesterday Rank less than 500.</p>
       </div>
 
       <button onclick="showRankChanges()" id="showRankChangesBtn">
@@ -439889,7 +439891,7 @@
       </div>
 
       <div class="info-panel" id="historyRankList">
-        <p>Click "Show History Rank" to display top 10 rank improvers for each date transition.</p>
+        <p>Click "Show History Rank" to display top 10 rank improvers for each date transition, only stocks with Yesterday Rank less than 500.</p>
       </div>
 
       <button onclick="showHistoryRank()" id="showHistoryRankBtn" style="padding: 14px 28px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px;">
@@ -440702,21 +440704,21 @@ function populateMarketcapCandleDropdown(selectedStock) {
   const table = document.getElementById('marketTable');
   if (!table) return;
   const rows = Array.from(table.querySelectorAll('tbody tr'));
-  const select = document.getElementById('marketcapCandleStockSelect');
-  if (!select) return;
-  const currentStock = selectedStock || select.value;
-  select.innerHTML = '';
+  const input = document.getElementById('marketcapCandleStockSelect');
+  const datalist = document.getElementById('marketcapCandleStockOptions');
+  if (!input || !datalist) return;
+  const currentStock = selectedStock || input.value;
+  datalist.innerHTML = '';
   rows.forEach(row => {
     const nameCell = row.cells[0];
     if (nameCell) {
       const opt = document.createElement('option');
       opt.value = nameCell.textContent.trim();
-      opt.textContent = nameCell.textContent.trim();
-      select.appendChild(opt);
+      datalist.appendChild(opt);
     }
   });
-  if (currentStock && Array.from(select.options).some(option => option.value === currentStock)) {
-    select.value = currentStock;
+  if (currentStock) {
+    input.value = currentStock;
   }
   updateMarketcapCandleActionButtons();
 }
@@ -441786,15 +441788,14 @@ let stockChart;
 function loadStockList() {
   const table = document.getElementById('marketTable');
   const rows = Array.from(table.querySelectorAll('tbody tr'));
-  const select = document.getElementById('stockSelect');
-  select.innerHTML = "";
+  const datalist = document.getElementById('stockSelectOptions');
+  datalist.innerHTML = "";
   rows.forEach(row => {
     const stock = row.cells[0].textContent.trim();
     if (stock) {
       const option = document.createElement('option');
       option.value = stock;
-      option.textContent = stock;
-      select.appendChild(option);
+      datalist.appendChild(option);
     }
   });
 }
@@ -442336,15 +442337,30 @@ function showTopPerformers() {
     }
   }
 
+  // Find the latest rank column
+  let rankColIndex = -1;
+  for (let i = headers.length - 1; i >= 1; i--) {
+    const headerText = headers[i].textContent.trim().toLowerCase();
+    if (headerText.includes('rank')) {
+      rankColIndex = i;
+      break;
+    }
+  }
+
   if (deliveryColIndex === -1) {
     alert('No delivery columns found!');
     return;
   }
 
-  // Collect stock data with delivery values
+  // Collect stock data with delivery values (only rank < 500)
   const stockData = [];
   rows.forEach(row => {
     const stockName = row.cells[0].textContent.trim();
+    if (rankColIndex !== -1) {
+      const rankText = row.cells[rankColIndex]?.textContent.trim().replace(/,/g, '') || '';
+      const rank = parseInt(rankText);
+      if (isNaN(rank) || rank >= 500) return;
+    }
     const deliveryText = row.cells[deliveryColIndex]?.textContent.trim().replace(/,/g, '').replace('%', '') || '';
     const delivery = parseFloat(deliveryText);
     if (!isNaN(delivery) && delivery > 0) {
@@ -442356,9 +442372,9 @@ function showTopPerformers() {
   stockData.sort((a, b) => b.delivery - a.delivery);
   const top10 = stockData.slice(0, 10);
 
-  // Display in info panel
+  // Display in info panel (names only)
   const infoPanel = document.getElementById('topPerformersList');
-  infoPanel.innerHTML = '<h4>Top 10 Stocks by Delivery Percentage</h4>';
+  infoPanel.innerHTML = '<h4>Top 10 Stocks by Delivery Percentage (Rank &lt; 500)</h4>';
   const list = document.createElement('ol');
   top10.forEach((stock, index) => {
     const item = document.createElement('li');
@@ -442369,9 +442385,7 @@ function showTopPerformers() {
     nameSpan.style.cursor = 'pointer';
     nameSpan.style.textDecoration = 'underline';
     nameSpan.onclick = function() { showStockDetails(stock.name, 'topPerformers'); };
-    const deliveryText = document.createTextNode(' - ' + stock.delivery.toFixed(2) + '%');
     item.appendChild(nameSpan);
-    item.appendChild(deliveryText);
     list.appendChild(item);
   });
   infoPanel.appendChild(list);
@@ -442395,9 +442409,51 @@ function showTopPerformersDuration(startDate, endDate) {
     }
   });
 
+  // Find rank columns with dates to match selected date range
+  const rankColumns = [];
+  headers.forEach((header, index) => {
+    if (index > 0 && header.textContent.trim().toLowerCase().includes('rank')) {
+      const headerText = header.textContent.trim();
+      const dateMatch = headerText.match(/(\d{4}-\d{2}-\d{2})/);
+      if (dateMatch) {
+        rankColumns.push({ index: index, date: dateMatch[1] });
+      }
+    }
+  });
+
   const stockDeliveryCounts = [];
   rows.forEach(row => {
     const stockName = row.cells[0].textContent.trim();
+    
+    // Find rank column for the selected end date (or latest if no end date)
+    let rankColIndex = -1;
+    if (rankColumns.length > 0) {
+      if (endDate) {
+        // Find rank column on or before endDate
+        const candidates = rankColumns.filter(rc => rc.date <= endDate);
+        if (candidates.length > 0) {
+          // Use the latest rank column on or before endDate
+          candidates.sort((a, b) => new Date(b.date) - new Date(a.date));
+          rankColIndex = candidates[0].index;
+        } else {
+          // No rank column before endDate, use earliest
+          rankColumns.sort((a, b) => new Date(a.date) - new Date(b.date));
+          rankColIndex = rankColumns[0].index;
+        }
+      } else {
+        // No end date, use latest rank column
+        rankColumns.sort((a, b) => new Date(b.date) - new Date(a.date));
+        rankColIndex = rankColumns[0].index;
+      }
+    }
+
+    // Check rank < 500
+    if (rankColIndex !== -1) {
+      const rankText = row.cells[rankColIndex]?.textContent.trim().replace(/,/g, '') || '';
+      const rank = parseInt(rankText);
+      if (isNaN(rank) || rank >= 500) return;
+    }
+    
     let count = 0;
     allDeliveryIndices.forEach(colIndex => {
       const colDate = deliveryDateMap[colIndex];
@@ -442475,8 +442531,8 @@ function showTopPerformersDuration(startDate, endDate) {
           title: {
             display: true,
             text: startDate && endDate
-              ? '🏆 Top 10 by Delivery Qty > 70, Dates Count (' + startDate + ' to ' + endDate + ')'
-              : '🏆 Top 10 by Delivery Qty > 70, Dates Count',
+              ? '🏆 Top 10 by Delivery Qty > 70, Dates Count (Rank < 500) (' + startDate + ' to ' + endDate + ')'
+              : '🏆 Top 10 by Delivery Qty > 70, Dates Count (Rank < 500)',
             font: { size: 16, weight: 'bold' },
             color: '#1e293b'
           }
@@ -442599,7 +442655,7 @@ function showRankChanges() {
     const latestRank = parseInt(latestRankText, 10);
     const previousRank = parseInt(previousRankText, 10);
 
-    if (!isNaN(latestRank) && !isNaN(previousRank)) {
+    if (!isNaN(latestRank) && !isNaN(previousRank) && previousRank < 500) {
       const change = previousRank - latestRank; // Positive means improvement
       if (change >= 10) {
         stockData.push({ name: stockName, previousRank: previousRank, latestRank: latestRank, change: change });
@@ -442613,7 +442669,7 @@ function showRankChanges() {
 
   // Display in info panel
   const infoPanel = document.getElementById('rankChangesList');
-  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers (Yesterday vs Today)</h4>';
+  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers (Yesterday vs Today, Yesterday Rank &lt; 500)</h4>';
   const list = document.createElement('ol');
   topImprovers.forEach((stock, index) => {
     const item = document.createElement('li');
@@ -442664,7 +442720,7 @@ function showHistoryRank() {
       const prevRank = parseInt(prevRankText, 10);
       const currRank = parseInt(currRankText, 10);
 
-      if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0) {
+      if (!isNaN(prevRank) && !isNaN(currRank) && prevRank > 0 && currRank > 0 && prevRank < 500) {
         const improvement = prevRank - currRank;
         if (improvement > 0) {
           stockData.push({
@@ -442715,7 +442771,7 @@ function renderHistoryRankAllDates(startDate, endDate) {
   const { dailyTop10Map, dailyTop10Stocks, rankColumns } = historyRankData;
 
   const infoPanel = document.getElementById('historyRankList');
-  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers by Date Transition</h4>';
+  infoPanel.innerHTML = '<h4>Top 10 Rank Improvers by Date Transition (Yesterday Rank &lt; 500)</h4>';
 
   const counts = historyRankData.dailyTop10Stocks || {};
   const top5 = Object.entries(counts)
