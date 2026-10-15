@@ -1360,7 +1360,7 @@ function updateDashboardStats() {{
     }}
   }}
   
-  // Find top performer (highest delivery %)
+  // Find top performer (highest delivery %) - only rank < 500
   let deliveryColIndex = -1;
   for (let i = headers.length - 1; i >= 1; i--) {{
     const headerText = headers[i].textContent.trim().toLowerCase();
@@ -1369,12 +1369,31 @@ function updateDashboardStats() {{
       break;
     }}
   }}
-  
+
+  // Find the latest rank column for filtering
+  let rankColIndex = -1;
+  for (let i = headers.length - 1; i >= 1; i--) {{
+    const headerText = headers[i].textContent.trim().toLowerCase();
+    if (headerText.includes('rank')) {{
+      rankColIndex = i;
+      break;
+    }}
+  }}
+
   if (deliveryColIndex !== -1) {{
     let topPerformer = '';
     let topValue = 0;
-    
+
     rows.forEach(row => {{
+      // Filter: only consider stocks with rank < 500
+      if (rankColIndex !== -1) {{
+        const rankCell = row.cells[rankColIndex];
+        if (rankCell) {{
+          const rankText = rankCell.textContent.trim().replace(/,/g, '') || '';
+          const rank = parseInt(rankText);
+          if (isNaN(rank) || rank >= 500) return;
+        }}
+      }}
       const cell = row.cells[deliveryColIndex];
       if (cell) {{
         const value = parseFloat(cell.textContent.trim().replace(/,/g, '').replace('%', ''));
@@ -1384,7 +1403,7 @@ function updateDashboardStats() {{
         }}
       }}
     }});
-    
+
     if (topPerformer) {{
       document.getElementById('topPerformer').textContent = topPerformer;
     }}
