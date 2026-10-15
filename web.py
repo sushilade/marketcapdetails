@@ -3975,18 +3975,18 @@ function showRankChanges() {{
     const latestRank = parseInt(latestRankText, 10);
     const previousRank = parseInt(previousRankText, 10);
 
-    if (!isNaN(latestRank) && !isNaN(previousRank) && previousRank < 500) {{
-      const change = previousRank - latestRank; // Positive means improvement
-      if (change >= 10) {{
-        const pctImprovement = previousRank > 0 ? ((change / previousRank) * 100) : 0;
-        stockData.push({{ name: stockName, previousRank: previousRank, latestRank: latestRank, change: change, pctImprovement: pctImprovement }});
+if (!isNaN(latestRank) && !isNaN(previousRank) && previousRank < 500) {{
+        const change = previousRank - latestRank; // Positive means improvement
+        if (change > 0) {{
+          const pctImprovement = previousRank > 0 ? ((change / previousRank) * 100) : 0;
+          stockData.push({{ name: stockName, previousRank: previousRank, latestRank: latestRank, change: change, pctImprovement: pctImprovement }});
+        }}
       }}
-    }}
-  }});
+    }});
 
-  // Sort by largest percentage improvement and take top 10
-  stockData.sort((a, b) => b.pctImprovement - a.pctImprovement);
-  const topImprovers = stockData.slice(0, 10);
+    // Sort by largest percentage improvement and take top 10
+    stockData.sort((a, b) => b.pctImprovement - a.pctImprovement);
+    const topImprovers = stockData.slice(0, 10);
 
   // Display in info panel as a styled table
   const infoPanel = document.getElementById('rankChangesList');
@@ -3994,7 +3994,7 @@ function showRankChanges() {{
 
   if (topImprovers.length === 0) {{
     const noData = document.createElement('p');
-    noData.textContent = 'No rank improvements of 10 or more points found.';
+    noData.textContent = 'No rank improvements found for the latest date transition.';
     noData.style.color = 'var(--text-light)';
     infoPanel.appendChild(noData);
     return;
