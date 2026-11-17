@@ -4,13 +4,114 @@ Handles NSE's session requirements automatically
 """
 
 from datetime import datetime
+import json
 import os
 import sqlite3
 from pathlib import Path
 from typing import Any
 
 from nse import NSE
+from nse.transport import Transport, th as nse_th
 from openpyxl import Workbook, load_workbook
+
+
+def _patch_nse_cookie_bootstrap() -> None:
+    """Work around NSE endpoint changes that break cookie initialization/requests."""
+
+    def _set_cookies(self):
+        for url in (
+            "https://www.nseindia.com",
+            "https://www.nseindia.com/market-data/live-equity-market",
+        ):
+            try:
+                r = self._session.get(url, timeout=self.timeout, follow_redirects=True)
+            except Exception:
+                continue
+            if 200 <= r.status_code < 300 and r.cookies:
+                self.cookie_path.write_text(json.dumps(dict(r.cookies)))
+                return r.cookies
+        # Fallback to library default URL if new endpoints fail
+        r = self.request("https://www.nseindia.com/option-chain")
+        if getattr(r, "cookies", None):
+            self.cookie_path.write_text(json.dumps(dict(r.cookies)))
+        return getattr(r, "cookies", {}) or {}
+
+    def _request_follow(self, url, params=None):
+        nse_th.check()
+        try:
+            r = self._session.get(
+                url, params=params, timeout=self.timeout, follow_redirects=True
+            )
+        except Exception as e:
+            import httpx
+
+            if isinstance(e, httpx.ReadTimeout):
+                raise TimeoutError("The request timed out.") from e
+            if isinstance(e, httpx.RemoteProtocolError):
+                self.exit()
+                raise ConnectionError(
+                    "The connection to the remote server was unexpectedly closed."
+                ) from e
+            raise
+        if not 200 <= r.status_code < 300:
+            raise ConnectionError(f"{url} {r.status_code}: {r.reason_phrase}")
+        return r
+
+    Transport._setCookies = _set_cookies
+    Transport.request = _request_follow
+
+    try:
+        from nse.request_transport import RequestTransport
+        import requests.utils
+
+        def _set_cookies_requests(self):
+            for url in (
+                "https://www.nseindia.com",
+                "https://www.nseindia.com/market-data/live-equity-market",
+            ):
+                try:
+                    r = self._session.get(url, timeout=self.timeout, allow_redirects=True)
+                except Exception:
+                    continue
+                if 200 <= r.status_code < 300 and r.cookies:
+                    self.cookie_path.write_text(
+                        json.dumps(requests.utils.dict_from_cookiejar(r.cookies))
+                    )
+                    return r.cookies
+            r = self.request("https://www.nseindia.com/option-chain")
+            cookies = getattr(r, "cookies", None)
+            if cookies:
+                self.cookie_path.write_text(
+                    json.dumps(requests.utils.dict_from_cookiejar(cookies))
+                )
+            return cookies or {}
+
+        def _request_follow_requests(self, url, params=None):
+            nse_th.check()
+            import requests
+
+            try:
+                r = self._session.get(
+                    url, params=params, timeout=self.timeout, allow_redirects=True
+                )
+            except requests.ReadTimeout as e:
+                raise TimeoutError("Request timed out") from e
+            except requests.exceptions.ConnectionError as e:
+                self.exit()
+                raise ConnectionError(
+                    "The connection to the remote server was unexpectedly closed."
+                ) from e
+            if not 200 <= r.status_code < 300:
+                raise ConnectionError(f"{url} {r.status_code}: {r.reason}")
+            return r
+
+        RequestTransport._setCookies = _set_cookies_requests
+        RequestTransport.request = _request_follow_requests
+    except Exception:
+        pass
+
+
+_patch_nse_cookie_bootstrap()
 
 stocks = [
 
@@ -727,7 +828,14 @@ def main():
     print("\nNSE Stock Data Fetcher - Multiple Stocks")
 
     results = []
-    with NSE(download_folder=Path.cwd(), server=False, timeout=20) as nse:
+    download_folder = Path.cwd()
+    try:
+        nse_cm = NSE(download_folder=download_folder, server=False, timeout=20)
+    except Exception as e:
+        print(f"Primary NSE session init failed ({e}), retrying with requests transport...")
+        nse_cm = NSE(download_folder=download_folder, server=False, timeout=20, use_requests_library=True)
+
+    with nse_cm as nse:
         for symbol in stocks:
             data = get_stock_data(nse, symbol)
             if data:
